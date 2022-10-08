@@ -50,7 +50,6 @@ void loop() {
     correction=-1;
   }
   Serial.println(correction);
-  
   motorL->setSpeed(int(125+(correction*125)));
   motorR->setSpeed(int(125-(correction*125)));
 }
