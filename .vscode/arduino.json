@@ -1,6 +1,0 @@
-{
-    "configuration": "mode=on",
-    "board": "arduino:megaavr:uno2018",
-    "programmer": "arduino:medbg",
-    "sketch": "LineFollow\\LineFollow.ino"
-}
