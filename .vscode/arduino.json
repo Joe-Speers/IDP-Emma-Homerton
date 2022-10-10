@@ -1,8 +1,0 @@
-{
-    "configuration": "mode=on",
-    "board": "arduino:megaavr:uno2018",
-    "programmer": "arduino:medbg",
-    "port": "COM7",
-    "sketch": "LineFollow\\LineFollow.ino",
-    "output": "../ArduinoOutput"
-}
