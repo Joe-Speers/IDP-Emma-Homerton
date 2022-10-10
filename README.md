@@ -1,10 +1,6 @@
 # Emma - Homerton IDP
 Group M108
 
-Drive for documents: https://drive.google.com/drive/folders/1_Vnp6F29aSAP3OmmlR4NDieIyZ3eWSvw?usp=sharing
-
-
-
 ## Setup Instructions
 
 First install:
