@@ -8,7 +8,7 @@ HOST = "192.168.4.1"  # The server's hostname or IP address
 PORT = 25586  # The port used by the server
 
 interval=80
-sensor_timeout=0.01
+sensor_timeout=0.02
 
 print("connecting...")
 s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,37 +30,44 @@ except:
 
 
 def updateGraph(i):
+    s.sendall(b"C\n")
+
+    reading.popleft()
+    reading.append(reading[-1])
+
     try:
         data = s.recv(20).decode()
     except:
-        print("FAIL ##########")
-        s.sendall(b"C\n")
+        print("timeout")
         return
-    if(data[-1]=='\n' and len(data)>2):
+    if(data[-1]=='\n'):
         data=data.split("\n")[0]
         data=data.replace("\n", "")
         data=data.replace("\r", "")
     else:
-        s.sendall(b"C\n")
         print("discarded data")
         return
-    print("'"+data+"'")
-    reading.popleft()
+    if(len(data)==0):
+        print("empty message")
+        return
+    print(data)
+    
     try:
-        reading.append(float(data))
+        reading[-1]=float(data)
     except:
-        reading.append(reading[-2])
+        print("data in invalid format")
     # clear axis
     ax.cla()
+    ax.set_ylim([0, 1100])
     #plot
     ax.plot(reading)
-    s.sendall(b"C\n")
     
 
 reading= collections.deque(np.zeros(100))
 fig = plt.figure(figsize=(12,6), facecolor='#DEDEDE')
 ax = plt.subplot(121)
 ax.set_facecolor('#DEDEDE')
+
 s.sendall(b"C\n")
 s.settimeout(sensor_timeout)
 ani = FuncAnimation(fig, updateGraph, interval=interval)
