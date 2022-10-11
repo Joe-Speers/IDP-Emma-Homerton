@@ -19,7 +19,7 @@ float DIFFERENTIAL_K=0.003;
 float INTEGRAL_LIMIT=(1/INTEGRAL_K)/6;// hard limit on integral size
 
 //sets the main loop() speed.
-float dt=0.005;
+float dt=0.001;
 
 //Settings for line sensor pin
 double LINE_SENSE_MIDDLE = 531; //what reading should be treated as the 'LINE_SENSE_MIDDLE' of the line
@@ -54,7 +54,7 @@ void setup() {
   pinMode(LINE_SENSOR_PIN,INPUT);
 
   //start serial to pc (optional)
-  Serial.begin(11500);
+  Serial.begin(115200);
 }
 
 void loop() {
@@ -87,6 +87,7 @@ void loop() {
   // Calculate correction value
   double correction=(-PROPORTIONAL_K*error) + (-INTEGRAL_K*integral) +(-DIFFERENTIAL_K*differential);
   //chop off anything above 1 or below -1.
+  Serial.println(correction);
   if(correction>1){
     correction=1;
   }
@@ -94,7 +95,7 @@ void loop() {
     correction=-1;
   }
   //print out any useful value here
-  Serial.println(correction);
+  
   //set motor speeds based on correction value.
   int left_motor=(correction*MOTOR_SWING)+MOTOR_SPEED;
   int right_motor =(-correction*MOTOR_SWING)+MOTOR_SPEED;
