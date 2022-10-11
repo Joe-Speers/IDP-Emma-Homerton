@@ -1,5 +1,17 @@
 # Emma - Homerton IDP
 Group M108
+## Structure
+ ### Main Program
+
+ - `src` contains the modules for each subsystem
+ - `src\include` contains the header files
+ - `main.ino` is the main program that calls the other modules
+ - `Wifi debug Python client` contains the PC code that connects to the arduino for debugging
+
+### Other Programs
+ - `magnetsensing` Contains the code for the hall effect sensor
+ - `LineSensitivityPlot` contains the code for calibrating the line sensor positions
+
 
 ## Setup Instructions
 
@@ -30,5 +42,4 @@ Finally, setup VSCode:
 
 To upload changes to the repository you can use the inbuilt git manager (`Source Control`) or use the terminal. Please add helpful commit messages!
 
-## Folders
- - `Line Follow` is a test script that just follows a line
+
