@@ -4,11 +4,12 @@ See Linear Systems and Control handout 6, page 14 onwards for PID control info. 
 as well as proportional control (PROPORTIONAL_K) to set the correcting value.
 Ideally motor control should be removed from this file and implemented seperatly
 */
-#include "include/LineSensor.h" // see this file for publicly accessable variables
 
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
+
+#include "include/LineSensor.h" // see this file for publicly accessable variables
 
 //pin selection
 int LEFT_MOTOR_NUM = 1;

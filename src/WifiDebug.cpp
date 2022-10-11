@@ -3,9 +3,10 @@ Wifi Debug code. Sets up a wifi hotspot (details in WifiDebug.h). Connects to th
 Useful for sending text and data values back and forth from a pc.
 Note: WiFi is slow! I have only been able to send data up to 20 times per second reliably.
 */
-#include "include/WifiDebug.h"
-
 #include <WiFiNINA.h>
+#include <String.h>
+
+#include "include/WifiDebug.h"
 
 WiFiServer server(PORT);
 bool newLine=false; //set to true when currentLine needs to be reset to ""
