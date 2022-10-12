@@ -11,9 +11,6 @@ Ideally motor control should be removed from this file and implemented seperatly
 
 #include "include/LineSensor.h" // see this file for publicly accessable variables
 
-//pin selection
-int LEFT_MOTOR_NUM = 1;
-int RIGHT_MOTOR_NUM = 2;
 int LINE_SENSOR_PIN = A0;
 
 //PID control constants
@@ -27,32 +24,14 @@ double LINE_SENSE_MIDDLE = 531; //what reading should be treated as the 'LINE_SE
 int LINE_SENSE_MAX_AMPLITUDE = 500; // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
 double ERROR_DEAD_SPOT=0.01; //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
 
-//motor turning settings
-int MOTOR_SPEED = 200;//speed when 'correction' is zero (between 0 and 255)
-int MOTOR_SWING = 200;//amount to swing from 'MOTOR_SPEED' as 'correction' varies. probably should be as big as speed
-
-//motor variables
-Adafruit_MotorShield AFMS;
-Adafruit_DCMotor *motorL;
-Adafruit_DCMotor *motorR;
 
 //global variable
 float error_array[5]; // stores the last 5 values of 'error', used to calculate derivitive
 
 
 void LineSensor::LineSensorSetup() {
-  //setup motors
-  AFMS = Adafruit_MotorShield(); 
-  motorL = AFMS.getMotor(LEFT_MOTOR_NUM);
-  motorR = AFMS.getMotor(RIGHT_MOTOR_NUM);
-  AFMS.begin();
-  //set initial speed and direction
-  motorL->setSpeed(150);// 0 to 255
-  motorL->run(FORWARD);
-  motorR->setSpeed(150);
-  motorR->run(FORWARD);
+  
   pinMode(LINE_SENSOR_PIN,INPUT);
-  void SetupHotspot();
 }
 
 void LineSensor::LineSensorUpdate(int dt_micros) {
@@ -92,15 +71,4 @@ void LineSensor::LineSensorUpdate(int dt_micros) {
     correction=-1;
   }
   
-  //set motor speeds based on correction value.
-  int left_motor=(correction*MOTOR_SWING)+MOTOR_SPEED;
-  int right_motor =(-correction*MOTOR_SWING)+MOTOR_SPEED;
-  //ensures motor speed is within valid range
-  if(left_motor>255) left_motor=255;
-  if(right_motor>255) right_motor=255;
-  if(left_motor<0) left_motor=0;
-  if(right_motor<0) right_motor=0;
-  //set motor speed
-  motorL->setSpeed(left_motor);
-  motorR->setSpeed(right_motor);
 }

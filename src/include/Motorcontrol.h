@@ -1,5 +1,5 @@
-class MotorCon{
-    public
+class Motorcontrol{
+    public:
         
         int left_motor;
         int right_motor;
@@ -10,7 +10,7 @@ class MotorCon{
 
         void MotorSetup(); //Setup call to initilise sensors
         void MotorUpdate(int lmotor, int rmotor); // call every loop to update program. dt_micros is the elapsed time
-        void MotorControlUpdate(double correction)
+        void MotorControlUpdate(double correction);
 
 };
 

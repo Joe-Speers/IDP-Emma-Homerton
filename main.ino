@@ -6,10 +6,14 @@ Target loop speed is set by 'tick_time'.
 //include header files
 #include "src/include/LineSensor.h"
 #include "src/include/WifiDebug.h"
+#include "src/include/Motorcontrol.h"
+
 
 //Create objects to access modules
 LineSensor LineSense;
 WifiDebug Debug;
+Motorcontrol Mcon;
+
 
 //timer global variables
 int timer_last_value=0; //last time in microseconds
@@ -21,6 +25,7 @@ void setup(){
     Serial.begin(57600); //setup serial
     LineSense.LineSensorSetup();
     Debug.SetupHotspot(); // Setup wifi debugging
+    Mcon.MotorSetup();
 
     //setup timer
     timer_last_value=micros();
@@ -69,13 +74,14 @@ void loop(){
     // ### UPDATE SUBSYSTEMS ###
     LineSense.LineSensorUpdate(dt);
 
+
+
     // ### READ COMMANDS FROM PC ###
     String PC_reply=Debug.ReadCommand();
     if(PC_reply!=""){
         PC_Command(PC_reply);
     }
 }
-
 
 //called when the PC sends a command message. Debug.SendMessage sends a reply
 void PC_Command(String command){
