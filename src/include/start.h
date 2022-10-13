@@ -5,7 +5,7 @@ class start{
         int left_motor;
         int right_motor;
 
-        int startmovement(int ms);
+        int startmovement(int s, int m);
 
 };
 
