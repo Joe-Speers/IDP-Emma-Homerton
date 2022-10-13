@@ -1,6 +1,6 @@
 // details of wifi hotspot
 #define SSID "IDP_robot_wifi"
-#define PASSWORD "group108"
+#define PASSWORD "groupM108"
 #define PORT 25586
 
 class WifiDebug{

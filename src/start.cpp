@@ -2,22 +2,22 @@
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
+#include "include/MotorControl.h"
+#include "include/WifiDebug.h"
 #include "include/start.h"
 
-int start::startmovement(int s, int m){
+void start::startmovement(int s, int m, MotorControl Mcon, WifiDebug Debug){
     
     //Hardcoded millissecon values for start timings
-    if (s > 10 &&  s < 11){
-        
+    if (s =10){
+        if(m=0) Debug.SendMessage("moving forward");
         right_motor = 200;
         left_motor = 200;
-    
     }
-    if (s > 12 &&  s < 13){
-
+    if (s =12){
+        if(m=0) Debug.SendMessage("turning right");
         right_motor = 200;
         left_motor = 0;
-
     }
-    return left_motor, right_motor;
+    Mcon.SetMotors(left_motor,right_motor);
 }

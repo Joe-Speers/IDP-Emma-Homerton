@@ -5,7 +5,7 @@ class start{
         int left_motor;
         int right_motor;
 
-        int startmovement(int s, int m);
+        void startmovement(int s, int m, MotorControl Mcon, WifiDebug Debug);
 
 };
 

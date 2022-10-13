@@ -8,10 +8,10 @@ Ideally motor control should be removed from this file and implemented seperatly
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-
+#include "include/util.h"
 #include "include/LineSensor.h" // see this file for publicly accessable variables
 
-int LINE_SENSOR_PIN = A0;
+#define LINE_SENSOR_PIN A0
 
 //PID control constants
 float PROPORTIONAL_K=1;

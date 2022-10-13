@@ -76,10 +76,10 @@ void loop(){
     //double correction = LineSense.PIDLineFollowCorrection(dt);
     //Mcon.MotorControlUpdate(correction);
     if (s < 20){
-        int lmot, rmot = strt.startmovement(s, m); //
-        Mcon.SetMotors(lmot, rmot);
+        strt.startmovement(s, m, Mcon,Debug); //
     }
     else{
+        if(s==20 and m==0) Debug.SendMessage("Following line");
         Mcon.SetMotors(0,0);
     }
 

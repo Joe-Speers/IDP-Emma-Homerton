@@ -5,14 +5,7 @@
 #include "include/Motorcontrol.h"
 
 
-//pin selection
-int LEFT_MOTOR_NUM = 1;
-int RIGHT_MOTOR_NUM = 2;
 
-//motor variables
-Adafruit_MotorShield AFMS;
-Adafruit_DCMotor *motorL;
-Adafruit_DCMotor *motorR;
 
 void MotorControl::MotorSetup() {
   //setup motors
