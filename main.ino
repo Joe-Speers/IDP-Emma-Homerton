@@ -13,8 +13,7 @@ Target loop speed is set by 'tick_time'.
 LineSensor LineSense;
 WifiDebug Debug;
 MotorControl Mcon;
-start star;
-
+start strt;
 
 //timer global variables
 int timer_last_value=0; //last time in microseconds
@@ -76,13 +75,12 @@ void loop(){
     // line following
     //double correction = LineSense.PIDLineFollowCorrection(dt);
     //Mcon.MotorControlUpdate(correction);
-    if (s < 4){
-        int lmot, rmot = star.startmovement(dt);
+    if (s < 20){
+        int lmot, rmot = strt.startmovement(m); //
         Mcon.SetMotors(lmot, rmot);
     }
     else{
-        double correction = LineSense.PIDLineFollowCorrection(dt);
-        Mcon.MotorControlUpdate(correction);
+        Mcon.SetMotors(0,0);
     }
 
     // ### READ COMMANDS FROM PC ###
