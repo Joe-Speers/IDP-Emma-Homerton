@@ -30,11 +30,10 @@ float error_array[5]; // stores the last 5 values of 'error', used to calculate 
 
 
 void LineSensor::LineSensorSetup() {
-  
   pinMode(LINE_SENSOR_PIN,INPUT);
 }
 
-void LineSensor::LineSensorUpdate(int dt_micros) {
+double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   double dt=(double)dt_micros/1000000;//calculate dt in seconds
   //take reading of line sensor and calculate error
   differential_reading = analogRead(LINE_SENSOR_PIN);
@@ -70,5 +69,5 @@ void LineSensor::LineSensorUpdate(int dt_micros) {
   if(correction<-1){
     correction=-1;
   }
-  
+  return correction;
 }

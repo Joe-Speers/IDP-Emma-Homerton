@@ -14,7 +14,7 @@ Adafruit_MotorShield AFMS;
 Adafruit_DCMotor *motorL;
 Adafruit_DCMotor *motorR;
 
-void Motorcontrol::MotorSetup() {
+void MotorControl::MotorSetup() {
   //setup motors
   AFMS = Adafruit_MotorShield(); 
   motorL = AFMS.getMotor(LEFT_MOTOR_NUM);
@@ -25,34 +25,25 @@ void Motorcontrol::MotorSetup() {
   motorL->run(FORWARD);
   motorR->setSpeed(0);
   motorR->run(FORWARD);
-
-
 }
 
-void Motorcontrol::MotorUpdate(int lmotor, int rmotor){
+void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD){
   
   if(lmotor>255) lmotor=255;
   if(rmotor>255) rmotor=255;
   if(lmotor<0) lmotor=0;
   if(rmotor<0) rmotor=0;
   //set motor speed
+  motorL->run(ldirection);
+  motorR->run(rdirection);
   motorL->setSpeed(lmotor);
   motorR->setSpeed(rmotor);
 
 }
 
-void Motorcontrol::MotorControlUpdate(double correction){
-
+void MotorControl::MotorControlUpdate(double correction){
   //set motor speeds based on correction value.
   int left_motor=(correction*MOTOR_SWING)+MOTOR_SPEED;
   int right_motor =(-correction*MOTOR_SWING)+MOTOR_SPEED;
-  //ensures motor speed is within valid range
-  if(left_motor>255) left_motor=255;
-  if(right_motor>255) right_motor=255;
-  if(left_motor<0) left_motor=0;
-  if(right_motor<0) right_motor=0;
-  //set motor speed
-  motorL->setSpeed(left_motor);
-  motorR->setSpeed(right_motor);
-  
+  SetMotors(left_motor,right_motor);  
 }
