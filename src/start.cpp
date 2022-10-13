@@ -9,7 +9,11 @@
 void start::startmovement(int s, int m, MotorControl Mcon, WifiDebug Debug){
     
     //Hardcoded millissecon values for start timings
-    if (s =10){
+    if(s<10){
+        right_motor = 0;
+        left_motor = 0;
+    }
+    if (s = 10){
         if(m=0) Debug.SendMessage("moving forward");
         right_motor = 200;
         left_motor = 200;

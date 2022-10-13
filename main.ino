@@ -75,12 +75,14 @@ void loop(){
     // line following
     //double correction = LineSense.PIDLineFollowCorrection(dt);
     //Mcon.MotorControlUpdate(correction);
+    double correction = LineSense.PIDLineFollowCorrection();
     if (s < 20){
         strt.startmovement(s, m, Mcon,Debug); //
     }
     else{
         if(s==20 and m==0) Debug.SendMessage("Following line");
-        Mcon.SetMotors(0,0);
+        
+        Mcon.MotorControlUpdate(correction);
     }
 
     // ### READ COMMANDS FROM PC ###
