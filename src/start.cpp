@@ -4,14 +4,15 @@
 
 #include "include/start.h"
 
-int start::startmovement(int s, int m){
+int start::startmovement(int dt){
     
-    //Hardcoded s values for start timings
-    if (s <2){
+    double ms = dt/1000;
+    //Hardcoded millissecon values for start timings
+    if (ms <10000){
         right_motor = 200;
         left_motor = 200;
     }
-    if (s <2){
+    if (ms <11800){
         right_motor = 200;
         left_motor = 50;
     }

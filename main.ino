@@ -76,8 +76,8 @@ void loop(){
     // line following
     //double correction = LineSense.PIDLineFollowCorrection(dt);
     //Mcon.MotorControlUpdate(correction);
-    if (s < 10){
-        int lmot, rmot = star.startmovement(s, m);
+    if (s < 4){
+        int lmot, rmot = star.startmovement(dt);
         Mcon.SetMotors(lmot, rmot);
     }
     else{
