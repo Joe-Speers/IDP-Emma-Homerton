@@ -8,6 +8,7 @@ Target loop speed is set by 'tick_time'.
 #include "src/include/WifiDebug.h"
 #include "src/include/MotorControl.h"
 #include "src/include/start.h"
+#include "src/include/util.h"
 
 //Create objects to access modules
 LineSensor LineSense;
@@ -75,7 +76,7 @@ void loop(){
     // line following
     //double correction = LineSense.PIDLineFollowCorrection(dt);
     //Mcon.MotorControlUpdate(correction);
-    double correction = LineSense.PIDLineFollowCorrection();
+    double correction = LineSense.PIDLineFollowCorrection(dt);
     if (s < 20){
         strt.startmovement(s, m, Mcon,Debug); //
     }
