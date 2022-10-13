@@ -30,6 +30,8 @@ void setup(){
 
     //setup timer
     timer_last_value=micros();
+    //
+    ResetState();
 }
 
 
@@ -74,8 +76,6 @@ void loop(){
 
     // ### UPDATE SUBSYSTEMS ###
     // line following
-    //double correction = LineSense.PIDLineFollowCorrection(dt);
-    //Mcon.MotorControlUpdate(correction);
     double correction = LineSense.PIDLineFollowCorrection(dt);
     if (s < 20){
         strt.startmovement(s, m, Mcon,Debug); //
@@ -93,8 +93,18 @@ void loop(){
     }
 }
 
+//called to reset the time and state to an inital value
+void ResetState(){
+    m=0;
+    s=0;
+    //reset states to inital values
+}
+
 //called when the PC sends a command message. Debug.SendMessage sends a reply
 void PC_Command(String command){
+    if(command=="RESET"){
+        ResetState();
+    }
     // Graph plotting values
     if(command=="R"){ //Raw sensor input
         Debug.SendMessage(String(LineSense.differential_reading,0));
