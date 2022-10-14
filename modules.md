@@ -56,7 +56,7 @@ State enumerables:
 
   ## Location Dependent Submodules
 
-    Zone collection area:
+    Block collection area:
       -rotate on spot (may need to reverse first)
       -locate gaps in central obstacle
       -calculate allignment
@@ -69,7 +69,7 @@ State enumerables:
       concerns:
         -accidental collisions with block
 
-    Zoned side:
+    Starting side:
       -rotate on spot (may need to reverse first)
       -locate gaps in central obstacle
       -calculate allignment
