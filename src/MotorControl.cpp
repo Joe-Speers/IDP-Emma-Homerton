@@ -2,9 +2,8 @@
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
+#include "include/util.h"
 #include "include/Motorcontrol.h"
-
-
 
 
 void MotorControl::MotorSetup() {
@@ -36,7 +35,7 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
 
 void MotorControl::MotorControlUpdate(double correction){
   //set motor speeds based on correction value.
-  int left_motor=(correction*MOTOR_SWING)+MOTOR_SPEED;
-  int right_motor =(-correction*MOTOR_SWING)+MOTOR_SPEED;
+  int left_motor=(correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
+  int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
   SetMotors(left_motor,right_motor);  
 }

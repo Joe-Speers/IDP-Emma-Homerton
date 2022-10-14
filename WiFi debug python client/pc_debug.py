@@ -1,5 +1,6 @@
-# This code connects to the arduino to display debug data on a graph
-# There are a number of modes that can be selected with keyboard keys, see below
+# This code connects to the arduino for WiFi debugging
+# It has a console to display messages from the Arduino and a input field to send commands
+# There is also a graph to display sensor readings. This has a number of modes that can be selected with keyboard keys
 
 # use pip to install these modules first:
 import matplotlib.pyplot as plt
@@ -14,12 +15,11 @@ from matplotlib.animation import FuncAnimation
 import collections
 import socket
 import keyboard
-from scipy import interpolate
 
-HOST = "192.168.4.1"  # The server's hostname or IP address
+HOST = "192.168.4.1"  # The Arduino's IP address
 PORT = 25586  # The port used by the server
 
-interval=1#delay between sending requests
+interval=1#delay between sending requests in ms
 mode_code="R" # code letter for what data to request (see below for possible values)
 
 #connect to Arduino
@@ -80,7 +80,7 @@ def update():
         reading= collections.deque(np.zeros(100))
         mode_code="I"
     if keyboard.is_pressed('D'):
-        print('Swithched to Derivitive')
+        print('Swithched to derivative')
         reading= collections.deque(np.zeros(100))
         mode_code="D"
     if keyboard.is_pressed('E'): 
@@ -163,7 +163,7 @@ def updateGraph(i):
         ax.set_title("Integral")
     if(mode_code=="D"):
         ax.set_ylim([-30, 30])
-        ax.set_title("Derivitive")
+        ax.set_title("derivative")
     if(mode_code=="E"):
         ax.set_ylim([-1, 1])
         ax.set_title("Error")

@@ -7,17 +7,18 @@ Note: WiFi is slow! I have only been able to send data up to 20 times per second
 #include <String.h>
 
 #include "include/WifiDebug.h"
+#include "include/util.h"
 
+//WiFiNINA objects
 WiFiServer server(PORT);
-bool newLine=false; //set to true when currentLine needs to be reset to ""
-String currentLine = ""; //stores a fragment of a message untill it has been recieved
 WiFiClient client;
+
 
 void WifiDebug::SetupHotspot() {
   // print the network name (SSID);
   Serial.print("Creating access point named: ");
   Serial.println(SSID);
-  int status = WiFi.beginAP(SSID, PASSWORD);
+  WiFi.beginAP(SSID, PASSWORD);
   // start the web server on port 'PORT'
   server.begin();
   Serial.println("created wifi hotspot");

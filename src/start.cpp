@@ -13,13 +13,13 @@ void start::startmovement(int s, int m, MotorControl Mcon, WifiDebug Debug){
         right_motor = 0;
         left_motor = 0;
     }
-    if (s = 10){
-        if(m=0) Debug.SendMessage("moving forward");
+    if (s == 10){
+        if(m==0) Debug.SendMessage("moving forward");
         right_motor = 200;
         left_motor = 200;
     }
-    if (s =12){
-        if(m=0) Debug.SendMessage("turning right");
+    if (s ==12){
+        if(m==0) Debug.SendMessage("turning right");
         right_motor = 200;
         left_motor = 0;
     }

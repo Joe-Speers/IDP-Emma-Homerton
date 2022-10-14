@@ -1,21 +1,19 @@
+/*
+MotorControl interfaces with the 2 DC motors and servo motor. Any actions peformed on the motors will persist untill changed again.
+MotorControlUpdate() contains an algorithm to steer the robot based on a 'correction' value between -1 an 1, used for line follwing.
+
+TODO: servo motor control and exact distance traveling.
+*/
 #include <Adafruit_MotorShield.h>
+
 class MotorControl{
     public:
-        //motor turning settings
-        int MOTOR_SPEED = 200;//speed when 'correction' is zero (between 0 and 255)
-        int MOTOR_SWING = 200;//amount to swing from 'MOTOR_SPEED' as 'correction' varies. probably should be as big as speed
-
-        void MotorSetup(); //Setup call to initilise sensors
-        void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction
-        void MotorControlUpdate(double correction); //steers and drives the robot based on the correction input
+        void MotorSetup(); //Setup call to initilise motors
+        void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
+        void MotorControlUpdate(double correction); //steers and drives the robot based on the correction input for line following
     private:
-        //pin selection
-        int LEFT_MOTOR_NUM = 1;
-        int RIGHT_MOTOR_NUM = 2;
-
-        //motor variables
+        //motor objects
         Adafruit_MotorShield AFMS;
         Adafruit_DCMotor *motorL;
         Adafruit_DCMotor *motorR;
 };
-
