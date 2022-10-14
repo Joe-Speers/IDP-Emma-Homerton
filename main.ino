@@ -158,12 +158,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     }
 
     // ### STATE SYSTEM DESCISION TREE
-
+    // state system plan here: https://docs.google.com/spreadsheets/d/1c6zy2WIi2YzP9drrig8WuBd60yu9RLzDmgVKKxzxKIg/edit?usp=sharing
     //I'm trying to keep this in chronological order of actions.
     // Nested order: Purpose then Location then Task
     // check for single and double equal signs! the compiler does not seem to catch these errors
     if(RobotState.purpose==EXIT_START_BOX){
-        if(RobotState.location==EXIT_START_BOX){
+        if(RobotState.location==START_SQUARE){
             if(RobotState.task==STOPPED){ // 0) This is the initial state after a reset
                 if(s>=5){ // 1) Start moving after 5 seconds
                     Debug.SendMessage("Robot starting");
