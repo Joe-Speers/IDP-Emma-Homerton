@@ -52,6 +52,7 @@ struct{
 //called to reset the time and state to an inital value
 void ResetState(){
     Debug.SendMessage("Resetting State");
+    Mcon.SetMotors(0,0,FORWARD,FORWARD);
     m=0;
     s=0;
     //reset states to inital values
@@ -67,8 +68,8 @@ void ResetState(){
 void setup(){
     Serial.begin(57600); //setup serial
     LineSense.LineSensorSetup();
-    Debug.SetupHotspot(); // Setup wifi debugging
     Mcon.MotorSetup();
+    Debug.SetupHotspot(); // Setup wifi debugging
 
     //setup timer
     timer_last_value=micros();
