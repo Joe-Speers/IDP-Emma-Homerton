@@ -112,6 +112,24 @@ void PC_Command(String command){
     if(command=="RESET"){
         ResetState();
     }
+    if(command[0]=='A'){
+        if(command[1]=='P'){
+            LineSense.proportional_k=command.substring(2).toFloat();
+            Debug.SendMessage("Set proportional_k to "+String(LineSense.proportional_k,5));
+        }
+        if(command[1]=='I'){
+            LineSense.integral_k=command.substring(2).toFloat();
+            Debug.SendMessage("Set integral_k to "+String(LineSense.integral_k,5));
+        }
+        if(command[1]=='D'){
+            LineSense.derivative_k=command.substring(2).toFloat();
+            Debug.SendMessage("Set derivitive_k to "+String(LineSense.derivative_k,5));
+        }
+        if(command[1]=='L'){
+            LineSense.integral_limit=(1/LineSense.integral_k)*command.substring(2).toFloat();
+            Debug.SendMessage("Set integral_limit to "+String(LineSense.integral_limit,5));
+        }
+    }
     // Graph plotting values
     if(command=="R"){ //Raw sensor input
         Debug.SendMessage(String(LineSense.differential_reading,0));
