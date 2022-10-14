@@ -32,6 +32,12 @@ Also contains enumerables for the state system.
 
 // ### enums for State system ###
 
+enum Purpose{ //Describes the current goal
+    EXIT_START_BOX = 0,
+    TRAVEL_TO_FAR_SIDE = 1, //add more as needed
+
+};
+
 enum Location{
     START_SQUARE            = 0,
     DROPOFF_SIDE            = 1,
@@ -44,20 +50,13 @@ enum Location{
     GREEN_SQARE             = 8
 };
 
-
-enum Purpose{ //Describes the current goal
-    EXIT_START_BOX = 0,
-    TRAVEL_TO_FAR_SIDE = 1, //add more as needed
-
-};
-
 enum Task{  //Describes the exact task the robot is peforming
-    MOVE_FORWARD = 0,
-    REVERSE = 1,
-    TURN_LEFT = 2,
-    TURN_RIGHT = 3,
-    FOLLOW_LINE = 4,
-    SLOW_SWEEP =5, //add more as needed
+    STOPPED         = 0,
+    MOVE_FORWARD    = 1,
+    REVERSE         = 2,
+    TURN_LEFT       = 3,
+    TURN_RIGHT      = 4,
+    FOLLOW_LINE     = 5,
+    SLOW_SWEEP      = 6, //add more as needed
 
 };
-
