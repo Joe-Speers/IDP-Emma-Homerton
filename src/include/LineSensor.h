@@ -5,6 +5,7 @@ The PID readings as well as the raw sensor reading can be accessed through the p
 */
 
 #include "util.h"
+#define DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE 5
 
 class LineSensor{
     public:
@@ -23,5 +24,5 @@ class LineSensor{
         float derivative_k=DEFAULT_DERIVATIVE_K;
         float integral_limit=(1/integral_k)*DEFAULT_INTEGRAL_CORRECTION_LIMIT;// hard limit on integral size
 
-        float error_array[5]; // stores the last 5 values of 'error', used to calculate derivative
+        float error_array[DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE]; // stores the last few values of 'error', used to calculate derivative
 };

@@ -19,58 +19,44 @@ import keyboard
 HOST = "192.168.4.1"  # The Arduino's IP address
 PORT = 25586  # The port used by the server
 
-interval=1#delay between sending requests in ms
-mode_code="R" # code letter for what data to request (see below for possible values)
+interval=1#delay between sending graph data requests in ms
+mode_code="R" # code letter for what sensor reading to request (see below for possible values)
 
-#connect to Arduino
-print("connecting...")
-s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.settimeout(3) # set timeout to 3 seconds
-try:
-    s.connect((HOST, PORT))
-    s.sendall(b"test\n")# send a test message
-    data = s.recv(1024).decode()
-    if(data=="OK"):# check reply to test message
-        print("connected!")
-    else:
-        print("invalid response to connect message")
-        exit()
-except:
-    print("failed to connect")
-    exit()
+plotting=False #true if currently plotting a graph
 
-# Will only reach here if connected succesfully
-#setup Window
-root = tkinter.Tk()
-root.wm_title("Wifi Debug")
+data_in="" #stores a fragment of a message as it is recieved
+msg="" #stores the last received complete message
 
-plotting=False
+frames=0 #counter for the number of graph data points recieved each second, used to calculate fps
+last_time=datetime.datetime.now() #stores the current time, used for timing in update()
 
-def _quit():
+### Functions ###
+
+def _quit(): #called when GUI window closed
     print("quitting")
-    s.close()
-    root.quit()     # stops mainloop
+    s.close() # close connection to Arduino
+    root.quit()     # stops GUI mainloop
     root.destroy()
 
-data_in=""
-msg=""
-
-frames=0
-last_time=datetime.datetime.now()
-def update():
+def update(): #called as often as possible, every ~10ms. Handles all update events and communication with arduino.
     global frames
     global last_time
     global mode_code
     global reading
     global data_in
     global msg
-    elapsed = datetime.datetime.now()-last_time
-    
+
+    ### TIMER code
+
+    elapsed = datetime.datetime.now()-last_time #calculate time elapsed since last update()
     if(elapsed.seconds>0):
         last_time=datetime.datetime.now()
-        FPS_text.set("FPS: "+str(frames))
+        FPS_text.set("FPS: "+str(frames)) #calculate FPS if currently plotting a graph
         frames=0
-    #check for keybord press to change mode
+
+    ### Keyboard press events
+
+    #check for keybord press to change graph plotting mode
     if keyboard.is_pressed('R'):
         print('Swithched to Raw Sensor Input')
         reading= collections.deque(np.zeros(100))
@@ -92,19 +78,22 @@ def update():
         reading= collections.deque(np.zeros(100))
         mode_code="C"
 
-    #try to read data from the arduino
+    ### Read data from Ardiono
+
     try:
-        raw_data=s.recv(10)
+        raw_data=s.recv(10)# try to recieve up to 10 characters
         if(len(raw_data)>0):
-            data_in += raw_data.decode()
+            data_in += raw_data.decode() #decode into string and add message fragment to data_in
     except:
-        pass
-    #check that all the data has been recieved and remove newline chars
+        pass # ignore errors
+    #check if a complete message has been recieved (indicated by a newline character)
     if('\n' in data_in):
-        msg=data_in.split("\n",1)[0]
-        data_in=data_in.split("\n",1)[1]
+        msg=data_in.split("\n")[0] #get the message portion
+        data_in=data_in.split("\n",1)[1] #place the fragement of the next message back into data_in
+        #remove newline characters
         msg=msg.replace("\n", "")
         msg=msg.replace("\r", "")
+        #if not plotting, display the message in the console
         if(not plotting):
             ConsoleWrite(msg)
 
@@ -115,18 +104,18 @@ def ToggleGraph():
     if(plotting): plotting=False
     else: plotting=True
 
-def SendMessage():
+def SendMessage(): # send a message to the arduino from the text input box (command_entry)
     command=command_entry.get()
     if(command!=""):
+        s.sendall((command+"\n").encode('utf-8')) # encode and send data
         print("Sent: '"+command+"'")
-        s.sendall((command+"\n").encode('utf-8'))
-        command_entry.delete(0, tkinter.END)
+        command_entry.delete(0, tkinter.END) # clear entry box
 
-def ConsoleWrite(msg):
-    console_log.configure(state="normal")  # make field editable
+def ConsoleWrite(msg): # write a message to the console
+    console_log.configure(state="normal")  # make GUI field editable
     console_log.insert("end", msg+"\n")  # write text to textbox
     console_log.see("end")  # scroll to end
-    console_log.configure(state="disabled")  # make field readonly
+    console_log.configure(state="disabled")  # make GUI field readonly
 
 #called every interval to update the graph
 def updateGraph(i):
@@ -144,13 +133,13 @@ def updateGraph(i):
     #try to read response
     if(msg!=""):
         try:
-            reading[-1]=float(msg)
-            frames+=1
+            reading[-1]=float(msg) # try to plot the reading on the graph
+            frames+=1 # counter to calculate fps
             msg=""
         except:
-            ConsoleWrite(msg)# message is not a number so print instead
+            ConsoleWrite(msg)# message is not a number so is probably a message instead, so print to console
     else:
-        print("taking too long to reply")
+        print("TIMEOUT, Arduino may have lost connection")
 
     # clear axis
     ax.cla()
@@ -170,20 +159,47 @@ def updateGraph(i):
     if(mode_code=="C"):
         ax.set_ylim([-1, 1])
         ax.set_title("Correction")
-    #plot graph
+    #re-plot graph
     ax.plot(reading)
-    
+
+### Startup Code ###
+
+#connect to Arduino
+print("connecting...")
+s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(3) # set timeout to 3 seconds
+try:
+    s.connect((HOST, PORT))
+    s.sendall(b"test\n")# send a test message
+    data = s.recv(1024).decode()
+    if(data=="OK"):# check reply to test message
+        print("connected!")
+    else:
+        print("invalid response to connect message")
+        exit()
+except:
+    print("failed to connect")
+    exit()
+
+s.settimeout(0)#expect data instantly from now on
+
+## Will only reach here if connected succesfully
+
+#setup GUI Window
+root = tkinter.Tk()
+root.wm_title("Wifi Debug")
+root.protocol("WM_DELETE_WINDOW", _quit) # setup handle in case the window is closed
+
 #setup matplotlib graph
 reading= collections.deque(np.zeros(100))
 fig = plt.figure(figsize=(12,6), facecolor='#DEDEDE')
 ax = plt.subplot(121)
 ax.set_facecolor('#DEDEDE')
-
-canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
+#create canvas for graph
+canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.draw()
 
-
-#setup UI
+#setup GUI buttons and text fields
 ToggleBut = tkinter.Button(root, text ="Toggle graph", command = ToggleGraph)
 command_entry = tkinter.Entry(root)
 SubmitBut=tkinter.Button(root, text='Send Command', command=SendMessage)
@@ -191,7 +207,7 @@ FPS_text = tkinter.StringVar()
 FPS_label = tkinter.Label( root, textvariable=FPS_text)
 main_label = tkinter.Label( root, text="Wifi Debug",font=("consolas", "20", "normal"))
 console_log = ScrolledText(root, height=30, font=("consolas", "12", "normal"))
-
+#the order of these commands determines position of GUI elements
 main_label.pack(side=tkinter.TOP)
 console_log.pack(side=tkinter.RIGHT)
 canvas.get_tk_widget().pack(side=tkinter.TOP,expand=1)
@@ -200,12 +216,9 @@ ToggleBut.pack()
 command_entry.pack()
 SubmitBut.pack()
 
-#send the initial request for data
-s.sendall((mode_code+"\n").encode('utf-8'))
-s.settimeout(0)#expect data instantly
-#this sets up a background operation that continuosly calls updateGraph
+#this sets up a background operation that continuosly calls updateGraph()
 ani = FuncAnimation(fig, updateGraph, interval=interval)
-#start displaying the window
-root.protocol("WM_DELETE_WINDOW", _quit)
-root.after(1, update)
+
+root.after(1, update) #start update loop. This is called by Tkinter as often as possible
+#start displaying the GUI window
 root.mainloop()
