@@ -148,10 +148,10 @@ def updateGraph(i):
         ax.set_ylim([0, 1100])
         ax.set_title("Raw Sensor Input")
     if(mode_code=="I"):
-        ax.set_ylim([-0.2, 0.2])
+        ax.set_ylim([-0.3, 0.3])
         ax.set_title("Integral")
     if(mode_code=="D"):
-        ax.set_ylim([-30, 30])
+        ax.set_ylim([-5, 5])
         ax.set_title("derivative")
     if(mode_code=="E"):
         ax.set_ylim([-1, 1])

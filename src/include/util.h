@@ -8,9 +8,9 @@ Also contains enumerables for the state system.
 // ### constants ###
 
 //PID constants
-#define DEFAULT_PROPORTIONAL_K 1.1
-#define DEFAULT_INTEGRAL_K 1.0
-#define DEFAULT_DERIVATIVE_K 0.01
+#define DEFAULT_PROPORTIONAL_K 0.8
+#define DEFAULT_INTEGRAL_K 2.5
+#define DEFAULT_DERIVATIVE_K 0
 #define DEFAULT_INTEGRAL_CORRECTION_LIMIT 0.3 //limits the size of the integral.
 
 // line follow motor settings
@@ -20,7 +20,7 @@ Also contains enumerables for the state system.
 //Settings for line sensor value normalisation
 #define LINE_SENSE_MIDDLE           531 //what reading should be treated as the 'middle' of the line
 #define LINE_SENSE_MAX_AMPLITUDE    500 // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
-#define ERROR_DEAD_SPOT             0.01 //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
+#define ERROR_DEAD_SPOT             0.02 //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
 
 // ### Pin assignment ###
 

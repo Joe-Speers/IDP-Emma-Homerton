@@ -5,7 +5,7 @@ The PID readings as well as the raw sensor reading can be accessed through the p
 */
 
 #include "util.h"
-#define DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE 5
+#define DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE 70
 
 class LineSensor{
     public:
