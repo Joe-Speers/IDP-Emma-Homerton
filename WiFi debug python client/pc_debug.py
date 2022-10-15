@@ -93,9 +93,9 @@ def update(): #called as often as possible, every ~10ms. Handles all update even
         #remove newline characters
         msg=msg.replace("\n", "")
         msg=msg.replace("\r", "")
-        #if not plotting, display the message in the console
+        #if not plotting, process the message
         if(not plotting):
-            ConsoleWrite(msg)
+            ProcessMessage(msg)
 
     root.after(1, update) # queue next update
 
@@ -104,18 +104,45 @@ def ToggleGraph():
     if(plotting): plotting=False
     else: plotting=True
 
-def SendMessage(): # send a message to the arduino from the text input box (command_entry)
-    command=command_entry.get()
-    if(command!=""):
-        s.sendall((command+"\n").encode('utf-8')) # encode and send data
-        print("Sent: '"+command+"'")
-        command_entry.delete(0, tkinter.END) # clear entry box
+def SendMessage(command=""): # send a message to the arduino from the text input box (command_entry)
+    if(command==""):#if message blank, get message from input field
+        command=command_entry.get()
+        if(command==""):
+            return #ignore if message is blank
+        command_entry.delete(0, tkinter.END) # clear entry box    
+    s.sendall((command+"\n").encode('utf-8')) # encode and send data
+    print("Sent: '"+command+"'")
+
+def SendReset():#tell robot to reset to starting state and reset clock
+    SendMessage("RESET")
+
+def SendStop():#tell robot to stop (resets and sets s to -10000, effectivly halting the robot)
+    SendMessage("RESET")
 
 def ConsoleWrite(msg): # write a message to the console
     console_log.configure(state="normal")  # make GUI field editable
     console_log.insert("end", msg+"\n")  # write text to textbox
     console_log.see("end")  # scroll to end
     console_log.configure(state="disabled")  # make GUI field readonly
+
+def ProcessMessage(msg):
+    if(msg[0]=="!"):# indicates message is a state update
+        if(msg[1]=="L"):
+            location_status.set("Location: "+msg[2:-1])
+        elif(msg[1]=="P"):
+            purpose_status.set("Purpose: "+msg[2:-1])
+        elif(msg[1]=="T"):
+            task_status.set("Task: "+msg[2:-1])
+        elif(msg[1]=="R"):
+            isLost_status.set("Is Lost: "+msg[2:-1])
+        elif(msg[1]=="C"):
+            task_countdown_status.set("Task countdown timer: "+msg[2:-1])
+        elif(msg[1]=="S"):
+            task_stopwatch_status.set("Task stopwatch: "+msg[2:-1])
+        elif(msg[1]=="J"):
+            junction_counter_status.set("Junction counter: "+msg[2:-1])
+    else: #if message is not a state update, then print to console
+        ConsoleWrite(msg)
 
 #called every interval to update the graph
 def updateGraph(i):
@@ -137,7 +164,7 @@ def updateGraph(i):
             frames+=1 # counter to calculate fps
             msg=""
         except:
-            ConsoleWrite(msg)# message is not a number so is probably a message instead, so print to console
+            ProcessMessage(msg)# message is not a number so is probably a message instead
     else:
         print("TIMEOUT, Arduino may have lost connection")
 
@@ -200,21 +227,41 @@ canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.draw()
 
 #setup GUI buttons and text fields
-ToggleBut = tkinter.Button(root, text ="Toggle graph", command = ToggleGraph)
-command_entry = tkinter.Entry(root)
-SubmitBut=tkinter.Button(root, text='Send Command', command=SendMessage)
+main_font=("consolas", "14", "normal")
+ToggleBut = tkinter.Button(root, text ="Toggle graph", command = ToggleGraph,font=main_font)
+ResetBut=tkinter.Button(root, text='RESET robot', command=SendReset,font=main_font)
+StopBut=tkinter.Button(root, text='STOP robot', command=SendStop,font=main_font)
+command_entry = tkinter.Entry(root,font=main_font)
+SubmitBut=tkinter.Button(root, text='Send Command', command=SendMessage,font=main_font)
 FPS_text = tkinter.StringVar()
-FPS_label = tkinter.Label( root, textvariable=FPS_text)
+FPS_label = tkinter.Label( root, textvariable=FPS_text,font=main_font)
 main_label = tkinter.Label( root, text="Wifi Debug",font=("consolas", "20", "normal"))
-console_log = ScrolledText(root, height=30, font=("consolas", "12", "normal"))
+console_log = ScrolledText(root, height=30,font=main_font)
+#status labels
+location_status = tkinter.Label( root, text="Location:",font=main_font)
+purpose_status = tkinter.Label( root, text="Purpose:",font=main_font)
+task_status = tkinter.Label( root, text="Task:",font=main_font)
+isLost_status = tkinter.Label( root, text="Is Lost:",font=main_font)
+task_countdown_status = tkinter.Label( root, text="Task countdown timer:",font=main_font)
+task_stopwatch_status = tkinter.Label( root, text="Task stopwatch:",font=main_font)
+junction_counter_status = tkinter.Label( root, text="Junction counter:",font=main_font)
 #the order of these commands determines position of GUI elements
 main_label.pack(side=tkinter.TOP)
 console_log.pack(side=tkinter.RIGHT)
-canvas.get_tk_widget().pack(side=tkinter.TOP,expand=1)
 FPS_label.pack()
 ToggleBut.pack()
+ResetBut.pack()
+StopBut.pack()
 command_entry.pack()
 SubmitBut.pack()
+location_status.pack()
+purpose_status.pack()
+task_status.pack()
+isLost_status.pack()
+task_countdown_status.pack()
+task_stopwatch_status.pack()
+junction_counter_status.pack()
+canvas.get_tk_widget().pack(expand=1)
 
 #this sets up a background operation that continuosly calls updateGraph()
 ani = FuncAnimation(fig, updateGraph, interval=interval)

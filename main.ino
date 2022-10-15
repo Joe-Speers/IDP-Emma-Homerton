@@ -110,13 +110,13 @@ void loop(){
     }
     if(m%300==0){// 3 times a second, send the robot's state information over WiFi debug
         String state_update_message="";
-        state_update_message+="SL"+String(RobotState.location)+"\n";
-        state_update_message+="SP"+String(RobotState.purpose)+"\n";
-        state_update_message+="ST"+String(RobotState.task)+"\n";
-        state_update_message+="SR"+String(RobotState.isLost)+"\n"; // recovery
-        state_update_message+="SC"+String(RobotState.task_timer,1)+"\n"; //countdown
-        state_update_message+="SS"+String(RobotState.task_stopwatch,1)+"\n"; //stopwatch
-        state_update_message+="SJ:"+String(RobotState.junction_counter)+"\n";
+        state_update_message+="!L"+String(RobotState.location)+"\n";
+        state_update_message+="!P"+String(RobotState.purpose)+"\n";
+        state_update_message+="!T"+String(RobotState.task)+"\n";
+        state_update_message+="!R"+String(RobotState.isLost)+"\n"; // recovery
+        state_update_message+="!C"+String(RobotState.task_timer,1)+"\n"; //countdown
+        state_update_message+="!S"+String(RobotState.task_stopwatch,1)+"\n"; //stopwatch
+        state_update_message+="!J:"+String(RobotState.junction_counter)+"\n";
         Debug.SendMessage(state_update_message);
     }
     if(m%500==0){ // twice a second
@@ -216,6 +216,10 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
 void PC_Command(String command){
     if(command=="RESET"){
         ResetState();
+    }
+    if(command=="STOP"){
+        ResetState();
+        s=-10000; //set timer to -10000 seconds to prevent state system from starting
     }
     if(command[0]=='A'){
         if(command[1]=='P'){

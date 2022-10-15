@@ -10,7 +10,7 @@ Also contains enumerables for the state system.
 //PID constants
 #define DEFAULT_PROPORTIONAL_K 0.8
 #define DEFAULT_INTEGRAL_K 2.5
-#define DEFAULT_DERIVATIVE_K 0
+#define DEFAULT_DERIVATIVE_K 0 // currently disabled
 #define DEFAULT_INTEGRAL_CORRECTION_LIMIT 0.3 //limits the size of the integral.
 
 // line follow motor settings
