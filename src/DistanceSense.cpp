@@ -2,7 +2,7 @@
 #include "include/util.h"
 
 //Filter for float numbers, (a,b) a is weighting of filter (to be calibrated), b is initial value of filter
-ExponentialFilter<float> FilteredDistance(90, 0);
+//ExponentialFilter<float> FilteredDistance(90, 0);
 
 void SensorSetup() {
   pinMode(ULTRASOUND_TRIGGER_PIN, OUTPUT); // Sets the trigPin as an Output
@@ -22,8 +22,8 @@ float ReadUltrasoundDistance() {
   // Calculating the distance
   float distance = duration * 0.034 / 2;
   //applying filter
-  FilteredDistance.Filter(distance);
-  float SmoothDistance = FilteredDistance.Current();
+  //FilteredDistance.Filter(distance);
+  //float SmoothDistance = FilteredDistance.Current();
   // print SmoothDistance in Serial monitor
-  return SmoothDistance;
+  return distance;
 }

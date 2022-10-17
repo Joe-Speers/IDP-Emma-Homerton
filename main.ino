@@ -23,7 +23,6 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 LineSensor LineSense;
 WifiDebug Debug;
 MotorControl Mcon;
-start strt;
 
 //timer global variables
 int timer_last_value=0; //last time in microseconds
