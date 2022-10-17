@@ -31,6 +31,7 @@ Also contains enumerables for the state system.
 
 
 // ### enums for State system ###
+// ANY CHANGES TO THESE, please replicate in the top of pc_debug.py
 
 enum Purpose{ //Describes the current goal
     EXIT_START_BOX = 0,
