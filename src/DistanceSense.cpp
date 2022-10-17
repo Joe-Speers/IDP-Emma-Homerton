@@ -1,15 +1,16 @@
 #include <Filters.h> //to apply exponential recursive filter
+#include "include/DistanceSense.h"
 #include "include/util.h"
 
 //Filter for float numbers, (a,b) a is weighting of filter (to be calibrated), b is initial value of filter
 //ExponentialFilter<float> FilteredDistance(90, 0);
 
-void SensorSetup() {
+void DistanceSense::SensorSetup() {
   pinMode(ULTRASOUND_TRIGGER_PIN, OUTPUT); // Sets the trigPin as an Output
   pinMode(ULTRASOUND_ECHO_PIN, INPUT); // Sets the echoPin as an Input
 }
 
-float ReadUltrasoundDistance() {
+float DistanceSense::ReadUltrasoundDistance() {
   // Clears the trigPin
   digitalWrite(ULTRASOUND_TRIGGER_PIN, LOW);
   delayMicroseconds(2);
