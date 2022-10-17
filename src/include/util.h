@@ -17,6 +17,15 @@ Also contains enumerables for the state system.
 #define LINE_FOLLOW_MOTOR_SPEED     255 //speed when 'correction' is zero (between 0 and 255)
 #define LINE_FOLLOW_MOTOR_SWING     255 //amount to swing from 'MOTOR_SPEED' as 'correction' varies. probably should be as big as speed
 
+//Conversion constants
+#define Distance_Acceleration 2 //distance covered in motor acceleration and deceleration
+#define Time_Accelartionn 50 //time taken for acceleration and deceleration
+#define Distance_To_Time 10 //constant of proportionality between distance and time at constant speed
+
+#define Angle_Acceleration 2 //degrees turned in angular acceleration and deceleration
+#define Time_Angular_Acceleration 10 //time taken for angular acceleration and deceleration
+#define Angle_To_Time 5 //constant of proportionality between angle and time at constant angular speed
+
 //Settings for line sensor value normalisation
 #define LINE_SENSE_MIDDLE           531 //what reading should be treated as the 'middle' of the line
 #define LINE_SENSE_MAX_AMPLITUDE    500 // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
