@@ -21,7 +21,7 @@
     - Infrared
     -distance calculation
 - Recovery (kyle)
-- AdditonalSensors??
+- AdditonalSensors (kyle)
   - Tunnel sensor
   - Ramp sensor
 

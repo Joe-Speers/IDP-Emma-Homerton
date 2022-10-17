@@ -17,6 +17,11 @@ void LineSensor::LineSensorSetup() {
   pinMode(LINE_SENSOR_PIN,INPUT);
 }
 
+void LineSensor::ResetPID(){
+  integral=0;
+  //also reset error values (todo)
+}
+
 double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   double dt=(double)dt_micros/1000000;//calculate dt in seconds, this is the time elapsed since the last call
 

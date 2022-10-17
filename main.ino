@@ -121,7 +121,7 @@ void loop(){
     }
     if(m%500==0){ // twice a second
         //print out the clock
-        Debug.SendMessage("Distance: "+String(distanceSense.ReadUltrasoundDistance(),1));
+        //Debug.SendMessage("Distance: "+String(distanceSense.ReadUltrasoundDistance(),1)); has a long delay!
         Debug.SendMessage("t: "+String(s)+":"+String(m));
     }
 
@@ -173,7 +173,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     //need to implement function to replace the next two lines with a distance to travel.
                     Mcon.SetMotors(255,255);
-                    RobotState.task_timer=1000; //move forward for 2000 seconds.
+                    RobotState.task_timer=1050; //move forward.
                 }
             } else if(RobotState.task==MOVE_FORWARD){
                 if(RobotState.task_timer==0){ //replace with junction detection test (will also need to add another step to move forward more before turning)
@@ -183,7 +183,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     //need to implement function to replace the next two lines with an angle to turn.
                     Mcon.SetMotors(255,255,FORWARD, BACKWARD);
-                    RobotState.task_timer=900;
+                    RobotState.task_timer=730;
                 }
             }
         } 
@@ -192,10 +192,11 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==TURN_RIGHT){
                 if(RobotState.task_timer==0){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
+                    LineSense.ResetPID();
                     RobotState.task_stopwatch=0;
                 }
             } else if(RobotState.task==FOLLOW_LINE){
-                if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
+                //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
                 if(false){ // 4) check tilt sensor to see if has hit ramp (TODO)
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
@@ -203,14 +204,6 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         }
     }
-    
-    //if (s < 20){
-    //    strt.startmovement(s, m, Mcon,Debug);
-    //}
-    //else{
-    //    if(s==20 and m==0) Debug.SendMessage("Following line");
-    //    RobotState.task=FOLLOW_LINE;
-    //}
 }
 
 //called when the PC sends a command message. Debug.SendMessage sends a reply

@@ -31,8 +31,6 @@ TASK={
     6:"SLOW_SWEEP"
 }
 
-
-
 # use pip to install these modules first:
 import matplotlib.pyplot as plt
 import datetime
