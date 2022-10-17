@@ -1,4 +1,6 @@
 
+#include "Arduino.h"
+#include "Morse.h"
 #include <Servo.h>
    Servo myservo; // create servo object to control a servo
    int potpin = 0; // analog pin used to connect the potentiometer

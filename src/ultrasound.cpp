@@ -1,5 +1,4 @@
 #include <Filters.h> //to apply exponential recursive filter
-
 // defines pins numbers
 const int trigPin = 9;
 const int echoPin = 10;
