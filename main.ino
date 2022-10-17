@@ -15,7 +15,6 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/LineSensor.h"
 #include "src/include/WifiDebug.h"
 #include "src/include/MotorControl.h"
-#include "src/include/start.h"
 #include "src/include/util.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
