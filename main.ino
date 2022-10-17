@@ -172,7 +172,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     //need to implement function to replace the next two lines with a distance to travel.
                     Mcon.SetMotors(255,255);
-                    RobotState.task_timer=2000; //move forward for 2000 seconds.
+                    RobotState.task_timer=1000; //move forward for 2000 seconds.
                 }
             } else if(RobotState.task==MOVE_FORWARD){
                 if(RobotState.task_timer==0){ //replace with junction detection test (will also need to add another step to move forward more before turning)
@@ -181,8 +181,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                     RobotState.task_stopwatch=0;
                     //need to implement function to replace the next two lines with an angle to turn.
-                    Mcon.SetMotors(255,0);
-                    RobotState.task_timer=1500;
+                    Mcon.SetMotors(255,255,FORWARD, BACKWARD);
+                    RobotState.task_timer=900;
                 }
             }
         } 
