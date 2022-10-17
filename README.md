@@ -11,7 +11,8 @@ Group M108
 ### Other Programs
  - `magnetsensing` Contains the code for the hall effect sensor
  - `LineSensitivityPlot` contains the code for calibrating the line sensor positions
-
+ - `servo` contains test code for the servo module
+ - `ultra_sound` contains test code for the ultrasound sensor
 
 ## Setup Instructions
 

@@ -1,32 +1,16 @@
 /*
 This program uses PID control to follow a line.
-See Linear Systems and Control handout 6, page 14 onwards for PID control info. Effectivly uses the derivitive and integral of the error (in proportions derivitive_K and INTEGRAL_K)
-as well as proportional control (PROPORTIONAL_K) to set the correcting value.
+See Linear Systems and Control handout 6, page 14 onwards for PID control info. Effectivly uses the derivative and integral of the error (in proportions derivative_k and integral_k)
+as well as proportional control (proportional_k) to set the correcting value.
 Ideally motor control should be removed from this file and implemented seperatly
 */
 
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-#include "include/util.h"
+
+#include "include/util.h" //contains some key constants used by this file
 #include "include/LineSensor.h" // see this file for publicly accessable variables
-
-#define LINE_SENSOR_PIN A0
-
-//PID control constants
-float PROPORTIONAL_K=1;
-float INTEGRAL_K=7;
-float derivitive_K=0.003;
-float INTEGRAL_LIMIT=(1/INTEGRAL_K)/6;// hard limit on integral size
-
-//Settings for line sensor pin
-double LINE_SENSE_MIDDLE = 531; //what reading should be treated as the 'LINE_SENSE_MIDDLE' of the line
-int LINE_SENSE_MAX_AMPLITUDE = 500; // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
-double ERROR_DEAD_SPOT=0.01; //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
-
-
-//global variable
-float error_array[5]; // stores the last 5 values of 'error', used to calculate derivitive
 
 
 void LineSensor::LineSensorSetup() {
@@ -34,34 +18,38 @@ void LineSensor::LineSensorSetup() {
 }
 
 double LineSensor::PIDLineFollowCorrection(int dt_micros) {
-  double dt=(double)dt_micros/1000000;//calculate dt in seconds
-  //take reading of line sensor and calculate error
+  double dt=(double)dt_micros/1000000;//calculate dt in seconds, this is the time elapsed since the last call
+
+  // ### Sensor reading and normalisation ###
+
+  //take reading of line sensor and normalise to be between -1 and 1
   differential_reading = analogRead(LINE_SENSOR_PIN);
-  error = (LINE_SENSE_MIDDLE-differential_reading)/LINE_SENSE_MAX_AMPLITUDE; // normalises reading to approximatly -1 to 1.
-  //removes error if close to LINE_SENSE_MIDDLE
+  error = (double)(LINE_SENSE_MIDDLE-differential_reading)/LINE_SENSE_MAX_AMPLITUDE; // normalises reading to approximatly -1 to 1.
+  //creates a 'dead spot' around LINE_SENSE_MIDDLE
   if(error==0 or (error<=ERROR_DEAD_SPOT && error>=-ERROR_DEAD_SPOT)){
     error=0;
   }
-  //add error to array of readings and shuffles the rest up one spot
-  for (int i = 4; i > 0; i--){
+  //add error to array of previous readings and shuffles the rest up one spot
+  for (int i = DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE -1; i > 0; i--){
     error_array[i] = error_array[i - 1];
   }
   error_array[0]=error;
+
   //// ### PID CONTROL ###
-  //Derivitive: calculate slope of error based on the average slope of the last few readings.
-  derivitive=0;
-  for(int i=0;i<4;i++){
-    derivitive+=error_array[i+1]-error_array[i];
+
+  //derivative: calculate slope of error based on the average slope of the last few readings.
+  derivative=0;
+  for(int i=0;i<DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE-1;i++){
+    derivative+=error_array[i+1]-error_array[i];
   }
-  derivitive=derivitive/(4*dt);
+  derivative=derivative/((DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE-1)*dt);
   //Integral: updates the integral of the error
   integral+=error*dt;
-  if(integral>INTEGRAL_LIMIT) integral=INTEGRAL_LIMIT;
-  if(integral<-INTEGRAL_LIMIT) integral=-INTEGRAL_LIMIT;
-  //Proportional is just -k * error
+  if(integral>integral_limit) integral=integral_limit;
+  if(integral<-integral_limit) integral=-integral_limit;
+  //Proportional is just -proportional_k * error
   // Calculate correction value
-  correction=(-PROPORTIONAL_K*error) + (-INTEGRAL_K*integral) +(-derivitive_K*derivitive);
-  //Serial.println(correction);
+  correction=(-proportional_k*error) + (-integral_k*integral) +(-derivative_k*derivative);
   //chop off anything above 1 or below -1.
   if(correction>1){
     correction=1;
