@@ -15,8 +15,8 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/LineSensor.h"
 #include "src/include/WifiDebug.h"
 #include "src/include/MotorControl.h"
-#include "src/include/start.h"
 #include "src/include/util.h"
+#include "src/include/DistanceSense.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
 
@@ -24,7 +24,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 LineSensor LineSense;
 WifiDebug Debug;
 MotorControl Mcon;
-start strt;
+DistanceSense distanceSense;
 
 //timer global variables
 int timer_last_value=0; //last time in microseconds
@@ -70,7 +70,7 @@ void setup(){
     LineSense.LineSensorSetup();
     Mcon.MotorSetup();
     Debug.SetupHotspot(); // Setup wifi debugging
-
+    distanceSense.SensorSetup();
     //setup timer
     timer_last_value=micros();
     //set state variables
@@ -121,6 +121,7 @@ void loop(){
     }
     if(m%500==0){ // twice a second
         //print out the clock
+        Debug.SendMessage("Distance: "+String(distanceSense.ReadUltrasoundDistance(),1));
         Debug.SendMessage("t: "+String(s)+":"+String(m));
     }
 

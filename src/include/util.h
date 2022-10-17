@@ -34,6 +34,8 @@ Also contains enumerables for the state system.
 // ### Pin assignment ###
 
 #define LINE_SENSOR_PIN         A0
+#define ULTRASOUND_TRIGGER_PIN 9
+#define ULTRASOUND_ECHO_PIN 10
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          2
 #define RIGHT_MOTOR_NUM         1
