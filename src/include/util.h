@@ -35,8 +35,8 @@ Also contains enumerables for the state system.
 
 #define LINE_SENSOR_PIN         A0
 // Motor shield motor numbers (1-4)
-#define LEFT_MOTOR_NUM          1
-#define RIGHT_MOTOR_NUM         2
+#define LEFT_MOTOR_NUM          2
+#define RIGHT_MOTOR_NUM         1
 
 
 // ### enums for State system ###

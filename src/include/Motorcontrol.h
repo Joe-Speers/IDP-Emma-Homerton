@@ -20,5 +20,5 @@ class MotorControl{
         Adafruit_DCMotor *motorL;
         Adafruit_DCMotor *motorR;
         //time variable
-        int time
+        int time;
 };
