@@ -36,7 +36,7 @@ void MotorControl::MotorControlUpdate(double correction){
   SetMotors(left_motor,right_motor);  
 }
 
-int MotorControl::DistanceCon(double distance){
+int MotorControl::DistanceCon(int distance){
 
   distance -= Distance_Acceleration;
   time = int(distance*Distance_To_Time);
@@ -46,12 +46,22 @@ int MotorControl::DistanceCon(double distance){
 
 }
 
-int MotorControl::AngleCon(double angle){
+int MotorControl::AngleCon(int angle){
 
   angle -= Angle_Acceleration;
   time = int(angle*Angle_To_Time);
   time += Time_Angular_Acceleration;
   
   return time;
+
+}
+
+int MotorControl::TimeToAngleCon(int time){
+
+  time -= int (Time_Angular_Acceleration /2);
+  ang = int(ang / Angle_To_Time);
+  ang += Time_Angular_Acceleration;
+  
+  return ang;
 
 }
