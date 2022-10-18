@@ -36,6 +36,31 @@ void MotorControl::MotorControlUpdate(double correction){
   SetMotors(left_motor,right_motor);  
 }
 
+void MotorControl::MoveSetDistance(int distance, int s, int m){
+  
+  milli = (s + (m *1000));
+  if (setmovestate = 0){
+    setmovestate += 1;
+    starttime = milli;
+    SetMotors(Default_Speed, Default_Speed);
+    stoptime = starttime + DistanceCon(distance);
+  }
+
+  if (milli >= stoptime){
+
+    
+  }
+
+
+
+}
+
+void MotorControl::TurnSetAngle(int angle, int s, int m){
+
+
+  
+}
+
 int MotorControl::DistanceCon(int distance){
 
   distance -= Distance_Acceleration;

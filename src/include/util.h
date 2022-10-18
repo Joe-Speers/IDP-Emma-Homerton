@@ -7,6 +7,9 @@ Also contains enumerables for the state system.
 
 // ### constants ###
 
+//Motor default speed
+#define Default_Speed 255
+
 //PID constants
 #define DEFAULT_PROPORTIONAL_K 0.8
 #define DEFAULT_INTEGRAL_K 2.5
