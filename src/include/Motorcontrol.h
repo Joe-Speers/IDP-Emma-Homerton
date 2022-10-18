@@ -4,6 +4,8 @@ MotorControlUpdate() contains an algorithm to steer the robot based on a 'correc
 DistanceCon takes distance input in cm and returns millisecond value to move that distance.
 AngleCon takes angle input and returns millisecond value to turn that amount.
 TimeToAngleCon takes millisecond input and returns turned in that time, assumes angle turned in acceleration = angle turned in deceleration.
+MoveSetDistance takes a distance value and runs motor for required time to move distance input, constantly returns a bool which will return 0 for movement complete.
+TurnSetAngle takes a Angle value and runs motor for required time to turn angle input, constantly returns a bool which will return 0 for movement complete.
 TODO: servo motor control and exact distance traveling.
 */
 #include <Adafruit_MotorShield.h>
@@ -13,11 +15,11 @@ class MotorControl{
         void MotorSetup(); //Setup call to initilise motors
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
         void MotorControlUpdate(double correction); //steers and drives the robot based on the correction input for line following
-        void MoveSetDistance(int distance, int s, int m);
-        void TurnSetAngle(int angle, int s, int m);
-        int DistanceCon(int distance);
-        int AngleCon(int angle);
-        int TimeToAngleCon(int millisec);
+        bool MoveSetDistance(int distance, int s, int m);//moves set distance, returns bool of 0 when movement is complete
+        void TurnSetAngle(int angle, int s, int m);//turns set angle clockwise, returns bool of 0 when movement is complete
+        int DistanceCon(int distance);//converts distance to time at default speed
+        int AngleCon(int angle);//converts angles to time at default speed
+        int TimeToAngleCon(int millisec);//converts time to angle to turn
 
     private:
         //motor objects
@@ -29,7 +31,7 @@ class MotorControl{
         //angle variable
         int ang;
         //set movement state
-        int setmovestate = 0;
+        bool ismoving = 0;
         //elapsed time in ms;
         int milli;
         //setmovement's start time
