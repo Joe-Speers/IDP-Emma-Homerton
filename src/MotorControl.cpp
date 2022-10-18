@@ -35,3 +35,33 @@ void MotorControl::MotorControlUpdate(double correction){
   int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
   SetMotors(left_motor,right_motor);  
 }
+
+int MotorControl::DistanceCon(int distance){
+
+  distance -= Distance_Acceleration;
+  time = int(distance*Distance_To_Time);
+  time += Time_Accelartionn;
+  
+  return time;
+
+}
+
+int MotorControl::AngleCon(int angle){
+
+  angle -= Angle_Acceleration;
+  time = int(angle*Angle_To_Time);
+  time += Time_Angular_Acceleration;
+  
+  return time;
+
+}
+
+int MotorControl::TimeToAngleCon(int time){
+
+  time -= int (Time_Angular_Acceleration /2);
+  ang = int(ang / Angle_To_Time);
+  ang += Time_Angular_Acceleration;
+  
+  return ang;
+
+}

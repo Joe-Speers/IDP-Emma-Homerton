@@ -15,8 +15,8 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/LineSensor.h"
 #include "src/include/WifiDebug.h"
 #include "src/include/MotorControl.h"
-#include "src/include/start.h"
 #include "src/include/util.h"
+#include "src/include/DistanceSense.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
 
@@ -24,7 +24,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 LineSensor LineSense;
 WifiDebug Debug;
 MotorControl Mcon;
-start strt;
+DistanceSense distanceSense;
 
 //timer global variables
 int timer_last_value=0; //last time in microseconds
@@ -70,7 +70,7 @@ void setup(){
     LineSense.LineSensorSetup();
     Mcon.MotorSetup();
     Debug.SetupHotspot(); // Setup wifi debugging
-
+    distanceSense.SensorSetup();
     //setup timer
     timer_last_value=micros();
     //set state variables
@@ -116,11 +116,12 @@ void loop(){
         state_update_message+="!R"+String(RobotState.isLost)+"\n"; // recovery
         state_update_message+="!C"+String(RobotState.task_timer,1)+"\n"; //countdown
         state_update_message+="!S"+String(RobotState.task_stopwatch,1)+"\n"; //stopwatch
-        state_update_message+="!J:"+String(RobotState.junction_counter)+"\n";
+        state_update_message+="!J"+String(RobotState.junction_counter)+"\n";
         Debug.SendMessage(state_update_message);
     }
     if(m%500==0){ // twice a second
         //print out the clock
+        //Debug.SendMessage("Distance: "+String(distanceSense.ReadUltrasoundDistance(),1)); has a long delay!
         Debug.SendMessage("t: "+String(s)+":"+String(m));
     }
 
@@ -172,7 +173,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     //need to implement function to replace the next two lines with a distance to travel.
                     Mcon.SetMotors(255,255);
-                    RobotState.task_timer=2000; //move forward for 2000 seconds.
+                    RobotState.task_timer=1050; //move forward.
                 }
             } else if(RobotState.task==MOVE_FORWARD){
                 if(RobotState.task_timer==0){ //replace with junction detection test (will also need to add another step to move forward more before turning)
@@ -181,8 +182,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                     RobotState.task_stopwatch=0;
                     //need to implement function to replace the next two lines with an angle to turn.
-                    Mcon.SetMotors(255,0);
-                    RobotState.task_timer=1500;
+                    Mcon.SetMotors(255,255,FORWARD, BACKWARD);
+                    RobotState.task_timer=730;
                 }
             }
         } 
@@ -191,10 +192,11 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==TURN_RIGHT){
                 if(RobotState.task_timer==0){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
+                    LineSense.ResetPID();
                     RobotState.task_stopwatch=0;
                 }
             } else if(RobotState.task==FOLLOW_LINE){
-                if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
+                //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
                 if(false){ // 4) check tilt sensor to see if has hit ramp (TODO)
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
@@ -202,14 +204,6 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         }
     }
-    
-    //if (s < 20){
-    //    strt.startmovement(s, m, Mcon,Debug);
-    //}
-    //else{
-    //    if(s==20 and m==0) Debug.SendMessage("Following line");
-    //    RobotState.task=FOLLOW_LINE;
-    //}
 }
 
 //called when the PC sends a command message. Debug.SendMessage sends a reply

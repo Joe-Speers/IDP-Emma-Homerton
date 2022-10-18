@@ -17,6 +17,11 @@ void LineSensor::LineSensorSetup() {
   pinMode(LINE_SENSOR_PIN,INPUT);
 }
 
+void LineSensor::ResetPID(){
+  integral=0;
+  //also reset error values (todo)
+}
+
 double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   double dt=(double)dt_micros/1000000;//calculate dt in seconds, this is the time elapsed since the last call
 
@@ -24,7 +29,7 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
 
   //take reading of line sensor and normalise to be between -1 and 1
   differential_reading = analogRead(LINE_SENSOR_PIN);
-  error = (double)(LINE_SENSE_MIDDLE-differential_reading)/LINE_SENSE_MAX_AMPLITUDE; // normalises reading to approximatly -1 to 1.
+  error = -(double)(LINE_SENSE_MIDDLE-differential_reading)/LINE_SENSE_MAX_AMPLITUDE; // normalises reading to approximatly -1 to 1.
   //creates a 'dead spot' around LINE_SENSE_MIDDLE
   if(error==0 or (error<=ERROR_DEAD_SPOT && error>=-ERROR_DEAD_SPOT)){
     error=0;

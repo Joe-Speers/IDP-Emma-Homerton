@@ -21,7 +21,7 @@
     - Infrared
     -distance calculation
 - Recovery (kyle)
-- AdditonalSensors??
+- AdditonalSensors (kyle)
   - Tunnel sensor
   - Ramp sensor
 
@@ -99,4 +99,16 @@ State enumerables:
       concerns:
         -falling off ramp
         -a loop of forwards and backwards movement
+
+# block sweep module
+  Starts with robot on cross
+  Rotates 180 degrees anticlockwise
+  while rotating logs angle block is detected and angle block is no longer detected
+  rotates back to midpoint of these angles
+  measures distance
+  moves forward to that distance minus some small constant
+  iniates grab sequence
+  reverses distance from before
+  rotates back to line face forwards
+  set tasks to line follow
 

@@ -2,6 +2,35 @@
 # It has a console to display messages from the Arduino and a input field to send commands
 # There is also a graph to display sensor readings. This has a number of modes that can be selected with keyboard keys
 
+#update enums here!
+# ANY CHANGES TO THESE, please replicate in util.h
+PURPOSE={
+    0:"EXIT_START_BOX",
+    1:"TRAVEL_TO_FAR_SIDE"
+}
+
+LOCATION={
+    0:"START_SQUARE",
+    1:"DROPOFF_SIDE",
+    2:"RAMP",
+    3:"COLLECTION_SIDE",
+    4:"CROSS",
+    5:"BLOCK_COLLECTION_AREA",
+    6:"TUNNEL",
+    7:"RED_SQUARE",
+    8:"GREEN_SQARE"
+}
+
+TASK={
+    0:"STOPPED",
+    1:"MOVE_FORWARD",
+    2:"REVERSE",
+    3:"TURN_LEFT",
+    4:"TURN_RIGHT",
+    5:"FOLLOW_LINE",
+    6:"SLOW_SWEEP"
+}
+
 # use pip to install these modules first:
 import matplotlib.pyplot as plt
 import datetime
@@ -114,10 +143,12 @@ def SendMessage(command=""): # send a message to the arduino from the text input
     print("Sent: '"+command+"'")
 
 def SendReset():#tell robot to reset to starting state and reset clock
+    ConsoleWrite("Resetting robot")
     SendMessage("RESET")
 
 def SendStop():#tell robot to stop (resets and sets s to -10000, effectivly halting the robot)
-    SendMessage("RESET")
+    ConsoleWrite("Stopping robot")
+    SendMessage("STOP")
 
 def ConsoleWrite(msg): # write a message to the console
     console_log.configure(state="normal")  # make GUI field editable
@@ -126,21 +157,32 @@ def ConsoleWrite(msg): # write a message to the console
     console_log.configure(state="disabled")  # make GUI field readonly
 
 def ProcessMessage(msg):
+    if(msg==""): return
     if(msg[0]=="!"):# indicates message is a state update
         if(msg[1]=="L"):
-            location_status.set("Location: "+msg[2:-1])
+            if(int(msg[2:]) in LOCATION.keys()):
+                location_status_txt.set("Location: "+LOCATION[int(msg[2:])])
+            else:
+                location_status_txt.set("Location: "+msg[2:])
+            
         elif(msg[1]=="P"):
-            purpose_status.set("Purpose: "+msg[2:-1])
+            if(int(msg[2:]) in PURPOSE.keys()):
+                purpose_status_txt.set("Purpose: "+PURPOSE[int(msg[2:])])
+            else:
+                purpose_status_txt.set("Purpose: "+msg[2:])
         elif(msg[1]=="T"):
-            task_status.set("Task: "+msg[2:-1])
+            if(int(msg[2:]) in TASK.keys()):
+                task_status_txt.set("Task: "+TASK[int(msg[2:])])
+            else:
+                task_status_txt.set("Task: "+msg[2:])
         elif(msg[1]=="R"):
-            isLost_status.set("Is Lost: "+msg[2:-1])
+            isLost_status_txt.set("Is Lost: "+msg[2:])
         elif(msg[1]=="C"):
-            task_countdown_status.set("Task countdown timer: "+msg[2:-1])
+            task_countdown_status_txt.set("Task countdown timer: "+msg[2:])
         elif(msg[1]=="S"):
-            task_stopwatch_status.set("Task stopwatch: "+msg[2:-1])
+            task_stopwatch_status_txt.set("Task stopwatch: "+msg[2:])
         elif(msg[1]=="J"):
-            junction_counter_status.set("Junction counter: "+msg[2:-1])
+            junction_counter_status_txt.set("Junction counter: "+msg[2:])
     else: #if message is not a state update, then print to console
         ConsoleWrite(msg)
 
@@ -238,13 +280,20 @@ FPS_label = tkinter.Label( root, textvariable=FPS_text,font=main_font)
 main_label = tkinter.Label( root, text="Wifi Debug",font=("consolas", "20", "normal"))
 console_log = ScrolledText(root, height=30,font=main_font)
 #status labels
-location_status = tkinter.Label( root, text="Location:",font=main_font)
-purpose_status = tkinter.Label( root, text="Purpose:",font=main_font)
-task_status = tkinter.Label( root, text="Task:",font=main_font)
-isLost_status = tkinter.Label( root, text="Is Lost:",font=main_font)
-task_countdown_status = tkinter.Label( root, text="Task countdown timer:",font=main_font)
-task_stopwatch_status = tkinter.Label( root, text="Task stopwatch:",font=main_font)
-junction_counter_status = tkinter.Label( root, text="Junction counter:",font=main_font)
+location_status_txt = tkinter.StringVar()
+purpose_status_txt = tkinter.StringVar()
+task_status_txt = tkinter.StringVar()
+isLost_status_txt = tkinter.StringVar()
+task_countdown_status_txt = tkinter.StringVar()
+task_stopwatch_status_txt = tkinter.StringVar()
+junction_counter_status_txt = tkinter.StringVar()
+location_status = tkinter.Label( root, textvariable=location_status_txt,font=main_font)
+purpose_status = tkinter.Label( root, textvariable=purpose_status_txt,font=main_font)
+task_status = tkinter.Label( root, textvariable=task_status_txt,font=main_font)
+isLost_status = tkinter.Label( root, textvariable=isLost_status_txt,font=main_font)
+task_countdown_status = tkinter.Label( root, textvariable=task_countdown_status_txt,font=main_font)
+task_stopwatch_status = tkinter.Label( root, textvariable=task_stopwatch_status_txt,font=main_font)
+junction_counter_status = tkinter.Label( root, textvariable=junction_counter_status_txt,font=main_font)
 #the order of these commands determines position of GUI elements
 main_label.pack(side=tkinter.TOP)
 console_log.pack(side=tkinter.RIGHT)
