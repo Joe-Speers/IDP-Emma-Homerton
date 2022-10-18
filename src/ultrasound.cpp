@@ -5,8 +5,9 @@ const int echoPin = 10;
 // defines variables
 long duration;
 int distance;
+float weight;
 //Filter for float numbers, (a,b) a is weighting of filter (to be calibrated), b is initial value of filter
-ExponentialFilter<float> FilteredDistance(90, 0);
+ExponentialFilter<float> FilteredDistance(weignt, 0);
 
 void setup() {
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
