@@ -11,6 +11,10 @@ Also contains enumerables for the state system.
 #define Default_Speed 255
 #define Sweep_Speed 100
 
+//Block gathering constants
+#define GapLeftToBlock 5
+#define MinWallDistance 80
+
 //Turning direction 
 #define Clockwise 1
 #define Anticlockwise 0
