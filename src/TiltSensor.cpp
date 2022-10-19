@@ -13,26 +13,26 @@ TiltState TiltSensor::getTilt(int dt){
         if (IMU.gyroscopeAvailable()) {
             IMU.readGyroscope(x, y, z);
             
-            if (TiltState == HORIZONTAL){
+            if (lastState == HORIZONTAL){
                 if (x > GYRO_THRESHOLD){
-                    TiltState = TILT_UP
+                    lastState = TILT_UP
                     buffer = 100;
                 }
                 if (x < GYRO_THRESHOLD){
-                    TiltState = TILT_DOWN
+                    lastState = TILT_DOWN
                     buffer = 100;
 
                 }
             }
-            if (TiltState == TILT_UP){
+            if (lastState == TILT_UP){
                 if (x < GYRO_THRESHOLD){
-                    TiltState = HORIZONTAL
+                    lastState = HORIZONTAL
                     buffer = 100;
                 }
             }
-            if (TiltState == TILT_DOWN){
+            if (lastState == TILT_DOWN){
                 if (x > GYRO_THRESHOLD){
-                    TiltState = HORIZONTAL                    
+                    lastState = HORIZONTAL                    
                     buffer = 100;
                 }
             }
