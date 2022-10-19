@@ -7,8 +7,13 @@ Also contains enumerables for the state system.
 
 // ### constants ###
 
-//Motor default speed
+//Motor speeds
 #define Default_Speed 255
+#define Sweep_Speed 100
+
+//Turning direction 
+#define Clockwise 1
+#define anticlockwise 0
 
 //PID constants
 #define DEFAULT_PROPORTIONAL_K 0.8
