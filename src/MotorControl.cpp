@@ -63,10 +63,10 @@ bool MotorControl::TurnSetAngle(int angle, int s, int m, bool isclockwise){
       starttime = milli;
       
       if (isclockwise = 1) {
-        SetMotors(Default_Speed, Default_Speed, FORWARD, BACKWARD);
+        SetMotors(Sweep_Speed, Sweep_Speed, FORWARD, BACKWARD);
       }
       if (isclockwise = 0) {
-        SetMotors(Default_Speed, Default_Speed, BACKWARD, FORWARD);
+        SetMotors(Sweep_Speed, Sweep_Speed, BACKWARD, FORWARD);
       }
 
       stoptime = starttime + AngleCon(angle);
