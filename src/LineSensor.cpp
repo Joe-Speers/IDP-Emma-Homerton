@@ -15,6 +15,7 @@ Ideally motor control should be removed from this file and implemented seperatly
 
 void LineSensor::LineSensorSetup() {
   pinMode(LINE_SENSOR_PIN,INPUT);
+  pinMode(JUNCTION_SENSOR_PIN, INPUT);
 }
 
 void LineSensor::ResetPID(){
@@ -63,4 +64,16 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
     correction=-1;
   }
   return correction;
+}
+
+bool LineSensor::juntionDetect() {
+  
+  if (digitalRead(JUNCTION_SENSOR_PIN == HIGH))
+  {
+    return 1;
+  }
+  if (digitalRead(JUNCTION_SENSOR_PIN == LOW)
+  {
+    return 0;
+  }
 }

@@ -22,6 +22,8 @@ class LineSensor{
         void LineSensor::ResetPID();     //resets integral value
         void LineSensorSetup();         //Setup call to initilise sensors
         double PIDLineFollowCorrection(int dt_micros); // takes a sensor reading and peforms PID calculation. Returns correction value between -1 and 1. dt_micros is the elapsed time since this was last called.
+        bool juntionDetect();   //returns binary output, 1 for junction detected, otherwise 0
     private:
         float error_array[DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE]; // stores the last few values of 'error', used to calculate derivative
+
 };
