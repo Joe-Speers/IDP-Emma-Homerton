@@ -55,13 +55,20 @@ bool MotorControl::MoveSetDistance(int distance, int s, int m){
 
 }
 
-void MotorControl::TurnSetAngle(int angle, int s, int m){
+void MotorControl::TurnSetAngle(int angle, int s, int m, bool isclockwise){
 
   milli = (s + (m *1000));
     if (ismoving == 0){
       ismoving = 1;
       starttime = milli;
-      SetMotors(Default_Speed, Default_Speed, FORWARD, BACKWARD);
+      
+      if (isclockwise = 1) {
+        SetMotors(Default_Speed, Default_Speed, FORWARD, BACKWARD);
+      }
+      if (isclockwise = 0) {
+        SetMotors(Default_Speed, Default_Speed, BACKWARD, FORWARD);
+      }
+
       stoptime = starttime + AngleCon(angle);
     }
 
