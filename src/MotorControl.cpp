@@ -36,9 +36,10 @@ void MotorControl::MotorControlUpdate(double correction){
   SetMotors(left_motor,right_motor);  
 }
 
-bool MotorControl::MoveSetDistance(int distance, int s, int m){
+bool MotorControl::MoveSetDistance(int distance){
   
-  milli = (s + (m *1000));
+  milli = millis();
+
   if (ismoving == 0){
     ismoving = 1;
     starttime = milli;
@@ -55,9 +56,9 @@ bool MotorControl::MoveSetDistance(int distance, int s, int m){
 
 }
 
-bool MotorControl::TurnSetAngle(int angle, int s, int m, bool isclockwise){
+bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
 
-  milli = (s + (m *1000));
+  milli = millis();
     if (ismoving == 0){
       ismoving = 1;
       starttime = milli;

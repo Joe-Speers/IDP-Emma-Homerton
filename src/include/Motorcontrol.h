@@ -15,8 +15,8 @@ class MotorControl{
         void MotorSetup(); //Setup call to initilise motors
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
         void MotorControlUpdate(double correction); //steers and drives the robot based on the correction input for line following
-        bool MoveSetDistance(int distance, int s, int m);//moves set distance, returns bool of 0 when movement is complete
-        bool TurnSetAngle(int angle, int s, int m, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
+        bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
+        bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
         int DistanceCon(int distance);//converts distance to time at default speed
         int AngleCon(int angle);//converts angles to time at default speed
         int TimeToAngleCon(int millisec);//converts time to angle to turn
@@ -30,10 +30,10 @@ class MotorControl{
         int time;
         //angle variable
         int ang;
+        //time elapsed in milliseconds
+        int milli;
         //set movement state
         bool ismoving = 0;
-        //elapsed time in ms;
-        int milli;
         //setmovement's start time
         int starttime;
         //setmovement's stop time 

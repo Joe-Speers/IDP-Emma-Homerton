@@ -7,7 +7,7 @@ class BlockSweep
         int distance = 0;
         
         //
-        bool BlockSwe(int s, int m, int distance);
+        bool BlockSwe(int distance);
         int AngleFind(int distance, int milliseconds);
 
     private:

@@ -5,54 +5,59 @@
 
 MotorControl MotorC;
 
-bool BlockSweep::BlockSwe(int s, int m, int distance){
+bool BlockSweep::BlockSwe(int distance){
 
-    milli = s + (1000*m);
+    milli = millis();
     if (sweepstate == 0){
+        //Sets start time
         starttime = milli;
         sweepstate += 1;
     }
     if (sweepstate == 1){
-        ismoving = MotorC.TurnSetAngle(180, s, m, Anticlockwise);
+        //Turns robot 180 degrees whilst recording if block is sensed
+        ismoving = MotorC.TurnSetAngle(180, Anticlockwise);
         midp = AngleFind(distance, milli);
         if (ismoving == 0){
             sweepstate += 1;
         }
     }
     if (sweepstate == 2){
+        //Turns robot to face midpoint of block and records distance to block
         angleofblock = 180 - MotorC.TimeToAngleCon(midp);
-    }
-    if (sweepstate == 3){
-        ismoving = MotorC.TurnSetAngle(angleofblock, s, m, Clockwise);
+        ismoving = MotorC.TurnSetAngle(angleofblock, Clockwise);
         if (ismoving == 0){
             sweepstate += 1;
             blockdistance = distance;
         }
     }
     if (sweepstate == 3){
-        ismoving = MotorC.MoveSetDistance(blockdistance - GapLeftToBlock, s, m);
+        //Moves robot forwards to a set distance from the block
+        ismoving = MotorC.MoveSetDistance(blockdistance - GapLeftToBlock);
         if (ismoving == 0){
             sweepstate += 1;
         }
     }
     if (sweepstate == 4){
-        //add block picking up here
+        //Add block picking up here
         sweepstate += 1;
     }
     if (sweepstate == 5){
-        ismoving = MotorC.TurnSetAngle(180, s, m, Anticlockwise);
+        //Turns robot around
+        ismoving = MotorC.TurnSetAngle(180, Anticlockwise);
         if (ismoving == 0){
             sweepstate += 1;
         }
     }
     if (sweepstate == 6){
-        ismoving = MotorC.MoveSetDistance(blockdistance - GapLeftToBlock, s, m);
+        //Moves robot back to cross
+        ismoving = MotorC.MoveSetDistance(blockdistance - GapLeftToBlock);
         if (ismoving == 0){
             sweepstate += 1;
         }
     }
     if (sweepstate == 7){
-        ismoving = MotorC.TurnSetAngle(angleofblock, s, m, Anticlockwise);
+        //Rotates robot to face allong the line
+        ismoving = MotorC.TurnSetAngle(angleofblock, Anticlockwise);
         if (ismoving == 0){
             sweepstate += 1;
         }
