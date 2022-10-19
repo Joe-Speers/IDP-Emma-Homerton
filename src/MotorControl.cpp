@@ -55,7 +55,7 @@ bool MotorControl::MoveSetDistance(int distance, int s, int m){
 
 }
 
-void MotorControl::TurnSetAngle(int angle, int s, int m, bool isclockwise){
+bool MotorControl::TurnSetAngle(int angle, int s, int m, bool isclockwise){
 
   milli = (s + (m *1000));
     if (ismoving == 0){
