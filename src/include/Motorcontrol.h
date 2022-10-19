@@ -8,11 +8,14 @@ MoveSetDistance takes a distance value and runs motor for required time to move 
 TurnSetAngle takes a Angle value and runs motor for required time to turn angle input, constantly returns a bool which will return 0 for movement complete.
 TODO: servo motor control and exact distance traveling.
 */
+#include <Servo.h>
 #include <Adafruit_MotorShield.h>
 
 class MotorControl{
     public:
         void MotorSetup(); //Setup call to initilise motors
+        void ServoSetup(); //Setup call to initilise servo
+        void SetServoAngle(int angle); //Set servo angle
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
         void MotorControlUpdate(double correction); //steers and drives the robot based on the correction input for line following
         bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
@@ -26,6 +29,8 @@ class MotorControl{
         Adafruit_MotorShield AFMS;
         Adafruit_DCMotor *motorL;
         Adafruit_DCMotor *motorR;
+        //servo object
+        Servo myservo;
         //time variable
         int time;
         //angle variable

@@ -53,6 +53,8 @@ Also contains enumerables for the state system.
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          2
 #define RIGHT_MOTOR_NUM         1
+// servo pin
+#define SERVO_PIN 10
 
 
 // ### enums for State system ###

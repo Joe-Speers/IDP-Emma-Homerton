@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-
+#include <Servo.h>
 #include "include/util.h"
 #include "include/Motorcontrol.h"
 
@@ -14,6 +14,19 @@ void MotorControl::MotorSetup() {
   AFMS.begin();
   //set initial speed and direction
   SetMotors(0,0,FORWARD,FORWARD);
+}
+
+void MotorControl::ServoSetup(){
+  // Attach the Servo variable to a pin:
+  myservo.attach(SERVO_PIN);
+}
+
+void MotorControl::SetServoAngle(int angle){
+  //restrict input to valid range
+  if (angle < 0 ){angle = 0;}
+  if (angle > 180){angle = 180;}
+  //set servo angle
+  myservo.write(angle);
 }
 
 void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD){
