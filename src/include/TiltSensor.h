@@ -1,12 +1,13 @@
 #include "util.h"
 
-class TiltSensor(){
+class TiltSensor{
     public:
-    void sensorSetup();
-    TiltState getTilt(); //returns the current tilt state
-    enum TiltState{
-        HORIZONTAL = 0,
-        TILT_UP = 1,
-        TILT_DOWN = 2,
-    }
+        enum TiltState{
+            HORIZONTAL = 0,
+            TILT_UP = 1,
+            TILT_DOWN = 2,
+        };
+        void sensorSetup();
+        TiltState getTilt(); //returns the current tilt state
+        
 }

@@ -19,7 +19,7 @@ class LineSensor{
         float integral_k=DEFAULT_INTEGRAL_K;
         float derivative_k=DEFAULT_DERIVATIVE_K;
         float integral_limit=(1/integral_k)*DEFAULT_INTEGRAL_CORRECTION_LIMIT;// hard limit on integral size
-        void LineSensor::ResetPID();     //resets integral value
+        void ResetPID();     //resets integral value
         void LineSensorSetup();         //Setup call to initilise sensors
         double PIDLineFollowCorrection(int dt_micros); // takes a sensor reading and peforms PID calculation. Returns correction value between -1 and 1. dt_micros is the elapsed time since this was last called.
         bool juntionDetect();   //returns binary output, 1 for junction detected, otherwise 0
