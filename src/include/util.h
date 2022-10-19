@@ -13,7 +13,7 @@ Also contains enumerables for the state system.
 
 //Turning direction 
 #define Clockwise 1
-#define anticlockwise 0
+#define Anticlockwise 0
 
 //PID constants
 #define DEFAULT_PROPORTIONAL_K 0.8
