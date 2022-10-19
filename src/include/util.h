@@ -14,13 +14,19 @@ Also contains enumerables for the state system.
 //distance between line sensors and turning point
 #define DISTANCE_TO_ROTATION_POINT 16
 
+//Gyroscope Constants
+#define GYRO_THRESHOLD 80
+#define GYRO_BUFFER 100
+
 //Block gathering constants
-#define GapLeftToBlock 5
-#define MinWallDistance 80
+#define GAP_LEFT_TO_BLOCK 5
+#define MIN_WALL_DISTANCE 80
+#define ARMS_CLOSED_ANGLE 90 //do not know these values currently, depends on setup and gearing
+#define ARMS_OPEN_ANGLE 0
 
 //Turning direction 
-#define Clockwise 1
-#define Anticlockwise 0
+#define CLOCKWISE 1
+#define ANTI_CLOCKWISE 0
 
 //PID constants
 #define DEFAULT_PROPORTIONAL_K 0.8

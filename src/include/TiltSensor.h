@@ -7,7 +7,10 @@ class TiltSensor{
             TILT_UP = 1,
             TILT_DOWN = 2,
         };
-        void sensorSetup();
-        TiltState getTilt(); //returns the current tilt state
         
+    void sensorSetup();
+    TiltState getTilt(int dt); //returns the current tilt state
+    private:
+        float x, y, z;
+        int buffer = 0;
 }
