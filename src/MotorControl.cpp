@@ -42,11 +42,40 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
   motorR->setSpeed(rmotor);
 }
 
-void MotorControl::MotorControlUpdate(double correction){
-  //set motor speeds based on correction steering value, used for line following
-  int left_motor=(correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
-  int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
-  SetMotors(left_motor,right_motor);  
+void MotorControl::LineFollowUpdate(double correction, bool onLine){
+  if(LineStatus.LINE_DETECTED){
+    if(!MoveSetDistance(DISTANCE_TO_ROTATION_POINT)){
+      //now aligned with line, just need to rotate onto line
+    }
+  }
+  if(onLine){
+    if(LineStatus.ON_LINE){
+
+    } else {
+      //line detected!
+      LineStatus.LINE_DETECTED;
+      MoveSetDistance(DISTANCE_TO_ROTATION_POINT);
+    }
+  } else {
+    if(correction>0){
+      LineStatus=RIGHT_SWEEP;
+      TurnSetAngle(90,true);
+    } else {
+      LineStatus = LEFT_SWEEP;
+    }
+  }
+  else{
+    if(Line)
+  }
+  if(!LostLine){ //if robot is on the line
+    //set motor speeds based on correction steering value, used for line following
+    int left_motor=(correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
+    int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
+    SetMotors(left_motor,right_motor);  
+    return;
+  } else {
+    
+  }
 }
 
 bool MotorControl::MoveSetDistance(int distance){
@@ -63,10 +92,8 @@ bool MotorControl::MoveSetDistance(int distance){
   if (milli >= stoptime){
     SetMotors(0,0);
     ismoving = 0;
-
-    return ismoving;
   }
-
+  return ismoving;
 }
 
 bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
@@ -89,10 +116,8 @@ bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
     if (milli >= stoptime){
       SetMotors(0,0);
       ismoving = 0;
-
-      return ismoving;
     }
-
+  return ismoving;
   
 }
 

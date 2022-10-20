@@ -17,7 +17,7 @@ class MotorControl{
         void ServoSetup(); //Setup call to initilise servo
         void SetServoAngle(int angle); //Set servo angle
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
-        void MotorControlUpdate(double correction); //steers and drives the robot based on the correction input for line following
+        void LineFollowUpdate(double correction, bool onLine); //steers and drives the robot based on the correction input for line following
         bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
         bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
         int DistanceCon(int distance);//converts distance to time at default speed
@@ -43,5 +43,13 @@ class MotorControl{
         int starttime;
         //setmovement's stop time 
         int stoptime;
+        //possible states for line following
+        enum LineStatus{
+            LINE_UNDETECTABLE =0, //if cannot find line after sweep
+            ON_LINE = 1,  //if detecting the line AND aligned with the line
+            LEFT_SWEEP = 2, // if sweeping anti-clockwise
+            RIGHT_SWEEP = 3, // if sweeping clockwise
+            LINE_DETECTED = 4 // if line has been detected (and so moving towards it)
+        };
 
 };

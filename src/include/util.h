@@ -11,6 +11,9 @@ Also contains enumerables for the state system.
 #define Default_Speed 255
 #define Sweep_Speed 100
 
+//distance between line sensors and turning point
+#define DISTANCE_TO_ROTATION_POINT 16
+
 //Block gathering constants
 #define GapLeftToBlock 5
 #define MinWallDistance 80
@@ -37,6 +40,8 @@ Also contains enumerables for the state system.
 #define Angle_Acceleration 2 //degrees turned in angular acceleration and deceleration
 #define Time_Angular_Acceleration 10 //time taken for angular acceleration and deceleration
 #define Angle_To_Time 5 //constant of proportionality between angle and time at constant angular speed
+
+#define COMPLETE 0 //value for SetDistance and SetAngle once complete
 
 //Settings for line sensor value normalisation
 #define LINE_SENSE_MIDDLE           531 //what reading should be treated as the 'middle' of the line

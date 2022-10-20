@@ -132,7 +132,17 @@ void loop(){
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE){
-        Mcon.MotorControlUpdate(correction);
+        if(true){ //if on line
+            Mcon.MotorControlUpdate(correction);
+        } else { //if line has been lost, swing to find it
+            //rotate clockwise untill line is found
+            if(!Mcon.ismoving){
+                Mcon.TurnSetAngle(90,false)
+            } else{}
+            if(Mcon.TurnSetAngle(90,false)==COMPLETE){
+                Mcon.TurnSetAngle(180,true);//if not found, rotate back and then 90 degrees in the other direction
+            }
+        }
     }
 
     // ### Wifi Debug Read ###
