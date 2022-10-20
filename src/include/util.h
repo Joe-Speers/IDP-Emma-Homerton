@@ -63,7 +63,10 @@ Also contains enumerables for the state system.
 enum Purpose{ //Describes the current goal
     EXIT_START_BOX = 0,
     TRAVEL_TO_FAR_SIDE = 1, //add more as needed
-
+    PICK_UP_BLOCK = 2,
+    TRAVEL_TO_START_SIDE = 3,
+    DROP_BLOCK = 4,
+    RETURN_HOME = 5,
 };
 
 enum Location{
@@ -75,7 +78,7 @@ enum Location{
     BLOCK_COLLECTION_AREA   = 5,
     TUNNEL                  = 6,
     RED_SQUARE              = 7,
-    GREEN_SQARE             = 8
+    GREEN_SQUARE             = 8,
 };
 
 enum Task{  //Describes the exact task the robot is peforming
