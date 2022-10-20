@@ -66,6 +66,10 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   return correction;
 }
 
+bool isLineDetected(){
+  return true; //todo.
+}
+
 bool LineSensor::juntionDetect() {
   
   if (digitalRead(JUNCTION_SENSOR_PIN == HIGH))

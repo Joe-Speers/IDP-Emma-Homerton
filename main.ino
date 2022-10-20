@@ -132,18 +132,8 @@ void loop(){
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE){
-        if(true){ //if on line
-            Mcon.MotorControlUpdate(correction);
-        } else { //if line has been lost, swing to find it
-            //rotate clockwise untill line is found
-            if(!Mcon.ismoving){
-                Mcon.TurnSetAngle(90,false)
-            } else{}
-            if(Mcon.TurnSetAngle(90,false)==COMPLETE){
-                Mcon.TurnSetAngle(180,true);//if not found, rotate back and then 90 degrees in the other direction
-            }
-        }
-    }
+        bool followingLine=Mcon.MotorControlUpdate(correction,LineSense.isLineDetected());
+        if(!followingLine) isLost = true;
 
     // ### Wifi Debug Read ###
     //read command from PC
@@ -166,6 +156,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     //If robot is lost then do something different
     if(RobotState.isLost){
         //recovery mode here
+        Mcon.SetMotors(0,0);//stop robot at the moment
         return;// do not proceed to descision tree
     }
 
