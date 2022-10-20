@@ -200,6 +200,86 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 if(false){ // 4) check tilt sensor to see if has hit ramp (TODO)
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
+                    RobotState.task=MOVE_FORWARD;
+                    Mcon.SetMotors(255,255);
+                }
+                
+            }
+        } else if(RobotState.location==RAMP){
+            if(RobotState.task==MOVE_FORWARD){
+                if(false){// if tilt sensor horizontal
+                    RobotState.task=FOLLOW_LINE;
+                    RobotState.task_stopwatch=0;
+                }
+            } else if(RobotState.task==FOLLOW_LINE){
+                if(false){ //if tilt downwards
+                RobotState.location=COLLECTION_SIDE;
+                    RobotState.task=MOVE_FORWARD;
+                    RobotState.task_stopwatch=0;
+                    Mcon.SetMotors(255,255);
+                }
+            }
+        } else if(RobotState.location==COLLECTION_SIDE){
+            if(RobotState.task==MOVE_FORWARD){
+                if(false){ //if tilt horizontal
+                    RobotState.task=FOLLOW_LINE;
+                    RobotState.task_stopwatch=0;
+                }
+            } else if(RobotState.task==FOLLOW_LINE){
+                if(LineSense.juntionDetect()){
+                    RobotState.purpose=PICK_UP_BLOCK;
+                    RobotState.location=CROSS;
+                    RobotState.task=STOPPED; //temporary
+                    Mcon.SetMotors(0,0);
+                    RobotState.task_stopwatch=0;
+                    RobotState.task_timer=3000;// just stop for 3 seconds
+                }
+            }
+        }
+    } else if(RobotState.purpose==PICK_UP_BLOCK){
+        if(RobotState.location==CROSS){
+            if(RobotState.task==STOPPED){
+                if(RobotState.task_timer==0){
+                    RobotState.purpose=TRAVEL_TO_START_SIDE;
+                    RobotState.location=COLLECTION_SIDE;
+                    RobotState.task=FOLLOW_LINE;
+                    RobotState.task_stopwatch=0;
+                }
+            }
+        }
+    } else if(RobotState.purpose==TRAVEL_TO_FAR_SIDE){
+        if(RobotState.location==COLLECTION_SIDE){
+            if(RobotState.task==FOLLOW_LINE){
+                if(false){//light sensor low
+                    RobotState.location=TUNNEL;
+                    RobotState.task=MOVE_FORWARD;
+                    Mcon.SetMotors(255,255);
+                    RobotState.task_stopwatch=0;
+                    LineSense.ResetPID();
+                }
+            }
+        } else if(RobotState.location==TUNNEL){
+            if(RobotState.task==MOVE_FORWARD){
+                if(false){ //light sensor high
+                    RobotState.task=MOVE_FORWARD;
+                    RobotState.location=DROPOFF_SIDE;
+                    RobotState.task_stopwatch=0;
+                    RobotState.task_timer=1000;
+                    Mcon.SetMotors(255,255);
+                }
+            }
+        } else if(RobotState.location==DROPOFF_SIDE){
+            if(RobotState.task==MOVE_FORWARD){
+                if(RobotState.task_timer==0){
+                    RobotState.task=FOLLOW_LINE;
+                    RobotState.task_stopwatch=0;
+                    LineSense.ResetPID();
+                }
+            } else if(RobotState.task==FOLLOW_LINE){
+                if(RobotState.task_stopwatch>5000){ // temporary loop back to start
+                    RobotState.purpose=TRAVEL_TO_FAR_SIDE;
+                    RobotState.task=FOLLOW_LINE;
+                    RobotState.task_stopwatch=0;
                 }
             }
         }
