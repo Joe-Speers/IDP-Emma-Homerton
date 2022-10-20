@@ -17,7 +17,7 @@ class MotorControl{
         void ServoSetup(); //Setup call to initilise servo
         void SetServoAngle(int angle); //Set servo angle
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
-        void LineFollowUpdate(double correction, bool onLine); //steers and drives the robot based on the correction input for line following
+        bool LineFollowUpdate(double correction, bool LineDetected); // handles line following based on the PID correction input. Also handles if the robot looses the line. Returns false if the line is undetectable, true otherwise.
         bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
         bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
         int DistanceCon(int distance);//converts distance to time at default speed
@@ -46,10 +46,17 @@ class MotorControl{
         //possible states for line following
         enum LineStatus{
             LINE_UNDETECTABLE =0, //if cannot find line after sweep
-            ON_LINE = 1,  //if detecting the line AND aligned with the line
-            LEFT_SWEEP = 2, // if sweeping anti-clockwise
-            RIGHT_SWEEP = 3, // if sweeping clockwise
-            LINE_DETECTED = 4 // if line has been detected (and so moving towards it)
+            LINE_ALIGNED = 1,  //if detecting the line AND aligned with the line
+            INITIAL_SCAN = 2, // if sweeping 90 degrees to find the line
+            REVERSE_SCAN = 3, // if sweeping back 180 degrees
+            MOVING_ONTO_LINE = 4, // if line has been detected (and so moving towards it)
+            ALIGN_SCAN = 5, //if aligning with the line (by moving 90 degrees)
+            REVERSE_ALIGN_SCAN = 6 //sweeping back to align (by moving 180 degrees)
         };
+        // line following state
+        struct{
+            LineStatus status=LINE_ALIGNED;
+            int scan_direction=0;
+        } LineState;
 
 };
