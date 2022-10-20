@@ -17,6 +17,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/MotorControl.h"
 #include "src/include/util.h"
 #include "src/include/DistanceSense.h"
+#include "src/include/TiltSensor.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
 
@@ -25,6 +26,7 @@ LineSensor LineSense;
 WifiDebug Debug;
 MotorControl Mcon;
 DistanceSense distanceSense;
+TiltSensor TiltSense;
 
 //timer global variables
 int timer_last_value=0; //last time in microseconds
@@ -71,6 +73,7 @@ void setup(){
     Mcon.MotorSetup();
     Debug.SetupHotspot(); // Setup wifi debugging
     distanceSense.SensorSetup();
+    TiltSense.sensorSetup();
     //setup timer
     timer_last_value=micros();
     //set state variables
@@ -131,7 +134,7 @@ void loop(){
     // peform PID calculation
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //if following line, apply PID calculation
-    if(RobotState.task==FOLLOW_LINE){
+    if(RobotState.task==FOLLOW_LINE and !isLost){
         bool followingLine=Mcon.MotorControlUpdate(correction,LineSense.isLineDetected());
         if(!followingLine) isLost = true;
 
@@ -198,7 +201,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             } else if(RobotState.task==FOLLOW_LINE){
                 //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
-                if(false){ // 4) check tilt sensor to see if has hit ramp (TODO)
+                if(TiltSense.getTilt==TILT_UP){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
                     RobotState.task=MOVE_FORWARD;
@@ -208,12 +211,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==RAMP){
             if(RobotState.task==MOVE_FORWARD){
-                if(false){// if tilt sensor horizontal
+                if(TiltSense.getTilt==HORIZONTAL){
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                 }
             } else if(RobotState.task==FOLLOW_LINE){
-                if(false){ //if tilt downwards
+                if(TiltSense.getTilt==TILT_DOWN){
                 RobotState.location=COLLECTION_SIDE;
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
@@ -222,7 +225,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==MOVE_FORWARD){
-                if(false){ //if tilt horizontal
+                if(TiltSense.getTilt==HORIZONTAL){
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                 }
@@ -244,6 +247,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.purpose=TRAVEL_TO_START_SIDE;
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
+                    LineSense.ResetPID();
                     RobotState.task_stopwatch=0;
                 }
             }
