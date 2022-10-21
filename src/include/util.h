@@ -39,6 +39,9 @@ Also contains enumerables for the state system.
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          2
 #define RIGHT_MOTOR_NUM         1
+#define HALL_SENSOR_PIN         A1
+#define Magnet_Red_LED          8
+#define NonMagnet_Green_LED     7
 
 
 // ### enums for State system ###
