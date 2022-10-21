@@ -15,7 +15,7 @@ Also contains enumerables for the state system.
 #define DISTANCE_TO_ROTATION_POINT 16
 
 //Gyroscope Constants
-#define GYRO_THRESHOLD 80
+#define GYRO_THRESHOLD 40
 #define GYRO_BUFFER 100
 
 //Block gathering constants

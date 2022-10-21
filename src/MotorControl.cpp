@@ -57,7 +57,6 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
     int left_motor=(correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
     int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
     SetMotors(left_motor,right_motor);  
-    return;
   } else if(LineState.status==INITIAL_SCAN){
     if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
       LineState.status=REVERSE_SCAN;
