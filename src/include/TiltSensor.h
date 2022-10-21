@@ -10,6 +10,7 @@ class TiltSensor{
         TILT_DOWN = 2,
     }
     private:
+    TiltState lastState;
     float x, y, z;
     int buffer = 0;
 }
