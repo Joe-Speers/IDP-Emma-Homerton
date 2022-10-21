@@ -4,6 +4,7 @@
 #include <Servo.h>
 #include "include/util.h"
 #include "include/Motorcontrol.h"
+//#include "include/WifiDebug.h"
 
 
 void MotorControl::MotorSetup() {
@@ -42,9 +43,10 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
   motorR->setSpeed(rmotor);
 }
 
-bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
+bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug){
   if((!LineDetected && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
     LineState.status=INITIAL_SCAN;
+    Debug.SendMessage("Lost line, now finding it");
     if(correction>=1){
     LineState.scan_direction=1;
     } else {

@@ -59,9 +59,9 @@ void ResetState(){
     m=0;
     s=0;
     //reset states to inital values
-    RobotState.location=START_SQUARE;
-    RobotState.purpose=EXIT_START_BOX;
-    RobotState.task=STOPPED;
+    RobotState.location=COLLECTION_SIDE;
+    RobotState.purpose=TRAVEL_TO_FAR_SIDE;
+    RobotState.task=FOLLOW_LINE;
     RobotState.isLost=false;
     RobotState.task_timer=0;
     RobotState.task_stopwatch=0;
@@ -75,6 +75,7 @@ void setup(){
     Debug.SetupHotspot(); // Setup wifi debugging
     distanceSense.SensorSetup();
     TiltSense.sensorSetup();
+    TiltSense.reset();
     //setup timer
     timer_last_value=micros();
     //set state variables
@@ -135,13 +136,14 @@ void loop(){
     TiltSensor::TiltState tilt = TiltSense.getTilt(dt/1000); // update tilt sensor
     if(m%20==0){
         //Serial.println(String(TiltSense.x_average));
-        Serial.println(String(tilt));
+        //Serial.println(String(TiltSense.x_average));
+        Serial.println(String(LineSense.derivative));
     }
     // peform PID calculation
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE and !RobotState.isLost){
-        bool followingLine=Mcon.LineFollowUpdate(correction,LineSense.isLineDetected());
+        bool followingLine=Mcon.LineFollowUpdate(correction,LineSense.isLineDetected(),Debug);
         if(!followingLine){
             RobotState.isLost = true;
             Debug.SendMessage("Failed to find line, now lost");
@@ -205,6 +207,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==TURN_RIGHT){
                 if(RobotState.task_timer==0){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
+                    TiltSense.reset();
                     LineSense.ResetPID();
                     RobotState.task_stopwatch=0;
                 }

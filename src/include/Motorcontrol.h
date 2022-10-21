@@ -10,6 +10,7 @@ TODO: servo motor control and exact distance traveling.
 */
 #include <Servo.h>
 #include <Adafruit_MotorShield.h>
+#include "WifiDebug.h"
 
 class MotorControl{
     public:
@@ -17,7 +18,7 @@ class MotorControl{
         void ServoSetup(); //Setup call to initilise servo
         void SetServoAngle(int angle); //Set servo angle
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
-        bool LineFollowUpdate(double correction, bool LineDetected); // handles line following based on the PID correction input. Also handles if the robot looses the line. Returns false if the line is undetectable, true otherwise.
+        bool LineFollowUpdate(double correction, bool LineDetected, WifiDebug Debug); // handles line following based on the PID correction input. Also handles if the robot looses the line. Returns false if the line is undetectable, true otherwise.
         bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
         bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
         int DistanceCon(int distance);//converts distance to time at default speed

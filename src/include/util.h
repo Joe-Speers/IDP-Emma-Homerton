@@ -6,7 +6,7 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 0.1
 //Motor speeds
 #define Default_Speed 255
 #define Sweep_Speed 100
@@ -15,8 +15,9 @@ Also contains enumerables for the state system.
 #define DISTANCE_TO_ROTATION_POINT 16
 
 //Gyroscope Constants
-#define GYRO_THRESHOLD 40
-#define GYRO_BUFFER 100
+#define GYRO_THRESHOLD 10
+#define GYRO_BUFFER 1000
+#define TILT_AVERAGE_READINGS 50
 
 //Block gathering constants
 #define GAP_LEFT_TO_BLOCK 5
@@ -40,12 +41,12 @@ Also contains enumerables for the state system.
 
 //Conversion constants
 #define Distance_Acceleration 2 //distance covered in motor acceleration and deceleration
-#define Time_Accelartionn 50 //time taken for acceleration and deceleration
-#define Distance_To_Time 10 //constant of proportionality between distance and time at constant speed
+#define Time_Accelartionn 1000 //time taken for acceleration and deceleration
+#define Distance_To_Time 200 //constant of proportionality between distance and time at constant speed
 
 #define Angle_Acceleration 2 //degrees turned in angular acceleration and deceleration
-#define Time_Angular_Acceleration 10 //time taken for angular acceleration and deceleration
-#define Angle_To_Time 5 //constant of proportionality between angle and time at constant angular speed
+#define Time_Angular_Acceleration 100 //time taken for angular acceleration and deceleration
+#define Angle_To_Time 50 //constant of proportionality between angle and time at constant angular speed
 
 #define COMPLETE 0 //value for SetDistance and SetAngle once complete
 

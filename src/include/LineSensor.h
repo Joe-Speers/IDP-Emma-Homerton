@@ -3,7 +3,7 @@ LineSensor interfaces with the line sensing subtraction interface circuit, as we
 PIDLineFollowCorrection() takes readings and peforms PID control, it should be called as frequently as possible to provide good control.
 The PID readings as well as the raw sensor reading can be accessed through the public variables.
 */
-
+#pragma once
 #include "util.h"
 #define DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE 70
 

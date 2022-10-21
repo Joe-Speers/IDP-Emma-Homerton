@@ -3,7 +3,7 @@ WifiDebug sets up a Wifi Hotspot and provides an interface to send messages back
 A PC can connect to the hotspot and then use PuTTY in raw mode, connecting to IP 192.168.4.1 with the port 'PORT'.
 Alternitivly pc_debug.py contains a GUI to communicate and has graphing capability.
 */
-
+#pragma once
 // details of wifi hotspot
 #define SSID "steve"
 #define PASSWORD "groupM108"

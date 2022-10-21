@@ -1,7 +1,5 @@
 #include "util.h"
 
-#define TILT_AVERAGE_READINGS 10
-
 class TiltSensor{
     public:
         enum TiltState{
@@ -11,6 +9,7 @@ class TiltSensor{
         };
     float x_average;
     void sensorSetup();
+    void reset(); //reset to horizontal
     TiltState getTilt(int dt_ms); //returns the current tilt state
     float getRaw();
     private:
