@@ -1,12 +1,12 @@
 #include "include/TiltSensor.h"
 #include <Arduino_LSM6DS3.h>
 
-void sensorSetup(){
+void TiltSensor::sensorSetup(){
     !IMU.begin();
     return;
 }
 
-TiltState TiltSensor::getTilt(int dt){
+TiltSensor::TiltState TiltSensor::getTilt(int dt){
     //todo get tilt state
     buffer -= dt;
     if (buffer <= 0){
@@ -15,24 +15,24 @@ TiltState TiltSensor::getTilt(int dt){
             
             if (lastState == HORIZONTAL){
                 if (x > GYRO_THRESHOLD){
-                    lastState = TILT_UP
+                    lastState = TILT_UP;
                     buffer = 100;
                 }
                 if (x < GYRO_THRESHOLD){
-                    lastState = TILT_DOWN
+                    lastState = TILT_DOWN;
                     buffer = 100;
 
                 }
             }
             if (lastState == TILT_UP){
                 if (x < GYRO_THRESHOLD){
-                    lastState = HORIZONTAL
+                    lastState = HORIZONTAL;
                     buffer = 100;
                 }
             }
             if (lastState == TILT_DOWN){
                 if (x > GYRO_THRESHOLD){
-                    lastState = HORIZONTAL                    
+                    lastState = HORIZONTAL;                 
                     buffer = 100;
                 }
             }

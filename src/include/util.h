@@ -61,6 +61,7 @@ Also contains enumerables for the state system.
 #define JUNCTION_SENSOR_PIN 2
 #define ULTRASOUND_TRIGGER_PIN 9
 #define ULTRASOUND_ECHO_PIN 10
+#define SERVO_PIN 5
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          2
 #define RIGHT_MOTOR_NUM         1

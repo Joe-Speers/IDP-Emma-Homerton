@@ -28,6 +28,7 @@ MotorControl Mcon;
 DistanceSense distanceSense;
 TiltSensor TiltSense;
 
+
 //timer global variables
 int timer_last_value=0; //last time in microseconds
 int max_tick_time_exceeded=0;//biggest time by which the TICK_TIME has been exceeded recently (in microseconds). This ought to be zero
@@ -134,10 +135,10 @@ void loop(){
     // peform PID calculation
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //if following line, apply PID calculation
-    if(RobotState.task==FOLLOW_LINE and !isLost){
-        bool followingLine=Mcon.MotorControlUpdate(correction,LineSense.isLineDetected());
-        if(!followingLine) isLost = true;
-
+    if(RobotState.task==FOLLOW_LINE and !RobotState.isLost){
+        bool followingLine=Mcon.LineFollowUpdate(correction,LineSense.isLineDetected());
+        if(!followingLine) RobotState.isLost = true;
+    }
     // ### Wifi Debug Read ###
     //read command from PC
     String PC_reply=Debug.ReadCommand();
@@ -201,7 +202,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             } else if(RobotState.task==FOLLOW_LINE){
                 //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
-                if(TiltSense.getTilt==TILT_UP){ // 4) check tilt sensor to see if has hit ramp
+                if(TiltSense.getTilt(elapsed_time_us)==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
                     RobotState.task=MOVE_FORWARD;
@@ -211,12 +212,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==RAMP){
             if(RobotState.task==MOVE_FORWARD){
-                if(TiltSense.getTilt==HORIZONTAL){
+                if(TiltSense.getTilt(elapsed_time_us)==TiltSensor::HORIZONTAL){
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                 }
             } else if(RobotState.task==FOLLOW_LINE){
-                if(TiltSense.getTilt==TILT_DOWN){
+                if(TiltSense.getTilt(elapsed_time_us)==TiltSensor::TILT_DOWN){
                 RobotState.location=COLLECTION_SIDE;
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
@@ -225,7 +226,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==MOVE_FORWARD){
-                if(TiltSense.getTilt==HORIZONTAL){
+                if(TiltSense.getTilt(elapsed_time_us)==TiltSensor::HORIZONTAL){
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                 }

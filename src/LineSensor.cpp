@@ -66,7 +66,7 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   return correction;
 }
 
-bool isLineDetected(){
+bool LineSensor::isLineDetected(){
   return true; //todo.
 }
 

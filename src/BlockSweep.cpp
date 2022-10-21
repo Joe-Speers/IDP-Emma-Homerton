@@ -38,7 +38,7 @@ bool BlockSweep::BlockSwe(int distance){
         }
     }
     if (sweepstate == 4){
-        MotorC.SetServoAngle(ARMS_CLOSED_ANGLE)
+        MotorC.SetServoAngle(ARMS_CLOSED_ANGLE);
         //may need to add delay time if 10us is not enough
         sweepstate += 1;
     }

@@ -46,7 +46,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
   if((!LineDetected && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
     LineState.status=INITIAL_SCAN;
     if(correction>=1){
-    LineState.scan_direction=1
+    LineState.scan_direction=1;
     } else {
       LineState.scan_direction=0;
     }
@@ -58,17 +58,17 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
     int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
     SetMotors(left_motor,right_motor);  
     return;
-  } else if(LineState.status==INITIAL_SCAN)(
-    if(!TurnSetAngle(90,LineState.scan_direction)){//if turn complete, scan in other direction
-      LineState.status=REVESE_SCAN;
+  } else if(LineState.status==INITIAL_SCAN){
+    if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
+      LineState.status=REVERSE_SCAN;
       LineState.scan_direction=!LineState.scan_direction;//reverse direction
     }
     if(LineDetected){
       LineState.status=MOVING_ONTO_LINE;
       ismoving=0;
     }
-  ) else if(LineState.status==REVERSE_SCAN){
-    if(!TurnSetAngle(180,LineState.scan_direction)){
+  } else if(LineState.status==REVERSE_SCAN){
+    if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
       LineState.status=LINE_UNDETECTABLE;
       SetMotors(0,0);//stop robot if line cannot be found.
     }
@@ -77,7 +77,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
       ismoving=0;
     }
   } else if(LineState.status==MOVING_ONTO_LINE){ //move onto the line, so the rotation point is where the line was detected
-    if(!MoveSetDistance(DISTANCE_TO_ROTATION_POINT)){
+    if(MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
       LineState.status=ALIGN_SCAN;//scan backwards for the line to align the robot along it
       LineState.scan_direction=!LineState.scan_direction;
     }
@@ -86,7 +86,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
       LineState.status=LINE_ALIGNED; // robot is now fully aligned
       ismoving=0;
     }
-    if(!TurnSetAngle(90,LineState.scan_direction)){
+    if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){
       LineState.status=REVERSE_ALIGN_SCAN;
       LineState.scan_direction=!LineState.scan_direction; //sweep in other direction
     }
@@ -95,7 +95,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected){
       LineState.status=LINE_ALIGNED; //robot is now fully aligned
       ismoving=0;
     }
-    if(!TurnSetAngle(180,LineState.scan_direction)){
+    if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
       LineState.status=LINE_UNDETECTABLE;
       SetMotors(0,0);//stop robot if line cannot be found
     }
