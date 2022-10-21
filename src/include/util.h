@@ -7,6 +7,21 @@ Also contains enumerables for the state system.
 
 // ### constants ###
 
+//Motor speeds
+#define Default_Speed 255
+#define Sweep_Speed 100
+
+//distance between line sensors and turning point
+#define DISTANCE_TO_ROTATION_POINT 16
+
+//Block gathering constants
+#define GapLeftToBlock 5
+#define MinWallDistance 80
+
+//Turning direction 
+#define Clockwise 1
+#define Anticlockwise 0
+
 //PID constants
 #define DEFAULT_PROPORTIONAL_K 0.8
 #define DEFAULT_INTEGRAL_K 2.5
@@ -26,6 +41,8 @@ Also contains enumerables for the state system.
 #define Time_Angular_Acceleration 10 //time taken for angular acceleration and deceleration
 #define Angle_To_Time 5 //constant of proportionality between angle and time at constant angular speed
 
+#define COMPLETE 0 //value for SetDistance and SetAngle once complete
+
 //Settings for line sensor value normalisation
 #define LINE_SENSE_MIDDLE           531 //what reading should be treated as the 'middle' of the line
 #define LINE_SENSE_MAX_AMPLITUDE    500 // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
@@ -34,14 +51,13 @@ Also contains enumerables for the state system.
 // ### Pin assignment ###
 
 #define LINE_SENSOR_PIN         A0
+
+#define JUNCTION_SENSOR_PIN 2
 #define ULTRASOUND_TRIGGER_PIN 9
 #define ULTRASOUND_ECHO_PIN 10
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          2
 #define RIGHT_MOTOR_NUM         1
-#define HALL_SENSOR_PIN         A1
-#define Magnet_Red_LED          8
-#define NonMagnet_Green_LED     7
 
 
 // ### enums for State system ###
@@ -50,7 +66,10 @@ Also contains enumerables for the state system.
 enum Purpose{ //Describes the current goal
     EXIT_START_BOX = 0,
     TRAVEL_TO_FAR_SIDE = 1, //add more as needed
-
+    PICK_UP_BLOCK = 2,
+    TRAVEL_TO_START_SIDE = 3,
+    DROP_BLOCK = 4,
+    RETURN_HOME = 5,
 };
 
 enum Location{
@@ -62,7 +81,7 @@ enum Location{
     BLOCK_COLLECTION_AREA   = 5,
     TUNNEL                  = 6,
     RED_SQUARE              = 7,
-    GREEN_SQARE             = 8
+    GREEN_SQUARE             = 8,
 };
 
 enum Task{  //Describes the exact task the robot is peforming
