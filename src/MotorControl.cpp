@@ -17,6 +17,10 @@ void MotorControl::MotorSetup() {
   SetMotors(0,0,FORWARD,FORWARD);
 }
 
+void MotorControl::ResetState(){
+  LineState.status=LINE_ALIGNED;
+}
+
 void MotorControl::ServoSetup(){
   // Attach the Servo variable to a pin:
   myservo.attach(SERVO_PIN);
@@ -46,11 +50,13 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
 bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug){
   if((!LineDetected && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
     LineState.status=INITIAL_SCAN;
-    Debug.SendMessage("Lost line, now finding it");
+    
     if(correction>=1){
-    LineState.scan_direction=1;
+      LineState.scan_direction=1;
+      Debug.SendMessage("Lost line, scanning right");
     } else {
       LineState.scan_direction=0;
+      Debug.SendMessage("Lost line, scanning left");
     }
   }
   // Make a movement depending on the state in LineState
@@ -61,10 +67,12 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     SetMotors(left_motor,right_motor);  
   } else if(LineState.status==INITIAL_SCAN){
     if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
+    Debug.SendMessage("Scanning reverse");
       LineState.status=REVERSE_SCAN;
       LineState.scan_direction=!LineState.scan_direction;//reverse direction
     }
     if(LineDetected){
+      Debug.SendMessage("Moving onto line");
       LineState.status=MOVING_ONTO_LINE;
       ismoving=0;
     }
@@ -75,31 +83,38 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     }
     if(LineDetected){
       LineState.status=MOVING_ONTO_LINE;
+      Debug.SendMessage("Moving onto line");
       ismoving=0;
     }
   } else if(LineState.status==MOVING_ONTO_LINE){ //move onto the line, so the rotation point is where the line was detected
     if(MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
+      Debug.SendMessage("aligning");
       LineState.status=ALIGN_SCAN;//scan backwards for the line to align the robot along it
       LineState.scan_direction=!LineState.scan_direction;
     }
   } else if(LineState.status==ALIGN_SCAN){
-    if(LineDetected){
-      LineState.status=LINE_ALIGNED; // robot is now fully aligned
-      ismoving=0;
-    }
     if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){
+      Debug.SendMessage("reverse aligning");
       LineState.status=REVERSE_ALIGN_SCAN;
       LineState.scan_direction=!LineState.scan_direction; //sweep in other direction
     }
-  } else if(LineState.status==REVERSE_ALIGN_SCAN){
     if(LineDetected){
-      LineState.status=LINE_ALIGNED; //robot is now fully aligned
+      Debug.SendMessage("aligned!");
+      LineState.status=LINE_ALIGNED; // robot is now fully aligned
       ismoving=0;
     }
+    
+  } else if(LineState.status==REVERSE_ALIGN_SCAN){
     if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
       LineState.status=LINE_UNDETECTABLE;
       SetMotors(0,0);//stop robot if line cannot be found
     }
+    if(LineDetected){
+      Debug.SendMessage("aligned!");
+      LineState.status=LINE_ALIGNED; //robot is now fully aligned
+      ismoving=0;
+    }
+    
   }
   //if line cannot be found, return false
   if(LineState.status==LINE_UNDETECTABLE){
@@ -134,10 +149,10 @@ bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
       ismoving = 1;
       starttime = milli;
       
-      if (isclockwise = 1) {
+      if (isclockwise == 1) {
         SetMotors(Sweep_Speed, Sweep_Speed, FORWARD, BACKWARD);
       }
-      if (isclockwise = 0) {
+      if (isclockwise == 0) {
         SetMotors(Sweep_Speed, Sweep_Speed, BACKWARD, FORWARD);
       }
 

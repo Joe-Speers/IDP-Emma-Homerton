@@ -56,6 +56,7 @@ struct{
 void ResetState(){
     Debug.SendMessage("Resetting State");
     Mcon.SetMotors(0,0,FORWARD,FORWARD);
+    Mcon.ResetState();
     m=0;
     s=0;
     //reset states to inital values

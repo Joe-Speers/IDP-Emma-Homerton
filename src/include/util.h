@@ -6,10 +6,10 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-#define DERIVITIVE_LINE_SENSE_THRESHOLD 0.1
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 0.8
 //Motor speeds
 #define Default_Speed 255
-#define Sweep_Speed 100
+#define Sweep_Speed 200
 
 //distance between line sensors and turning point
 #define DISTANCE_TO_ROTATION_POINT 16
@@ -41,12 +41,12 @@ Also contains enumerables for the state system.
 
 //Conversion constants
 #define Distance_Acceleration 2 //distance covered in motor acceleration and deceleration
-#define Time_Accelartionn 1000 //time taken for acceleration and deceleration
-#define Distance_To_Time 200 //constant of proportionality between distance and time at constant speed
+#define Time_Accelartionn 1 //time taken for acceleration and deceleration
+#define Distance_To_Time 20 //constant of proportionality between distance and time at constant speed
 
 #define Angle_Acceleration 2 //degrees turned in angular acceleration and deceleration
-#define Time_Angular_Acceleration 100 //time taken for angular acceleration and deceleration
-#define Angle_To_Time 50 //constant of proportionality between angle and time at constant angular speed
+#define Time_Angular_Acceleration 1//time taken for angular acceleration and deceleration
+#define Angle_To_Time 20 //constant of proportionality between angle and time at constant angular speed
 
 #define COMPLETE 0 //value for SetDistance and SetAngle once complete
 

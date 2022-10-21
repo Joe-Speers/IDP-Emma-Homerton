@@ -24,7 +24,7 @@ class MotorControl{
         int DistanceCon(int distance);//converts distance to time at default speed
         int AngleCon(int angle);//converts angles to time at default speed
         int TimeToAngleCon(int millisec);//converts time to angle to turn
-
+        void ResetState();
     private:
         //motor objects
         Adafruit_MotorShield AFMS;
