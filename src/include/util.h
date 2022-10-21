@@ -9,10 +9,10 @@ Also contains enumerables for the state system.
 #define DERIVITIVE_LINE_SENSE_THRESHOLD 0.8
 //Motor speeds
 #define Default_Speed 255
-#define Sweep_Speed 200
+#define Sweep_Speed 255
 
 //distance between line sensors and turning point
-#define DISTANCE_TO_ROTATION_POINT 16
+#define DISTANCE_TO_ROTATION_POINT 17.9
 
 //Gyroscope Constants
 #define GYRO_THRESHOLD 10
@@ -40,13 +40,11 @@ Also contains enumerables for the state system.
 #define LINE_FOLLOW_MOTOR_SWING     255 //amount to swing from 'MOTOR_SPEED' as 'correction' varies. probably should be as big as speed
 
 //Conversion constants
-#define Distance_Acceleration 2 //distance covered in motor acceleration and deceleration
-#define Time_Accelartionn 1 //time taken for acceleration and deceleration
-#define Distance_To_Time 20 //constant of proportionality between distance and time at constant speed
+#define Distance_Constant 0.0917 //distance overshoot constant (in cm)
+#define Measured_Speed 0.01529 //measured speed in cm/ms for conversion (at speed 255)
 
-#define Angle_Acceleration 2 //degrees turned in angular acceleration and deceleration
-#define Time_Angular_Acceleration 1//time taken for angular acceleration and deceleration
-#define Angle_To_Time 20 //constant of proportionality between angle and time at constant angular speed
+#define Angle_Constant -4.47 //angle overshoot constant (in degrees)
+#define Measured_Turn_Rate 0.06915 //measured turn rate (in degrees/ms) 
 
 #define COMPLETE 0 //value for SetDistance and SetAngle once complete
 

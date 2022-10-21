@@ -32,10 +32,6 @@ class MotorControl{
         Adafruit_DCMotor *motorR;
         //servo object
         Servo myservo;
-        //time variable
-        int time;
-        //angle variable
-        int ang;
         //time elapsed in milliseconds
         int milli;
         //set movement state

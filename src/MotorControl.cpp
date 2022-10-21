@@ -40,6 +40,12 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
   if(rmotor>255) rmotor=255;
   if(lmotor<0) lmotor=0;
   if(rmotor<0) rmotor=0;
+  lmotor/=2;
+  if(rdirection==FORWARD){
+    rdirection=BACKWARD;
+  } else {
+    rdirection=FORWARD;
+  }
   //set motor speed and direction
   motorL->run(ldirection);
   motorR->run(rdirection);
@@ -145,54 +151,43 @@ bool MotorControl::MoveSetDistance(int distance){
 bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
 
   milli = millis();
-    if (ismoving == 0){
-      ismoving = 1;
-      starttime = milli;
-      
-      if (isclockwise == 1) {
-        SetMotors(Sweep_Speed, Sweep_Speed, FORWARD, BACKWARD);
-      }
-      if (isclockwise == 0) {
-        SetMotors(Sweep_Speed, Sweep_Speed, BACKWARD, FORWARD);
-      }
-
-      stoptime = starttime + AngleCon(angle);
+  if (ismoving == 0){
+    ismoving = 1;
+    starttime = milli;
+    
+    if (isclockwise == 1) {
+      SetMotors(Sweep_Speed, Sweep_Speed, FORWARD, BACKWARD);
+    }
+    if (isclockwise == 0) {
+      SetMotors(Sweep_Speed, Sweep_Speed, BACKWARD, FORWARD);
     }
 
-    if (milli >= stoptime){
-      SetMotors(0,0);
-      ismoving = 0;
-    }
+    stoptime = starttime + AngleCon(angle);
+  }
+
+  if (milli >= stoptime){
+    SetMotors(0,0);
+    ismoving = 0;
+  }
   return ismoving;
   
 }
 
 int MotorControl::DistanceCon(int distance){
-
-  distance -= Distance_Acceleration;
-  time = int(distance*Distance_To_Time);
-  time += Time_Accelartionn;
-  
-  return time;
-
+  float time = distance/Measured_Speed; //calculate time to move 
+  time -=Distance_Constant/Measured_Speed; //account for overshoot / undershoot
+  return int(time);
 }
 
 int MotorControl::AngleCon(int angle){
-
-  angle -= Angle_Acceleration;
-  time = int(angle*Angle_To_Time);
-  time += Time_Angular_Acceleration;
-  
-  return time;
-
+  float time = angle/Measured_Turn_Rate;//calculate time it will take to turn
+  time -=Angle_Constant/Measured_Turn_Rate; //account for overshoot due to momentum
+  return int(time);
 }
 
 int MotorControl::TimeToAngleCon(int time){
-
-  time -= int (Time_Angular_Acceleration /2);
-  ang = int(ang / Angle_To_Time);
-  ang += Time_Angular_Acceleration;
-  
-  return ang;
+  float ang = ang * Measured_Turn_Rate;//calculate angle it has moved through
+  ang += Angle_Constant/2;//account for initial lag when starting to move
+  return int(ang);
 
 }

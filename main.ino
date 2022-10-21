@@ -82,7 +82,9 @@ void setup(){
     //set state variables
     ResetState();
 }
-
+//temp for distance calibration
+int move=0;
+int turn=0;
 void loop(){ 
     // ### TIMER CODE ### 
 
@@ -133,7 +135,21 @@ void loop(){
     }
 
     // ### UPDATE SUBSYSTEMS ###
-    StateSystemUpdate(dt); // update state system
+    //temp calibration script
+    if(false){//true if calibrating motors
+        if(move>0){
+            if(!Mcon.MoveSetDistance(move)){
+                move=0;
+            }
+        }
+        if(turn>0){
+            if(!Mcon.TurnSetAngle(turn,true)){
+                turn=0;
+            }
+        }
+    } else {
+        StateSystemUpdate(dt); // update state system
+    }
     TiltSensor::TiltState tilt = TiltSense.getTilt(dt/1000); // update tilt sensor
     if(m%20==0){
         //Serial.println(String(TiltSense.x_average));
@@ -143,7 +159,7 @@ void loop(){
     // peform PID calculation
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //if following line, apply PID calculation
-    if(RobotState.task==FOLLOW_LINE and !RobotState.isLost){
+    if(RobotState.task==FOLLOW_LINE && !RobotState.isLost){
         bool followingLine=Mcon.LineFollowUpdate(correction,LineSense.isLineDetected(),Debug);
         if(!followingLine){
             RobotState.isLost = true;
@@ -312,6 +328,12 @@ void PC_Command(String command){
     if(command=="STOP"){
         ResetState();
         s=-10000; //set timer to -10000 seconds to prevent state system from starting
+    }
+    if(command[0]=='M'){
+        move=command.substring(1).toInt();
+    }
+    if(command[0]=='T'){
+        turn=command.substring(1).toInt();
     }
     if(command[0]=='A'){
         if(command[1]=='P'){
