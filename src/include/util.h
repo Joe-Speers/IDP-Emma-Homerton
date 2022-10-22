@@ -60,6 +60,7 @@ Also contains enumerables for the state system.
 #define LINE_SENSOR_PIN         A0 //connection to subtraction circuit
 
 #define JUNCTION_SENSOR_PIN 2
+#define LIGHT_SENSOR 7
 #define ULTRASOUND_TRIGGER_PIN 9
 #define ULTRASOUND_ECHO_PIN 10
 #define SERVO_PIN 5

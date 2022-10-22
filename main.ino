@@ -18,6 +18,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/util.h"
 #include "src/include/DistanceSense.h"
 #include "src/include/TiltSensor.h"
+#include "src/include/TunnelSensor.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
 
@@ -27,6 +28,7 @@ WifiDebug Debug;
 MotorControl Mcon;
 DistanceSense distanceSense;
 TiltSensor TiltSense;
+TunnelSensor TunnelSense;
 
 
 //timer global variables
@@ -58,6 +60,7 @@ void ResetState(){
     Mcon.SetMotors(0,0,FORWARD,FORWARD);
     Mcon.ResetState();
     TiltSense.reset();
+    
     m=0;
     s=0;
     //reset states to inital values
@@ -77,6 +80,7 @@ void setup(){
     Debug.SetupHotspot(); // Setup wifi debugging
     distanceSense.SensorSetup();
     TiltSense.sensorSetup();
+    TunnelSense.sensorSetup();
     TiltSense.reset();
     //setup timer
     timer_last_value=micros();
@@ -160,7 +164,7 @@ void loop(){
     }
     // peform PID calculation   
     double correction = LineSense.PIDLineFollowCorrection(dt);
-    if(LineSense.isLineDetected()){
+    if(TunnelSense.TunnelDetected()){
          digitalWrite(AMBER_LED_PIN, HIGH);
     } else {
        
@@ -276,7 +280,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(LineSense.juntionDetect()){//need to check not finding line
+                if(LineSense.juntionDetect() || RobotState.task_stopwatch>7000){//need to check not finding line
+                    Debug.SendMessage("stopped at cross (todo)");
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
                     RobotState.task=STOPPED; //temporary
@@ -298,10 +303,11 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         }
-    } else if(RobotState.purpose==TRAVEL_TO_FAR_SIDE){
+    } else if(RobotState.purpose==TRAVEL_TO_START_SIDE){
         if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(false){//light sensor low
+                if(TunnelSense.TunnelDetected()){
+                    Debug.SendMessage("Entered Tunnel");
                     RobotState.location=TUNNEL;
                     RobotState.task=MOVE_FORWARD;
                     Mcon.SetMotors(255,255);
@@ -311,7 +317,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==TUNNEL){
             if(RobotState.task==MOVE_FORWARD){
-                if(false){ //light sensor high
+                if(!TunnelSense.TunnelDetected()){
+                    Debug.SendMessage("Exited tunnel");
                     RobotState.task=MOVE_FORWARD;
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.task_stopwatch=0;
@@ -322,6 +329,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         } else if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==MOVE_FORWARD){
                 if(RobotState.task_timer==0){
+                    Debug.SendMessage("Trying to find line after tunnel");
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                     LineSense.ResetPID();
