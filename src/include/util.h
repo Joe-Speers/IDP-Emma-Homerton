@@ -6,7 +6,9 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-#define DERIVITIVE_LINE_SENSE_THRESHOLD 0.8
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 3//3
+#define PROPORTIONAL_LINE_SENSE_REGION 0.35//0.35
+#define INTEGRAL_LINE_SENSE_REGION 0.01 //bound is currently 0.12
 //Motor speeds
 #define Default_Speed 255
 #define Sweep_Speed 255
@@ -30,10 +32,10 @@ Also contains enumerables for the state system.
 #define ANTI_CLOCKWISE 0
 
 //PID constants
-#define DEFAULT_PROPORTIONAL_K 0.8
-#define DEFAULT_INTEGRAL_K 2.5
+#define DEFAULT_PROPORTIONAL_K 4 //4
+#define DEFAULT_INTEGRAL_K 5//5
 #define DEFAULT_DERIVATIVE_K 0 // currently disabled
-#define DEFAULT_INTEGRAL_CORRECTION_LIMIT 0.3 //limits the size of the integral.
+#define DEFAULT_INTEGRAL_CORRECTION_LIMIT 0.5 //0.5 limits the size of the integral.
 
 // line follow motor settings
 #define LINE_FOLLOW_MOTOR_SPEED     255 //speed when 'correction' is zero (between 0 and 255)
@@ -55,12 +57,13 @@ Also contains enumerables for the state system.
 
 // ### Pin assignment ###
 
-#define LINE_SENSOR_PIN         A0
+#define LINE_SENSOR_PIN         A0 //connection to subtraction circuit
 
 #define JUNCTION_SENSOR_PIN 2
 #define ULTRASOUND_TRIGGER_PIN 9
 #define ULTRASOUND_ECHO_PIN 10
 #define SERVO_PIN 5
+#define AMBER_LED_PIN 8
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          2
 #define RIGHT_MOTOR_NUM         1

@@ -54,6 +54,7 @@ class MotorControl{
         struct{
             LineStatus status=LINE_ALIGNED;
             int scan_direction=0;
+            int lost_line_counter=0;
         } LineState;
 
 };

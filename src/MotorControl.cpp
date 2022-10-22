@@ -19,6 +19,7 @@ void MotorControl::MotorSetup() {
 
 void MotorControl::ResetState(){
   LineState.status=LINE_ALIGNED;
+  LineState.lost_line_counter=0;
 }
 
 void MotorControl::ServoSetup(){
@@ -54,7 +55,12 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
 }
 
 bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug){
-  if((!LineDetected && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
+  if(!LineDetected){
+    LineState.lost_line_counter+=1;
+  }else{
+    LineState.lost_line_counter=0;
+  }
+  if((LineState.lost_line_counter>100 && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
     LineState.status=INITIAL_SCAN;
     
     if(correction>=1){
@@ -93,7 +99,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
       ismoving=0;
     }
   } else if(LineState.status==MOVING_ONTO_LINE){ //move onto the line, so the rotation point is where the line was detected
-    if(MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
+    if(MoveSetDistance(DISTANCE_TO_ROTATION_POINT+1)==COMPLETE){
       Debug.SendMessage("aligning");
       LineState.status=ALIGN_SCAN;//scan backwards for the line to align the robot along it
       LineState.scan_direction=!LineState.scan_direction;
@@ -107,6 +113,8 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     if(LineDetected){
       Debug.SendMessage("aligned!");
       LineState.status=LINE_ALIGNED; // robot is now fully aligned
+      SetMotors(0,0);  
+      LineState.lost_line_counter=0;
       ismoving=0;
     }
     
@@ -118,6 +126,8 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     if(LineDetected){
       Debug.SendMessage("aligned!");
       LineState.status=LINE_ALIGNED; //robot is now fully aligned
+      SetMotors(0,0);  
+      LineState.lost_line_counter=0;
       ismoving=0;
     }
     

@@ -69,16 +69,16 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
 int LostLineCounter=0;
 
 bool LineSensor::isLineDetected(){
-  if(derivative>DERIVITIVE_LINE_SENSE_THRESHOLD || derivative<-DERIVITIVE_LINE_SENSE_THRESHOLD){
+  if(derivative>DERIVITIVE_LINE_SENSE_THRESHOLD || derivative< -DERIVITIVE_LINE_SENSE_THRESHOLD ||(integral<=INTEGRAL_LINE_SENSE_REGION && integral>=-INTEGRAL_LINE_SENSE_REGION && false) || (error>PROPORTIONAL_LINE_SENSE_REGION || error< -PROPORTIONAL_LINE_SENSE_REGION)){
     LostLineCounter=0;
-    return true; //todo.
+    return true;
   } else{
     LostLineCounter+=1;
-  }
-  if(LostLineCounter>10){
-    return false;
-  } else{
-    return true;
+    if(LostLineCounter>10){
+      return false;
+    } else{
+      return true;
+    }
   }
 }
 

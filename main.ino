@@ -81,6 +81,7 @@ void setup(){
     timer_last_value=micros();
     //set state variables
     ResetState();
+    pinMode(AMBER_LED_PIN, OUTPUT);
 }
 //temp for distance calibration
 int move=0;
@@ -154,13 +155,19 @@ void loop(){
     if(m%20==0){
         //Serial.println(String(TiltSense.x_average));
         //Serial.println(String(TiltSense.x_average));
-        Serial.println(String(LineSense.derivative));
+        //Serial.println(String(LineSense.differential_reading));
     }
-    // peform PID calculation
+    // peform PID calculation   
     double correction = LineSense.PIDLineFollowCorrection(dt);
+    if(LineSense.isLineDetected()){
+         digitalWrite(AMBER_LED_PIN, HIGH);
+    } else {
+       
+        digitalWrite(AMBER_LED_PIN, LOW);
+    }
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE && !RobotState.isLost){
-        bool followingLine=Mcon.LineFollowUpdate(correction,LineSense.isLineDetected(),Debug);
+        bool followingLine=Mcon.LineFollowUpdate(correction,true,Debug);
         if(!followingLine){
             RobotState.isLost = true;
             Debug.SendMessage("Failed to find line, now lost");
