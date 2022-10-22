@@ -17,7 +17,7 @@ Also contains enumerables for the state system.
 #define DISTANCE_TO_ROTATION_POINT 17.9
 
 //Gyroscope Constants
-#define GYRO_THRESHOLD 10
+#define GYRO_THRESHOLD 5
 #define GYRO_BUFFER 1000
 #define TILT_AVERAGE_READINGS 50
 

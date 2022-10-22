@@ -13,7 +13,10 @@ void TiltSensor::reset(){
         buffer=0;
     }
 }
-TiltSensor::TiltState TiltSensor::getTilt(int dt_ms){//dt_ms in miliseconds
+TiltSensor::TiltState TiltSensor::getTilt(int dt_ms=0){//dt_ms in miliseconds. 0 if not taking a reading
+    if(dt_ms==0){
+        return lastState;
+    }
     if (IMU.gyroscopeAvailable()) {
         IMU.readGyroscope(x, y, z);
     }
@@ -26,32 +29,28 @@ TiltSensor::TiltState TiltSensor::getTilt(int dt_ms){//dt_ms in miliseconds
     x_average/=TILT_AVERAGE_READINGS;
     buffer-=dt_ms;
     if(buffer<0) buffer=0;
-    if (IMU.gyroscopeAvailable()) {
-        IMU.readGyroscope(x, y, z);
-        
-        if (lastState == HORIZONTAL && buffer==0){
-            if (x_average > GYRO_THRESHOLD){
-                lastState = TILT_UP;
-                buffer = GYRO_BUFFER;
-            }
-            if (x_average < -GYRO_THRESHOLD){
-                lastState = TILT_DOWN;
-                buffer = GYRO_BUFFER;
+    if (lastState == HORIZONTAL && buffer==0){
+        if (x_average > GYRO_THRESHOLD){
+            lastState = TILT_UP;
+            buffer = GYRO_BUFFER;
+        }
+        if (x_average < -GYRO_THRESHOLD){
+            lastState = TILT_DOWN;
+            buffer = GYRO_BUFFER;
 
-            }
         }
-        if (lastState == TILT_UP && buffer==0){
-            if (x_average < -GYRO_THRESHOLD){
-                lastState = HORIZONTAL;
-                buffer = GYRO_BUFFER;
-            }
+    }
+    if (lastState == TILT_UP && buffer==0){
+        if (x_average < -GYRO_THRESHOLD){
+            lastState = HORIZONTAL;
+            buffer = GYRO_BUFFER;
         }
-        if (lastState == TILT_DOWN && buffer==0){
-            if (x_average > GYRO_THRESHOLD){
-                lastState = HORIZONTAL;                 
-                buffer = GYRO_BUFFER;
-            }
+    }
+    if (lastState == TILT_DOWN && buffer==0){
+        if (x_average > GYRO_THRESHOLD){
+            lastState = HORIZONTAL;                 
+            buffer = GYRO_BUFFER;
         }
-    } 
+    }
     return lastState;
 }

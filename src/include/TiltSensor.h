@@ -10,7 +10,7 @@ class TiltSensor{
     float x_average;
     void sensorSetup();
     void reset(); //reset to horizontal
-    TiltState getTilt(int dt_ms); //returns the current tilt state
+    TiltState getTilt(int dt_ms=0); //returns the current tilt state
     float getRaw();
     private:
         TiltState lastState = HORIZONTAL;

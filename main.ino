@@ -57,10 +57,11 @@ void ResetState(){
     Debug.SendMessage("Resetting State");
     Mcon.SetMotors(0,0,FORWARD,FORWARD);
     Mcon.ResetState();
+    TiltSense.reset();
     m=0;
     s=0;
     //reset states to inital values
-    RobotState.location=COLLECTION_SIDE;
+    RobotState.location=DROPOFF_SIDE;
     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
     RobotState.task=FOLLOW_LINE;
     RobotState.isLost=false;
@@ -237,36 +238,45 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             } else if(RobotState.task==FOLLOW_LINE){
                 //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
-                if(TiltSense.getTilt(elapsed_time_us/1000)==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
+                //ignore any tilt readings untill enough time has passed. Also reset if tilting down for some reason
+                if(RobotState.task_stopwatch<5000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
+                    TiltSense.reset();
+                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
-                    RobotState.task=MOVE_FORWARD;
-                    Mcon.SetMotors(255,255);
+                    RobotState.task_timer=0;
                 }
-                
             }
-        } else if(RobotState.location==RAMP){
-            if(RobotState.task==MOVE_FORWARD){
-                if(TiltSense.getTilt(elapsed_time_us/1000)==TiltSensor::HORIZONTAL){
+        } else if(RobotState.location==RAMP){      
+            if(RobotState.task==FOLLOW_LINE){
+                if(TiltSense.getTilt()==TiltSensor::TILT_UP){
+                    if(RobotState.task_stopwatch>5000){
+                        Debug.SendMessage("Stuck going up ramp");
+                        //reverse back
+                        RobotState.isLost=true;
+                        Mcon.SetMotors(0,0);
+                    }
+                }
+                if(TiltSense.getTilt()==TiltSensor::TILT_DOWN){
+                    RobotState.location=COLLECTION_SIDE;
+                    RobotState.task=FOLLOW_LINE;
+                    RobotState.task_stopwatch=0;
+                    RobotState.task_timer=0;
+                }
+                if((RobotState.task_timer==0 && TiltSense.getTilt()==TiltSensor::HORIZONTAL)&& RobotState.task_stopwatch>6500){
+                    Debug.SendMessage("Must have completed ramp by now");
+                    RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                 }
-            } else if(RobotState.task==FOLLOW_LINE){
-                if(TiltSense.getTilt(elapsed_time_us/1000)==TiltSensor::TILT_DOWN){
-                RobotState.location=COLLECTION_SIDE;
-                    RobotState.task=MOVE_FORWARD;
+                if(TiltSense.getTilt()==TiltSensor::HORIZONTAL && RobotState.task_timer==0){
+                    RobotState.task_timer=7000;
                     RobotState.task_stopwatch=0;
-                    Mcon.SetMotors(255,255);
                 }
             }
         } else if(RobotState.location==COLLECTION_SIDE){
-            if(RobotState.task==MOVE_FORWARD){
-                if(TiltSense.getTilt(elapsed_time_us/1000)==TiltSensor::HORIZONTAL){
-                    RobotState.task=FOLLOW_LINE;
-                    RobotState.task_stopwatch=0;
-                }
-            } else if(RobotState.task==FOLLOW_LINE){
-                if(LineSense.juntionDetect()){
+            if(RobotState.task==FOLLOW_LINE){
+                if(LineSense.juntionDetect()){//need to check not finding line
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
                     RobotState.task=STOPPED; //temporary
@@ -334,6 +344,9 @@ void PC_Command(String command){
     }
     if(command=="STOP"){
         ResetState();
+        RobotState.task=STOPPED;
+        RobotState.location=START_SQUARE;
+        RobotState.purpose=EXIT_START_BOX;
         s=-10000; //set timer to -10000 seconds to prevent state system from starting
     }
     if(command[0]=='M'){
