@@ -104,3 +104,19 @@ enum Task{  //Describes the exact task the robot is peforming
     SLOW_SWEEP      = 6, //add more as needed
 
 };
+// struct to store the robot's state.
+struct{
+    Purpose purpose;
+    Location location;
+    Task task;
+    bool isLost;
+    double task_timer; // acts as a countdown for the current action in miliseconds
+    double task_stopwatch; // acts as a countup for the current action. useful to detect when an action is taking too long, so maybe the robot is lost
+    int junction_counter; //counts the number of junctions passed
+    //suggestions:
+    //int blocks_collected
+    //bool is_holding_block
+    //bool is_magnetic
+    //remember to add any new options to ResetState() as well
+
+} RobotState; //name of struct
