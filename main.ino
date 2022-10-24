@@ -293,7 +293,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     } else if(RobotState.purpose==TRAVEL_TO_START_SIDE){
         if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(TunnelSense.TunnelDetected()){
+                if(TunnelSense.TunnelDetected() && RobotState.task_timer>5000){
                     Debug.SendMessage("Entered Tunnel");
                     RobotState.location=TUNNEL;
                     RobotState.task=MOVE_FORWARD;
