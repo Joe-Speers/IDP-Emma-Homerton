@@ -8,6 +8,7 @@ MoveSetDistance takes a distance value and runs motor for required time to move 
 TurnSetAngle takes a Angle value and runs motor for required time to turn angle input, constantly returns a bool which will return 0 for movement complete.
 TODO: servo motor control and exact distance traveling.
 */
+#pragma once
 #include <Servo.h>
 #include <Adafruit_MotorShield.h>
 #include "WifiDebug.h"

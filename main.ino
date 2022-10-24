@@ -19,6 +19,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/DistanceSense.h"
 #include "src/include/TiltSensor.h"
 #include "src/include/TunnelSensor.h"
+#include "src/include/Recovery.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
 
@@ -29,6 +30,7 @@ MotorControl Mcon;
 DistanceSense distanceSense;
 TiltSensor TiltSense;
 TunnelSensor TunnelSense;
+Recovery recovery;
 
 
 //timer global variables
@@ -37,22 +39,7 @@ int max_tick_time_exceeded=0;//biggest time by which the TICK_TIME has been exce
 int m=0;//miliseconds counter (between 0 and 999), in increments of 'TICK_TIME'
 int s=0;//seconds counter
 
-// struct to store the robot's state.
-struct{
-    Purpose purpose;
-    Location location;
-    Task task;
-    bool isLost;
-    double task_timer; // acts as a countdown for the current action in miliseconds
-    double task_stopwatch; // acts as a countup for the current action. useful to detect when an action is taking too long, so maybe the robot is lost
-    int junction_counter; //counts the number of junctions passed
-    //suggestions:
-    //int blocks_collected
-    //bool is_holding_block
-    //bool is_magnetic
-    //remember to add any new options to ResetState() as well
 
-} RobotState; //name of struct
 
 //called to reset the time and state to an inital value
 void ResetState(){
