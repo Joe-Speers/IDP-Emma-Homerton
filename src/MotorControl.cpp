@@ -41,12 +41,6 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
   if(rmotor>255) rmotor=255;
   if(lmotor<0) lmotor=0;
   if(rmotor<0) rmotor=0;
-  lmotor/=2;
-  if(rdirection==FORWARD){
-    rdirection=BACKWARD;
-  } else {
-    rdirection=FORWARD;
-  }
   //set motor speed and direction
   motorL->run(ldirection);
   motorR->run(rdirection);

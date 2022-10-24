@@ -164,7 +164,7 @@ void loop(){
     }
     // peform PID calculation   
     double correction = LineSense.PIDLineFollowCorrection(dt);
-    if(TunnelSense.TunnelDetected()){
+    if(TiltSense.getTilt()!=TiltSensor::HORIZONTAL){
          digitalWrite(AMBER_LED_PIN, HIGH);
     } else {
        
@@ -243,7 +243,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             } else if(RobotState.task==FOLLOW_LINE){
                 //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
                 //ignore any tilt readings untill enough time has passed. Also reset if tilting down for some reason
-                if(RobotState.task_stopwatch<5000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
+                if(RobotState.task_stopwatch<4000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     TiltSense.reset();
                 } else if(TiltSense.getTilt()==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
@@ -254,7 +254,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         } else if(RobotState.location==RAMP){      
             if(RobotState.task==FOLLOW_LINE){
                 if(TiltSense.getTilt()==TiltSensor::TILT_UP){
-                    if(RobotState.task_stopwatch>5000){
+                    if(RobotState.task_stopwatch>10000){
                         Debug.SendMessage("Stuck going up ramp");
                         //reverse back
                         RobotState.isLost=true;
@@ -316,13 +316,40 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         } else if(RobotState.location==TUNNEL){
+            
             if(RobotState.task==MOVE_FORWARD){
-                if(!TunnelSense.TunnelDetected()){
+                if(TunnelSense.WallCollisionLeft()){
+                    Debug.SendMessage("Hit Left Wall");
+                    RobotState.task=TURN_RIGHT;
+                    RobotState.task_stopwatch=0;
+                    RobotState.task_timer=1000;
+                    Mcon.TurnSetAngle(25, CLOCKWISE);
+                }
+                if(TunnelSense.WallCollisionRight()){
+                    Debug.SendMessage("Hit Right Wall");
+                    RobotState.task=TURN_LEFT;
+                    RobotState.task_stopwatch=0;
+                    RobotState.task_timer=1000;
+                    Mcon.TurnSetAngle(25, ANTI_CLOCKWISE);
+                } 
+            }
+            if(!TunnelSense.TunnelDetected()){
                     Debug.SendMessage("Exited tunnel");
                     RobotState.task=MOVE_FORWARD;
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=1000;
+                    Mcon.SetMotors(255,255);
+            }
+            if (RobotState.task == TURN_RIGHT){
+                if (Mcon.TurnSetAngle(20, CLOCKWISE==COMPLETE)){
+                    RobotState.task=MOVE_FORWARD;
+                    Mcon.SetMotors(255,255);
+                }
+            }
+            if (RobotState.task == TURN_LEFT){
+                if (Mcon.TurnSetAngle(20, ANTI_CLOCKWISE)==COMPLETE){
+                    RobotState.task=MOVE_FORWARD;
                     Mcon.SetMotors(255,255);
                 }
             }
@@ -339,6 +366,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
+                    TiltSense.reset();
                 }
             }
         }

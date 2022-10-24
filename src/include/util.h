@@ -32,8 +32,8 @@ Also contains enumerables for the state system.
 #define ANTI_CLOCKWISE 0
 
 //PID constants
-#define DEFAULT_PROPORTIONAL_K 4 //4
-#define DEFAULT_INTEGRAL_K 5//5
+#define DEFAULT_PROPORTIONAL_K 0.8 //0.8
+#define DEFAULT_INTEGRAL_K 1//1
 #define DEFAULT_DERIVATIVE_K 0 // currently disabled
 #define DEFAULT_INTEGRAL_CORRECTION_LIMIT 0.5 //0.5 limits the size of the integral.
 
@@ -59,6 +59,8 @@ Also contains enumerables for the state system.
 
 #define LINE_SENSOR_PIN         A0 //connection to subtraction circuit
 
+#define LEFT_BUMPER_PIN 5
+#define RIGHT_BUMPER_PIN 6
 #define JUNCTION_SENSOR_PIN 2
 #define LIGHT_SENSOR 7
 #define ULTRASOUND_TRIGGER_PIN 9
@@ -66,8 +68,8 @@ Also contains enumerables for the state system.
 #define SERVO_PIN 5
 #define AMBER_LED_PIN 8
 // Motor shield motor numbers (1-4)
-#define LEFT_MOTOR_NUM          2
-#define RIGHT_MOTOR_NUM         1
+#define LEFT_MOTOR_NUM          1
+#define RIGHT_MOTOR_NUM         2
 
 
 // ### enums for State system ###
