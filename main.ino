@@ -202,26 +202,20 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Debug.SendMessage("Robot starting");
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
-                    //need to implement function to replace the next two lines with a distance to travel.
-                    Mcon.SetMotors(255,255);
-                    RobotState.task_timer=1050; //move forward.
                 }
             } else if(RobotState.task==MOVE_FORWARD){
-                if(RobotState.task_timer==0){ //replace with junction detection test (will also need to add another step to move forward more before turning)
+                if(Mcon.MoveSetDistance(30)==COMPLETE){ //replace with junction detection test (will also need to add another step to move forward more before turning)
                     RobotState.task=TURN_RIGHT; // 2) Start turning onto line
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                     RobotState.task_stopwatch=0;
-                    //need to implement function to replace the next two lines with an angle to turn.
-                    Mcon.SetMotors(255,255,FORWARD, BACKWARD);
-                    RobotState.task_timer=730;
                 }
             }
         } 
     } else if (RobotState.purpose==TRAVEL_TO_FAR_SIDE){
         if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==TURN_RIGHT){
-                if(RobotState.task_timer==0){ // 3) start following the line
+                if(Mcon.TurnSetAngle(80,true)==COMPLETE){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
                     TiltSense.reset();
                     LineSense.ResetPID();
