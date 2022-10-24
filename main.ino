@@ -329,7 +329,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.SetMotors(255,255);
             }
             if (RobotState.task == TURN_RIGHT){
-                if (Mcon.TurnSetAngle(20, CLOCKWISE==COMPLETE)){
+                if (Mcon.TurnSetAngle(20, CLOCKWISE)==COMPLETE){
                     RobotState.task=MOVE_FORWARD;
                     Mcon.SetMotors(255,255);
                 }
