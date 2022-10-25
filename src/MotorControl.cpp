@@ -42,22 +42,23 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
   if(lmotor<0) lmotor=0;
   if(rmotor<0) rmotor=0;
   //set motor speed and direction
+  lmotor*=0.886;
   motorL->run(ldirection);
   motorR->run(rdirection);
   motorL->setSpeed(lmotor);
   motorR->setSpeed(rmotor);
 }
 
-bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug){
+bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug,bool forceFind=false){
   if(!LineDetected){
     LineState.lost_line_counter+=1;
   }else{
     LineState.lost_line_counter=0;
   }
-  if((LineState.lost_line_counter>100 && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
+  if(forceFind||(LineState.lost_line_counter>150 && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
     LineState.status=INITIAL_SCAN;
     
-    if(correction>=1){
+    if(correction>=0){
       LineState.scan_direction=1;
       Debug.SendMessage("Lost line, scanning right");
     } else {
