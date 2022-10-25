@@ -149,8 +149,23 @@ void loop(){
         //Serial.println(String(TiltSense.x_average));
         //Serial.println(String(LineSense.differential_reading));
     }
-    // peform PID calculation   
+    // peform PID calculation  
     double correction = LineSense.PIDLineFollowCorrection(dt);
+    //amber LED code
+    /*
+    if(RobotState.task==STOPPED){
+        digitalWrite(AMBER_LED_PIN, LOW);
+    }
+    else {
+        if (m == 500 || m ==0){
+            digitalWrite(AMBER_LED_PIN, HIGH);
+        }
+        if (m == 100 || m == 600){
+            digitalWrite(AMBER_LED_PIN, LOW);
+        }
+    }
+    */
+
     if(TiltSense.getTilt()!=TiltSensor::HORIZONTAL){
          digitalWrite(AMBER_LED_PIN, HIGH);
     } else {
