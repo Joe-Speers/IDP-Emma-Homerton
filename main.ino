@@ -150,8 +150,23 @@ void loop(){
         Serial.print(String(LineSense.derivative));
         Serial.println(","+String(LineSense.error));
     }
-    // peform PID calculation   
+    // peform PID calculation  
     double correction = LineSense.PIDLineFollowCorrection(dt);
+    //amber LED code
+    /*
+    if(RobotState.task==STOPPED){
+        digitalWrite(AMBER_LED_PIN, LOW);
+    }
+    else {
+        if (m == 500 || m ==0){
+            digitalWrite(AMBER_LED_PIN, HIGH);
+        }
+        if (m == 100 || m == 600){
+            digitalWrite(AMBER_LED_PIN, LOW);
+        }
+    }
+    */
+
     if(LineSense.isLineDetected()){
          digitalWrite(AMBER_LED_PIN, HIGH);
     } else {
