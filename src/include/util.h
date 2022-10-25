@@ -6,9 +6,9 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-#define DERIVITIVE_LINE_SENSE_THRESHOLD 3//3
-#define PROPORTIONAL_LINE_SENSE_REGION 0.35//0.35
-#define INTEGRAL_LINE_SENSE_REGION 0.01 //bound is currently 0.12
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 1.2//3
+#define PROPORTIONAL_LINE_SENSE_REGION 0.1//0.35, 0.1 is ok
+#define INTEGRAL_LINE_SENSE_REGION 0.00002 //bound is currently 0.12
 //Motor speeds
 #define Default_Speed 255
 #define Sweep_Speed 255
@@ -42,11 +42,11 @@ Also contains enumerables for the state system.
 #define LINE_FOLLOW_MOTOR_SWING     255 //amount to swing from 'MOTOR_SPEED' as 'correction' varies. probably should be as big as speed
 
 //Conversion constants
-#define Distance_Constant 0.0917 //distance overshoot constant (in cm)
-#define Measured_Speed 0.01529 //measured speed in cm/ms for conversion (at speed 255)
+#define Distance_Constant -0.014 //distance overshoot constant (in cm)
+#define Measured_Speed 0.01287 //measured speed in cm/ms for conversion (at speed 255)
 
-#define Angle_Constant -4.47 //angle overshoot constant (in degrees)
-#define Measured_Turn_Rate 0.06915 //measured turn rate (in degrees/ms) 
+#define Angle_Constant -2 //-5 //angle overshoot constant (in degrees)
+#define Measured_Turn_Rate 0.06628 //measured turn rate (in degrees/ms) 
 
 #define COMPLETE 0 //value for SetDistance and SetAngle once complete
 

@@ -51,9 +51,9 @@ void ResetState(){
     m=0;
     s=0;
     //reset states to inital values
-    RobotState.location=DROPOFF_SIDE;
-    RobotState.purpose=TRAVEL_TO_FAR_SIDE;
-    RobotState.task=FOLLOW_LINE;
+    RobotState.location=START_SQUARE;
+    RobotState.purpose=EXIT_START_BOX;
+    RobotState.task=STOPPED;
     RobotState.isLost=false;
     RobotState.task_timer=0;
     RobotState.task_stopwatch=0;
@@ -147,7 +147,8 @@ void loop(){
     if(m%20==0){
         //Serial.println(String(TiltSense.x_average));
         //Serial.println(String(TiltSense.x_average));
-        //Serial.println(String(LineSense.differential_reading));
+        Serial.print(String(LineSense.derivative));
+        Serial.println(","+String(LineSense.error));
     }
     // peform PID calculation  
     double correction = LineSense.PIDLineFollowCorrection(dt);
@@ -166,7 +167,7 @@ void loop(){
     }
     */
 
-    if(TiltSense.getTilt()!=TiltSensor::HORIZONTAL){
+    if(LineSense.isLineDetected()){
          digitalWrite(AMBER_LED_PIN, HIGH);
     } else {
        
@@ -174,7 +175,14 @@ void loop(){
     }
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE && !RobotState.isLost){
-        bool followingLine=Mcon.LineFollowUpdate(correction,true,Debug);
+        bool linesense = LineSense.isLineDetected();
+        bool followingLine=false;
+        if(!linesense && (RobotState.location!=RAMP || TiltSense.getTilt()==TiltSensor::HORIZONTAL)){
+            followingLine=Mcon.LineFollowUpdate(correction,false,Debug);
+        } else {
+            followingLine=Mcon.LineFollowUpdate(correction,true,Debug);
+        }
+        
         if(!followingLine){
             RobotState.isLost = true;
             Debug.SendMessage("Failed to find line, now lost");
@@ -219,7 +227,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                 }
             } else if(RobotState.task==MOVE_FORWARD){
-                if(Mcon.MoveSetDistance(30)==COMPLETE){ //replace with junction detection test (will also need to add another step to move forward more before turning)
+                if(Mcon.MoveSetDistance(15+DISTANCE_TO_ROTATION_POINT)==COMPLETE){ //replace with junction detection test (will also need to add another step to move forward more before turning)
                     RobotState.task=TURN_RIGHT; // 2) Start turning onto line
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
@@ -230,7 +238,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     } else if (RobotState.purpose==TRAVEL_TO_FAR_SIDE){
         if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(80,true)==COMPLETE){ // 3) start following the line
+                if(Mcon.TurnSetAngle(70,true)==COMPLETE){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
                     TiltSense.reset();
                     LineSense.ResetPID();
@@ -276,7 +284,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(LineSense.juntionDetect() || RobotState.task_stopwatch>7000){//need to check not finding line
+                if(LineSense.juntionDetect() || RobotState.task_stopwatch>13000){//need to check not finding line
                     Debug.SendMessage("stopped at cross (todo)");
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
@@ -302,7 +310,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     } else if(RobotState.purpose==TRAVEL_TO_START_SIDE){
         if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(TunnelSense.TunnelDetected() && RobotState.task_timer>5000){
+                if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){
                     Debug.SendMessage("Entered Tunnel");
                     RobotState.location=TUNNEL;
                     RobotState.task=MOVE_FORWARD;
@@ -318,24 +326,19 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Debug.SendMessage("Hit Left Wall");
                     RobotState.task=TURN_RIGHT;
                     RobotState.task_stopwatch=0;
-                    RobotState.task_timer=1000;
                     Mcon.TurnSetAngle(25, CLOCKWISE);
-                }
-                if(TunnelSense.WallCollisionRight()){
+                } else if(TunnelSense.WallCollisionRight()){
                     Debug.SendMessage("Hit Right Wall");
                     RobotState.task=TURN_LEFT;
                     RobotState.task_stopwatch=0;
-                    RobotState.task_timer=1000;
                     Mcon.TurnSetAngle(25, ANTI_CLOCKWISE);
-                } 
+                }
             }
-            if(!TunnelSense.TunnelDetected()){
-                    Debug.SendMessage("Exited tunnel");
-                    RobotState.task=MOVE_FORWARD;
+            if(!TunnelSense.TunnelDetected() && RobotState.task_stopwatch>600){ // checks 600ms has elapsed from last turning event
+                    Debug.SendMessage("Leaving tunnel");
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.task_stopwatch=0;
-                    RobotState.task_timer=1000;
-                    Mcon.SetMotors(255,255);
+                    Mcon.MoveSetDistance(10);
             }
             if (RobotState.task == TURN_RIGHT){
                 if (Mcon.TurnSetAngle(20, CLOCKWISE)==COMPLETE){
@@ -351,8 +354,9 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==MOVE_FORWARD){
-                if(RobotState.task_timer==0){
+                if(Mcon.MoveSetDistance(10)==COMPLETE){
                     Debug.SendMessage("Trying to find line after tunnel");
+                    Mcon.LineFollowUpdate(-0.001,true,Debug,true);
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
                     LineSense.ResetPID();
