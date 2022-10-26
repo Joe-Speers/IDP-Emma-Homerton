@@ -42,7 +42,7 @@ void MotorControl::SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int 
   if(lmotor<0) lmotor=0;
   if(rmotor<0) rmotor=0;
   //set motor speed and direction
-  lmotor*=0.886;
+  //lmotor*=0.886;
   motorL->run(ldirection);
   motorR->run(rdirection);
   motorL->setSpeed(lmotor);
@@ -142,8 +142,15 @@ bool MotorControl::MoveSetDistance(int distance){
   if (ismoving == 0){
     ismoving = 1;
     starttime = milli;
-    SetMotors(Default_Speed, Default_Speed);
-    stoptime = starttime + DistanceCon(distance);
+    if(distance>0){
+      SetMotors(Default_Speed, Default_Speed,FORWARD,FORWARD);
+      stoptime = starttime + DistanceCon(distance);
+    } else {
+      SetMotors(Default_Speed, Default_Speed,BACKWARD,BACKWARD);
+      stoptime = starttime + DistanceCon(-distance);
+    }
+    
+    
   }
 
   if (milli >= stoptime){

@@ -20,12 +20,13 @@ class Recovery
             FIND_LINE = 3,
             LINE_FOUND = 4,
             LINE_NOT_FOUND = 5,
+            DISTANCE_TOO_SMALL = 6,
         };
         //location based recovery modules
-        RecoveryState blocksite(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int usdistance);
-        RecoveryState start(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int usdistance);
-        RecoveryState ramp(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance);
-        RecoveryState tunnel(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance);
+        RecoveryState openarea(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
+        RecoveryState withblock(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
+        RecoveryState ramp(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
+        RecoveryState tunnel(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
 
     private:
         int milli;
