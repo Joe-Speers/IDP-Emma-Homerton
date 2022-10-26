@@ -10,6 +10,10 @@ void DistanceSense::SensorSetup() {
   pinMode(ULTRASOUND_ECHO_PIN, INPUT); // Sets the echoPin as an Input
 }
 
+void DistanceSense::IRSetup() {
+//HERE pin is already in utils is this enough
+}
+
 float DistanceSense::ReadUltrasoundDistance() {
   // Clears the trigPin
   digitalWrite(ULTRASOUND_TRIGGER_PIN, LOW);
@@ -27,4 +31,17 @@ float DistanceSense::ReadUltrasoundDistance() {
   //float SmoothDistance = FilteredDistance.Current();
   // print SmoothDistance in Serial monitor
   return distance;
+}
+
+float DistanceSense::ReadIRDistance() {
+  //HERE
+  val = analogRead(IR_SENSOR_PIN);
+  IR_distance = 11137/(val - 22.8); //converts between analouge reading and distance
+  if (0 < IR_distance < 160) { //accounts for errors in non0linear region when outside of range to prevent spiking
+    Serial.print("Out of range");
+  }
+  else {
+    return IR_distance;
+  } //returns distances that are in the range
+  //nb errors incured when distance <20cm... need to reverse robot before scanning?
 }
