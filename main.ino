@@ -20,6 +20,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/TiltSensor.h"
 #include "src/include/TunnelSensor.h"
 #include "src/include/Recovery.h"
+#include "src/include/MagnetSensor.h"
 
 #define TICK_TIME 10 //target tick time in ms. Ideally <10ms
 
@@ -31,6 +32,7 @@ DistanceSense distanceSense;
 TiltSensor TiltSense;
 TunnelSensor TunnelSense;
 Recovery recovery;
+MagnetSensor magnetSense;
 
 
 //timer global variables
@@ -58,6 +60,9 @@ void ResetState(){
     RobotState.task_timer=0;
     RobotState.task_stopwatch=0;
     RobotState.junction_counter=0;
+    RobotState.circuit_count=0;
+    RobotState.is_magnetic=false;
+    RobotState.is_holding_block=false;
 }
 
 void setup(){
@@ -68,12 +73,15 @@ void setup(){
     distanceSense.SensorSetup();
     TiltSense.sensorSetup();
     TunnelSense.sensorSetup();
+    magnetSense.sensorSetup();
     TiltSense.reset();
     //setup timer
     timer_last_value=micros();
     //set state variables
     ResetState();
     pinMode(AMBER_LED_PIN, OUTPUT);
+    pinMode(RED_LED, OUTPUT);
+    pinMode(GREEN_LED, OUTPUT);
 }
 //temp for distance calibration
 int move=0;
@@ -156,7 +164,7 @@ void loop(){
     // peform PID calculation  
     double correction = LineSense.PIDLineFollowCorrection(dt);
     //amber LED code
-    /*
+    
     if(RobotState.task==STOPPED){
         digitalWrite(AMBER_LED_PIN, LOW);
     }
@@ -168,14 +176,20 @@ void loop(){
             digitalWrite(AMBER_LED_PIN, LOW);
         }
     }
-    */
-
-    if(LineSense.isLineDetected()){
-         digitalWrite(AMBER_LED_PIN, HIGH);
-    } else {
-       
-        digitalWrite(AMBER_LED_PIN, LOW);
+    if((magnetSense.MagnetDetected() && !RobotState.is_holding_block) ||(RobotState.is_magnetic && RobotState.is_holding_block) ){
+        digitalWrite(RED_LED, HIGH);
+        digitalWrite(GREEN_LED, LOW);
+    } else{
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(GREEN_LED, HIGH);
     }
+
+    //if(LineSense.isLineDetected()){
+    //     digitalWrite(AMBER_LED_PIN, HIGH);
+    //} else {
+    //   
+    //    digitalWrite(AMBER_LED_PIN, LOW);
+    //}
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE && !RobotState.isLost){
         bool linesense = LineSense.isLineDetected();
@@ -212,7 +226,9 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     //If robot is lost then do something different
     if(RobotState.isLost){
         //recovery mode here
-        Mcon.SetMotors(0,0);//stop robot at the moment
+        //Mcon.SetMotors(0,0);//stop robot at the moment
+        Mcon.ResetState();
+        RobotState.isLost=false;
         return;// do not proceed to descision tree
     }
 
@@ -254,7 +270,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     } else if (RobotState.purpose==TRAVEL_TO_FAR_SIDE){
         if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(60,true)==COMPLETE){ // 3) start following the line
+                if(Mcon.TurnSetAngle(90,true)==COMPLETE){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
                     TiltSense.reset();
                     LineSense.ResetPID();
@@ -322,6 +338,21 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.SetMotors(0,0);
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=3000;// just stop for 3 seconds
+                    //magnet sensing code
+                    if(magnetSense.MagnetDetected()){
+                        Debug.SendMessage("magnetic!");
+                        RobotState.is_magnetic=true;
+                        RobotState.is_holding_block=true;
+                    } else {
+                        Debug.SendMessage("Not magnetic");
+                        RobotState.is_magnetic=false;
+                        RobotState.is_holding_block=true;
+                    }
+                    if(RobotState.circuit_count>=1){
+                        RobotState.is_magnetic=false;
+                        RobotState.is_holding_block=false;
+                        Debug.SendMessage("Not picking up block");
+                    }
                 }
             }
         }
@@ -329,6 +360,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         if(RobotState.location==CROSS){
             if(RobotState.task==STOPPED){
                 if(RobotState.task_timer==0){
+                    
+                    
                     RobotState.purpose=TRAVEL_TO_START_SIDE;
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
@@ -340,6 +373,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     } else if(RobotState.purpose==TRAVEL_TO_START_SIDE){
         if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
+                
                 if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){
                     Debug.SendMessage("Entered Tunnel");
                     RobotState.location=TUNNEL;
@@ -365,11 +399,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
             if(!TunnelSense.TunnelDetected() && RobotState.task_stopwatch>600){ // checks 600ms has elapsed from last turning event
-                    Debug.SendMessage("Leaving tunnel");
-                    RobotState.location=DROPOFF_SIDE;
-                    RobotState.junction_counter=0;
-                    RobotState.task_stopwatch=0;
-                    Mcon.MoveSetDistance(10);
+                Debug.SendMessage("Leaving tunnel");
+                RobotState.location=DROPOFF_SIDE;
+                RobotState.junction_counter=0;
+                RobotState.task_stopwatch=0;
+                RobotState.task=MOVE_FORWARD;
+                Mcon.MoveSetDistance(10);
             }
             if (RobotState.task == TURN_RIGHT){
                 if (Mcon.TurnSetAngle(20, CLOCKWISE)==COMPLETE){
@@ -396,11 +431,20 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 if(RobotState.task_stopwatch<2000){ //reset junction counter
                     RobotState.junction_counter=0;
                 }
-                if(RobotState.junction_counter==2){ // temporary loop back to start
-                    RobotState.purpose=DROP_BLOCK;
-                    RobotState.task=MOVE_FORWARD;
-                    RobotState.task_stopwatch=0;
-                    TiltSense.reset();
+                if(RobotState.is_holding_block){
+                    if((RobotState.junction_counter==1 && !RobotState.is_magnetic) || (RobotState.junction_counter>=3 && RobotState.is_magnetic)){ // temporary loop back to start
+                        RobotState.purpose=DROP_BLOCK;
+                        RobotState.task=MOVE_FORWARD;
+                        RobotState.task_stopwatch=0;
+                        TiltSense.reset();
+                    }
+                } else {
+                    if(RobotState.junction_counter==2){ // temporary loop back to start
+                        RobotState.purpose=RETURN_HOME;
+                        RobotState.task=MOVE_FORWARD;
+                        RobotState.task_stopwatch=0;
+                        TiltSense.reset();
+                    }
                 }
             }
         }
@@ -411,9 +455,18 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task=TURN_RIGHT;
                 }
             } else if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(90,true)==COMPLETE){
-                    RobotState.task=MOVE_FORWARD;
-                    RobotState.location=START_SQUARE;
+                if(RobotState.junction_counter==1){
+                    if(Mcon.TurnSetAngle(60,true)==COMPLETE){
+                        RobotState.task=MOVE_FORWARD;
+                        RobotState.location=START_SQUARE;
+                        RobotState.circuit_count+=1;
+                    }
+                } else {
+                    if(Mcon.TurnSetAngle(90,true)==COMPLETE){
+                        RobotState.task=MOVE_FORWARD;
+                        RobotState.location=START_SQUARE;
+                        RobotState.circuit_count+=1;
+                    }
                 }
                 
             }
@@ -424,19 +477,49 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }else if(RobotState.task==REVERSE){
                 if(Mcon.MoveSetDistance(-20)==COMPLETE){
-                    RobotState.task=TURN_RIGHT;
+                    RobotState.is_holding_block=false;
+                    RobotState.task=TURN_LEFT;
                     RobotState.task_stopwatch=0;
                 }
-            }else if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(290,true)==COMPLETE){
+            }else if(RobotState.task==TURN_LEFT){
+                if(Mcon.TurnSetAngle(70,false)==COMPLETE){
                     RobotState.task=FOLLOW_LINE;
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                     RobotState.task_stopwatch=0;
                     Mcon.LineFollowUpdate(1,false,Debug,true);
-                    s=0;
                 }
                 
+            }
+        }
+    } else if(RobotState.purpose==RETURN_HOME){
+        if(RobotState.location==DROPOFF_SIDE){
+            if(RobotState.task==MOVE_FORWARD){
+                if(Mcon.MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
+                    RobotState.task=TURN_RIGHT;
+                }
+            } else if(RobotState.task==TURN_RIGHT){
+                if(Mcon.TurnSetAngle(90,true)==COMPLETE){
+                    RobotState.task=MOVE_FORWARD;
+                    RobotState.location=START_SQUARE;
+                    RobotState.circuit_count+=1;
+                } 
+            }
+        } else if (RobotState.location==START_SQUARE){
+            if(RobotState.task==MOVE_FORWARD){
+                if(Mcon.MoveSetDistance(10)==COMPLETE){
+                    RobotState.task=TURN_RIGHT;
+                }
+            }else if(RobotState.task==TURN_RIGHT){
+                if(Mcon.TurnSetAngle(180,false)==COMPLETE){
+                    RobotState.task=REVERSE;
+                } 
+            } else if(RobotState.task==REVERSE){
+                if(Mcon.MoveSetDistance(-10)==COMPLETE){
+                    RobotState.task=STOPPED;
+                    RobotState.task_stopwatch=0;
+                    Mcon.SetMotors(0,0);
+                }
             }
         }
     }

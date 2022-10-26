@@ -7,14 +7,20 @@ void TunnelSensor::sensorSetup(){
     pinMode(LEFT_BUMPER_PIN,INPUT);
     pinMode(RIGHT_BUMPER_PIN,INPUT);
 }
+int sticky=0;
 bool TunnelSensor::TunnelDetected(){
-    if (digitalRead(LIGHT_SENSOR) == HIGH)
-    {
-        return true;
-    }
     if (digitalRead(LIGHT_SENSOR) == LOW)
     {
-        return false;
+        sticky=0;
+        return true;
+    }
+    if (digitalRead(LIGHT_SENSOR) == HIGH)
+    {
+        sticky+=1;
+        if(sticky>40){
+            return false;
+        }
+        return true;;
     }
 }
 bool TunnelSensor::WallCollisionLeft(){

@@ -61,12 +61,15 @@ Also contains enumerables for the state system.
 
 #define LEFT_BUMPER_PIN 5
 #define RIGHT_BUMPER_PIN 6
+#define MAGNET_SENSOR_PIN 4
 #define JUNCTION_SENSOR_PIN 3
 #define LIGHT_SENSOR 7
 #define ULTRASOUND_TRIGGER_PIN 9
 #define ULTRASOUND_ECHO_PIN 10
 #define SERVO_PIN 5
 #define AMBER_LED_PIN 8
+#define RED_LED 11
+#define GREEN_LED 12
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          1
 #define RIGHT_MOTOR_NUM         2
@@ -115,10 +118,10 @@ struct{
     double task_timer; // acts as a countdown for the current action in miliseconds
     double task_stopwatch; // acts as a countup for the current action. useful to detect when an action is taking too long, so maybe the robot is lost
     int junction_counter; //counts the number of junctions passed
-    //suggestions:
     //int blocks_collected
-    //bool is_holding_block
-    //bool is_magnetic
+    bool is_holding_block=false;
+    bool is_magnetic=false;
+    int circuit_count=0;
     //remember to add any new options to ResetState() as well
 
 } RobotState; //name of struct
