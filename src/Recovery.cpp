@@ -5,7 +5,7 @@
 #include "include/LineSensor.h"
 
 
-Recovery::RecoveryState Recovery::blocksite(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance){
+Recovery::RecoveryState Recovery::openarea(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance){
     milli = millis();
     if (LastState==RECOVERY_SETUP){
         start_timer = milli;
@@ -14,7 +14,7 @@ Recovery::RecoveryState Recovery::blocksite(MotorControl Mcon, WifiDebug Debug,L
     }
     if (LastState==LOCATION_FIND){
         if (Mcon.TurnSetAngle(360, CLOCKWISE)){
-            if (usdistance < closest_distance){
+            if (distance < closest_distance){
                 wall_detect_time = milli;
           }
         }
@@ -26,12 +26,18 @@ Recovery::RecoveryState Recovery::blocksite(MotorControl Mcon, WifiDebug Debug,L
     }
     if (LastState==ROTATE_TO_WALL){
         if (!Mcon.TurnSetAngle(wall_angle, CLOCKWISE)){
+            if (closest_distance <= 23){
+                LastState = DISTANCE_TOO_SMALL;
+            }
+            else{
+                LastState = FIND_LINE;
+            }
             LastState = FIND_LINE;
             Debug.SendMessage("Moving to find line");
         }
     }
     if (LastState==FIND_LINE){
-        if (usdistance < 30){
+        if (distance < 30){
             if (Lsense.isLineDetected()){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
@@ -40,7 +46,7 @@ Recovery::RecoveryState Recovery::blocksite(MotorControl Mcon, WifiDebug Debug,L
                 Debug.SendMessage("Line not found rotating 90 degrees");
             }
         }
-        if (usdistance > 120){
+        if (distance > 120){
             if (Lsense.isLineDetected()){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
@@ -53,11 +59,16 @@ Recovery::RecoveryState Recovery::blocksite(MotorControl Mcon, WifiDebug Debug,L
     if (LastState==LINE_FOUND){
 
     }
+    if (LastState==DISTANCE_TOO_SMALL){
+        if (!Mcon.MoveSetDistance(-5)){
+            LastState = RECOVERY_SETUP;
+        }
+    }
     return LastState;
 
 }
 
-Recovery::RecoveryState Recovery::start(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance){
+Recovery::RecoveryState Recovery::withblock(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance){
 
     return LastState;
 

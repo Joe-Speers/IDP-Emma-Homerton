@@ -6,9 +6,9 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-#define DERIVITIVE_LINE_SENSE_THRESHOLD 1.2//3
-#define PROPORTIONAL_LINE_SENSE_REGION 0.1//0.35, 0.1 is ok
-#define INTEGRAL_LINE_SENSE_REGION 0.00002 //bound is currently 0.12
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 3//3
+#define PROPORTIONAL_LINE_SENSE_REGION 0.35//0.35
+#define INTEGRAL_LINE_SENSE_REGION 0.01 //bound is currently 0.12
 //Motor speeds
 #define Default_Speed 255
 #define Sweep_Speed 255
@@ -32,8 +32,8 @@ Also contains enumerables for the state system.
 #define ANTI_CLOCKWISE 0
 
 //PID constants
-#define DEFAULT_PROPORTIONAL_K 0.8 //0.8
-#define DEFAULT_INTEGRAL_K 1//1
+#define DEFAULT_PROPORTIONAL_K 4 //4
+#define DEFAULT_INTEGRAL_K 5//5
 #define DEFAULT_DERIVATIVE_K 0 // currently disabled
 #define DEFAULT_INTEGRAL_CORRECTION_LIMIT 0.5 //0.5 limits the size of the integral.
 
@@ -42,11 +42,11 @@ Also contains enumerables for the state system.
 #define LINE_FOLLOW_MOTOR_SWING     255 //amount to swing from 'MOTOR_SPEED' as 'correction' varies. probably should be as big as speed
 
 //Conversion constants
-#define Distance_Constant -0.014 //distance overshoot constant (in cm)
-#define Measured_Speed 0.01287 //measured speed in cm/ms for conversion (at speed 255)
+#define Distance_Constant 0.0917 //distance overshoot constant (in cm)
+#define Measured_Speed 0.01529 //measured speed in cm/ms for conversion (at speed 255)
 
-#define Angle_Constant -2 //-5 //angle overshoot constant (in degrees)
-#define Measured_Turn_Rate 0.06628 //measured turn rate (in degrees/ms) 
+#define Angle_Constant -4.47 //angle overshoot constant (in degrees)
+#define Measured_Turn_Rate 0.06915 //measured turn rate (in degrees/ms) 
 
 #define COMPLETE 0 //value for SetDistance and SetAngle once complete
 
@@ -58,6 +58,7 @@ Also contains enumerables for the state system.
 // ### Pin assignment ###
 
 #define LINE_SENSOR_PIN         A0 //connection to subtraction circuit
+#define IR_SENSOR_PIN           A1 //sort with technician
 
 #define LEFT_BUMPER_PIN 5
 #define RIGHT_BUMPER_PIN 6
@@ -71,8 +72,8 @@ Also contains enumerables for the state system.
 #define RED_LED 11
 #define GREEN_LED 12
 // Motor shield motor numbers (1-4)
-#define LEFT_MOTOR_NUM          1
-#define RIGHT_MOTOR_NUM         2
+#define LEFT_MOTOR_NUM          2
+#define RIGHT_MOTOR_NUM         1
 
 
 // ### enums for State system ###
