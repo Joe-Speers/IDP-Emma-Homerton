@@ -9,12 +9,12 @@ void TunnelSensor::sensorSetup(){
 }
 int sticky=0;
 bool TunnelSensor::TunnelDetected(){
-    if (digitalRead(LIGHT_SENSOR) == LOW)
+    if (digitalRead(LIGHT_SENSOR) == HIGH)
     {
         sticky=0;
         return true;
     }
-    if (digitalRead(LIGHT_SENSOR) == HIGH)
+    if (digitalRead(LIGHT_SENSOR) == LOW)
     {
         sticky+=1;
         if(sticky>40){

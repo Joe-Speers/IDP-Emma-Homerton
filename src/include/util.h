@@ -72,8 +72,8 @@ Also contains enumerables for the state system.
 #define RED_LED 11
 #define GREEN_LED 12
 // Motor shield motor numbers (1-4)
-#define LEFT_MOTOR_NUM          2
-#define RIGHT_MOTOR_NUM         1
+#define LEFT_MOTOR_NUM          1
+#define RIGHT_MOTOR_NUM         2
 
 
 // ### enums for State system ###

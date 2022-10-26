@@ -269,6 +269,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         }
     } else if (RobotState.purpose==TRAVEL_TO_FAR_SIDE){
         if(RobotState.location==DROPOFF_SIDE){
+            
             if(RobotState.task==TURN_RIGHT){
                 if(Mcon.TurnSetAngle(90,true)==COMPLETE){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;

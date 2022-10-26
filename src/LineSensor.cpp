@@ -30,7 +30,7 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
 
   //take reading of line sensor and normalise to be between -1 and 1
   differential_reading = analogRead(LINE_SENSOR_PIN);
-  error = (double)(LINE_SENSE_MIDDLE-differential_reading)/LINE_SENSE_MAX_AMPLITUDE; // normalises reading to approximatly -1 to 1.
+  error = -(double)(LINE_SENSE_MIDDLE-differential_reading)/LINE_SENSE_MAX_AMPLITUDE; // normalises reading to approximatly -1 to 1.
   //creates a 'dead spot' around LINE_SENSE_MIDDLE
   if(error==0 or (error<=ERROR_DEAD_SPOT && error>=-ERROR_DEAD_SPOT)){
     error=0;
