@@ -8,6 +8,7 @@
 void DistanceSense::SensorSetup() {
   pinMode(ULTRASOUND_TRIGGER_PIN, OUTPUT); // Sets the trigPin as an Output
   pinMode(ULTRASOUND_ECHO_PIN, INPUT); // Sets the echoPin as an Input
+  pinMode(IR_SENSOR_PIN, INPUT);// sets the IR sensor as an input
 }
 
 void DistanceSense::IRSetup() {
@@ -36,7 +37,19 @@ float DistanceSense::ReadUltrasoundDistance() {
 float DistanceSense::ReadIRDistance() {
   //HERE
   val = analogRead(IR_SENSOR_PIN);
-  IR_distance = 11137/(val - 22.8); //converts between analouge reading and distance
+  distanceVal = (11805/(val - 36.013));
+  if (distanceVal >90 ){
+    distanceVal = (12334/(val - 23.763));
+  }
+
+ 
+  average=distanceVal;
+  for (int i = IR_AVERAGE_READINGS -1; i > 0; i--){
+      previous_readings[i] = previous_readings[i - 1];
+      average+=previous_readings[i];
+  }
+  previous_readings[0] = distanceVal;
+  average /= IR_AVERAGE_READINGS;
   if (0 < IR_distance < 160) { //accounts for errors in non0linear region when outside of range to prevent spiking
     Serial.print("Out of range");
   }

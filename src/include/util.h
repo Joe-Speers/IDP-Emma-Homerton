@@ -23,9 +23,10 @@ Also contains enumerables for the state system.
 
 //Block gathering constants
 #define GAP_LEFT_TO_BLOCK 5
-#define MIN_WALL_DISTANCE 80
+#define MIN_WALL_DISTANCE 100
 #define ARMS_CLOSED_ANGLE 90 //do not know these values currently, depends on setup and gearing
 #define ARMS_OPEN_ANGLE 0
+#define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
 
 //Turning direction 
 #define CLOCKWISE 1
@@ -54,6 +55,9 @@ Also contains enumerables for the state system.
 #define LINE_SENSE_MIDDLE           531 //what reading should be treated as the 'middle' of the line
 #define LINE_SENSE_MAX_AMPLITUDE    500 // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
 #define ERROR_DEAD_SPOT             0.02 //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
+
+//IR constant
+#define IR_AVERAGE_READINGS 20 //A=amount of readings averaged for the IR distance
 
 // ### Pin assignment ###
 

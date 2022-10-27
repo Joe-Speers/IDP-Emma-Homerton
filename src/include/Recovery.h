@@ -23,13 +23,15 @@ class Recovery
             DISTANCE_TOO_SMALL = 6,
         };
         //location based recovery modules
-        RecoveryState openarea(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
+        RecoveryState blockSite(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
         RecoveryState withblock(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
         RecoveryState ramp(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
         RecoveryState tunnel(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
 
     private:
         int milli;
+        bool junct_prev; //whether the junction was previously detected
+        bool junct_cur; //whether the junction is currently detected
         int start_timer;
         int wall_detect_time;
         int wall_angle;

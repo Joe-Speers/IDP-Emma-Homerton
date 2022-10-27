@@ -5,8 +5,9 @@
 #include "include/LineSensor.h"
 
 
-Recovery::RecoveryState Recovery::openarea(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance){
+Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance){
     milli = millis();
+    junct_cur = Lsense.juntionDetect();
     if (LastState==RECOVERY_SETUP){
         start_timer = milli;
         closest_distance = 1000;
@@ -38,9 +39,10 @@ Recovery::RecoveryState Recovery::openarea(MotorControl Mcon, WifiDebug Debug,Li
     }
     if (LastState==FIND_LINE){
         if (distance < 30){
-            if (Lsense.isLineDetected()){
+            if (junct_prev == false && junct_cur == true){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
+                Debug.SendMessage("Line has been found");
             }
             else if(!Mcon.MoveSetDistance(120-start_distance)){
                 Debug.SendMessage("Line not found rotating 90 degrees");
@@ -65,6 +67,8 @@ Recovery::RecoveryState Recovery::openarea(MotorControl Mcon, WifiDebug Debug,Li
         }
     }
     return LastState;
+    
+    junct_prev = Lsense.juntionDetect();
 
 }
 
