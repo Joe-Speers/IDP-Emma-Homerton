@@ -42,7 +42,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
             if (junct_prev == false && junct_cur == true){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
-                Debug.SendMessage("Line has been found")
+                Debug.SendMessage("Line has been found");
             }
             else if(!Mcon.MoveSetDistance(120-start_distance)){
                 Debug.SendMessage("Line not found rotating 90 degrees");
@@ -68,7 +68,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
     }
     return LastState;
     
-    junct_prev = Lsense.juntionDetect()
+    junct_prev = Lsense.juntionDetect();
 
 }
 
