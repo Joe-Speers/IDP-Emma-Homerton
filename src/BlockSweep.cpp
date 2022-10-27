@@ -5,20 +5,40 @@
 
 MotorControl MotorC;
 
-bool BlockSweep::BlockSwe(int distance){
+BlockSweep::SweepState BlockSweep::BlockSwe(int distance){
 
     milli = millis();
-    if (sweepstate == 0){
-        //Sets start time
-        starttime = milli;
-        sweepstate += 1;
+
+    if (laststate == RORATE_TO_OFFSET){
+        if (!MotorC.TurnSetAngle(90, CLOCKWISE)){
+            laststate == MOVE_OFFSET;
+        }
     }
+    if (laststate == MOVE_OFFSET){
+        if (!MotorC.MoveSetDistance(CROSS_OFFSET)){
+            laststate == START_SWEEP;
+            starttime = milli;
+        }
+    }
+
     if (sweepstate == 1){
         //Turns robot 180 degrees whilst recording if block is sensed
-        ismoving = MotorC.TurnSetAngle(180, ANTI_CLOCKWISE);
-        midp = AngleFind(distance, milli);
-        if (ismoving == 0){
-            sweepstate += 1;
+        if (!MotorC.TurnSetAngle(180, ANTI_CLOCKWISE)){
+            laststate == TURN_TO_BLOCK;
+        }
+        if (blockdetected == 0){
+        //will work if block is placed closer than any part of the ramp/ tunnel, if not a linear distance equation is need
+            if (distance < MIN_WALL_DISTANCE){
+                blockdetected = 1;
+                firstdetect = milli;
+            }
+        }
+        if (blockdetected == 1){
+            if (distance > MIN_WALL_DISTANCE){
+                    blockdetected = 0;
+                    midpoint = int ((milli + starttime)/2);
+
+                } 
         }
     }
     if (sweepstate == 2){

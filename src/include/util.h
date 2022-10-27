@@ -23,9 +23,10 @@ Also contains enumerables for the state system.
 
 //Block gathering constants
 #define GAP_LEFT_TO_BLOCK 5
-#define MIN_WALL_DISTANCE 80
+#define MIN_WALL_DISTANCE 100
 #define ARMS_CLOSED_ANGLE 90 //do not know these values currently, depends on setup and gearing
 #define ARMS_OPEN_ANGLE 0
+#define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
 
 //Turning direction 
 #define CLOCKWISE 1
