@@ -55,6 +55,9 @@ Also contains enumerables for the state system.
 #define LINE_SENSE_MAX_AMPLITUDE    500 // aproximate max +- possible reading about LINE_SENSE_MIDDLE. Range is therefore 2*LINE_SENSE_MAX_AMPLITUDE
 #define ERROR_DEAD_SPOT             0.02 //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
 
+//IR constant
+#define IR_AVERAGE_READINGS 20 //A=amount of readings averaged for the IR distance
+
 // ### Pin assignment ###
 
 #define LINE_SENSOR_PIN         A0 //connection to subtraction circuit
