@@ -512,11 +512,11 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task=TURN_RIGHT;
                 }
             }else if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(180,false)==COMPLETE){
+                if(Mcon.TurnSetAngle(170,false)==COMPLETE){
                     RobotState.task=REVERSE;
                 } 
             } else if(RobotState.task==REVERSE){
-                if(Mcon.MoveSetDistance(-10)==COMPLETE){
+                if(Mcon.MoveSetDistance(-35)==COMPLETE){
                     RobotState.task=STOPPED;
                     RobotState.task_stopwatch=0;
                     Mcon.SetMotors(0,0);
