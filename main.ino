@@ -22,7 +22,7 @@ Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 #include "src/include/Recovery.h"
 #include "src/include/MagnetSensor.h"
 
-#define TICK_TIME 10 //target tick time in ms. Ideally <10ms
+#define TICK_TIME 10 //target tick time in ms. Everything relies on this being 10ms
 
 //Create objects to access modules
 LineSensor LineSense;
@@ -240,7 +240,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     if(RobotState.purpose==EXIT_START_BOX){
         if(RobotState.location==START_SQUARE){
             if(RobotState.task==STOPPED){ // 0) This is the initial state after a reset
-                if(s>=5){ // 1) Start moving after 5 seconds
+                if(s>=2){ // 1) Start moving after 5 seconds
                     Debug.SendMessage("Robot starting");
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
