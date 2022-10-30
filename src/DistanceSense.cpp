@@ -16,7 +16,7 @@ float DistanceSense::ReadUltrasoundDistance() {
   delayMicroseconds(10);
   digitalWrite(ULTRASOUND_TRIGGER_PIN, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  long duration = pulseIn(ULTRASOUND_ECHO_PIN, HIGH,18000);
+  long duration = pulseIn(ULTRASOUND_ECHO_PIN, HIGH,8000);
   // Calculating the distance
   float distance = duration * 0.034 / 2;
   return distance;
@@ -38,8 +38,8 @@ float DistanceSense::ReadIRDistance() {
   }
   previous_readings[0] = distanceVal;
   average /= IR_AVERAGE_READINGS;
-  if (0 < IR_distance < 160) { //accounts for errors in non0linear region when outside of range to prevent spiking
-    Serial.print("Out of range");
+  IR_distance=average;
+  if (IR_distance<=0 || IR_distance> 160) { //accounts for errors in non0linear region when outside of range to prevent spiking
     return -1;
   }
   else {
