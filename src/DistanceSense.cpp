@@ -1,5 +1,6 @@
 #include "include/DistanceSense.h"
 #include "include/util.h"
+#include <Wire.h>
 
 void DistanceSense::SensorSetup() {
   pinMode(ULTRASOUND_TRIGGER_PIN, OUTPUT); // Sets the trigPin as an Output
