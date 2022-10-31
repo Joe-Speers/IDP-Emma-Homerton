@@ -39,7 +39,7 @@ MagnetSensor magnetSense;
 int timer_last_value=0; //last time in microseconds
 int max_tick_time_exceeded=0;//biggest time by which the TICK_TIME has been exceeded recently (in microseconds). This ought to be zero
 int m=0;//miliseconds counter (between 0 and 999), in increments of 'TICK_TIME'
-int s=0;//seconds counter
+int s=-10000;//seconds counter
 
 
 
@@ -51,14 +51,13 @@ void ResetState(){
     TiltSense.reset();
     RobotState.junction_counter=0;
     m=0;
-    s=0;
     //reset states to inital values
     RobotState.location=START_SQUARE;
     RobotState.purpose=EXIT_START_BOX;
     RobotState.task=STOPPED;
     RobotState.isLost=false;
     RobotState.wrongWay=false;
-    RobotState.task_timer=0;
+    RobotState.task_timer=1000;
     RobotState.task_stopwatch=0;
     RobotState.junction_counter=0;
     RobotState.circuit_count=0;
@@ -133,7 +132,7 @@ void loop(){
     if(m%500==0){ // twice a second
         //print out the clock
         //Debug.SendMessage("Distance: "+String(distanceSense.ReadUltrasoundDistance(),1)); has a long delay!
-        //Debug.SendMessage("t: "+String(s)+":"+String(m));
+        Debug.SendMessage("t: "+String(s)+":"+String(m));
         int temp=0;
     }
     if(!LineSense.LastJunctionDetectionState && LineSense.juntionDetect() && !RobotState.isLost){
@@ -186,6 +185,9 @@ void loop(){
         digitalWrite(GREEN_LED, HIGH);
     }
     if(digitalRead(RESET_BUTTON)==HIGH){
+        if(s<0){
+            s=0;
+        }
         ResetState();
         digitalWrite(AMBER_LED_PIN, HIGH);
     }
@@ -245,7 +247,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     if(RobotState.purpose==EXIT_START_BOX){
         if(RobotState.location==START_SQUARE){
             if(RobotState.task==STOPPED){ // 0) This is the initial state after a reset
-                if(s>=2){ // 1) Start moving after 5 seconds
+                if(RobotState.task_timer==0 && s>=0){ // 1) Start moving after 1 second
                     Debug.SendMessage("Robot starting");
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
