@@ -10,13 +10,14 @@ class BlockSweep
             ROTATE_TO_SWEEP_START = 2,
             START_SWEEP = 3,
             ROTATE_TO_BLOCK = 4,
-            MOVE_TO_BLOCK = 5,
-            LINE_NOT_FOUND = 6,
-            GRAB_BLOCK = 7,
-            ROTATE_TO_CROSS = 8,
-            MOVE_TO_CROSS = 9,
-            ROTATE_FORWARD = 10,
-            SWEEP_COMPLETE = 11,
+            WAIT_FOR_IRSENSOR = 5,
+            MOVE_TO_BLOCK = 6,
+            LINE_NOT_FOUND = 7,
+            GRAB_BLOCK = 8,
+            ROTATE_TO_CROSS = 9,
+            MOVE_TO_CROSS = 10,
+            ROTATE_FORWARD = 11,
+            SWEEP_COMPLETE = 12,
         };
 
         int angle = 0;

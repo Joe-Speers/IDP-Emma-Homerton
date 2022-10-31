@@ -15,12 +15,13 @@ class Recovery
     public:
         enum RecoveryState{
             RECOVERY_SETUP = 0,
-            LOCATION_FIND = 1,
+            WALL_FIND = 1,
             ROTATE_TO_WALL = 2,
-            FIND_LINE = 3,
-            LINE_FOUND = 4,
-            LINE_NOT_FOUND = 5,
-            DISTANCE_TOO_SMALL = 6,
+            FIND_LINE_BACKWARDS = 3,
+            FIND_LINE_FORWARDS = 4,
+            LINE_FOUND = 5,
+            LINE_NOT_FOUND = 6,
+            DISTANCE_TOO_SMALL = 7,
         };
         //location based recovery modules
         RecoveryState blockSite(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);

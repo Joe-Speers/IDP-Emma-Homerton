@@ -55,9 +55,17 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
         if (!Mcon.TurnSetAngle(180 - angleofblock, ANTI_CLOCKWISE)){
             blockdistance = distance;
             blockdistance -= GAP_LEFT_TO_BLOCK;
+            laststate = WAIT_FOR_IRSENSOR;
+            starttime = milli;
+        }
+    }
+
+    if (laststate == WAIT_FOR_IRSENSOR){
+        if (milli + IR_WAIT_TIME > milli){
             laststate = MOVE_TO_BLOCK;
         }
     }
+
     if (laststate == MOVE_TO_BLOCK){
         //Moves robot forwards to a set distance from the block
         if (Mcon.MoveSetDistance(blockdistance - GAP_LEFT_TO_BLOCK)){
@@ -76,12 +84,12 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
     if (laststate == ROTATE_TO_CROSS){
         //Turns robot around
         if (angleofblock > 90){
-            if (!Mcon.TurnSetAngle(180 + crossangle, ANTI_CLOCKWISE)){
+            if (!Mcon.TurnSetAngle(180 - crossangle, ANTI_CLOCKWISE)){
                 laststate = MOVE_TO_CROSS;
             }
         }
         else {
-            if (!Mcon.TurnSetAngle(180 + crossangle, CLOCKWISE)){
+            if (!Mcon.TurnSetAngle(180 - crossangle, CLOCKWISE)){
                 laststate = MOVE_TO_CROSS;
             }
         }
@@ -95,12 +103,12 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
     if (laststate == ROTATE_FORWARD){
         //Rotates robot to face allong the line
         if (angleofblock > 90){
-            if (!Mcon.TurnSetAngle(180 + crossangle - angleofblock, ANTI_CLOCKWISE)){
+            if (!Mcon.TurnSetAngle(180 - crossangle - angleofblock, ANTI_CLOCKWISE)){
                 laststate = SWEEP_COMPLETE;
             }
         }
         else {
-            if (!Mcon.TurnSetAngle(180 + crossangle - angleofblock, CLOCKWISE)){
+            if (!Mcon.TurnSetAngle(180 + crossangle - angleofblock, ANTI_CLOCKWISE)){
                 laststate = SWEEP_COMPLETE;
             }
         }
