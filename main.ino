@@ -143,12 +143,12 @@ void loop(){
     //temp calibration script
     if(false){//true if calibrating motors
         if(move>0){
-            if(!Mcon.MoveSetDistance(move)){
+            if(Mcon.MoveSetDistance(move)== COMPLETE){
                 move=0;
             }
         }
         if(turn>0){
-            if(!Mcon.TurnSetAngle(turn,true)){
+            if(Mcon.TurnSetAngle(turn,true)== COMPLETE){
                 turn=0;
             }
         }

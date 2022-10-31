@@ -6,7 +6,7 @@ class BlockSweep
 {
     public:
         enum SweepState{
-            RORATE_TO_OFFSET = 0,
+            ROTATE_TO_OFFSET = 0,
             MOVE_OFFSET = 1,
             ROTATE_TO_SWEEP_START = 2,
             START_SWEEP = 3,
@@ -24,7 +24,7 @@ class BlockSweep
         int angle = 0;
         int distance = 0;
         
-        //
+
         SweepState BlockSwp(MotorControl Mcon, DistanceSense Dsense);
         SweepState ReturnToCross(MotorControl Mcon, DistanceSense Dsense);
 
@@ -36,7 +36,7 @@ class BlockSweep
         int midp = 0;
         int angleofblock = 700;
         int blockdistance = 0;
-        SweepState laststate = RORATE_TO_OFFSET;
+        SweepState laststate = ROTATE_TO_OFFSET;
         bool blockdetected = 0;
         int crossangle = 0;
         int crossdistance = 0;

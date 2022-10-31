@@ -31,7 +31,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
         }
     }
     if (LastState==ROTATE_TO_WALL){
-        if (!Mcon.TurnSetAngle(wall_angle, CLOCKWISE)){
+        if (Mcon.TurnSetAngle(wall_angle, CLOCKWISE)== COMPLETE){
             if (closest_distance <= 25){
                 LastState = DISTANCE_TOO_SMALL;
             }
@@ -52,7 +52,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
                 Mcon.ResetMovement();
                 Debug.SendMessage("Line has been found");
             }
-            else if(!Mcon.MoveSetDistance(closest_distance - 120)){
+            else if(Mcon.MoveSetDistance(closest_distance - 120)== COMPLETE){
                 LastState = LINE_NOT_FOUND;
                 Mcon.ResetMovement();
                 Debug.SendMessage("Line not found rotating 90 degrees");
@@ -65,7 +65,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
                 Mcon.ResetMovement();
                 Debug.SendMessage("Line has been found");
             }
-            if(!Mcon.MoveSetDistance(closest_distance-110)){
+            if(Mcon.MoveSetDistance(closest_distance-110)== COMPLETE){
                 LastState = FIND_LINE_FORWARDS;
                 Mcon.ResetMovement();
             }
@@ -78,25 +78,25 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
 
     if (LastState==FIND_LINE_FORWARDS){
         if (closest_distance >= 29 && closest_distance <= 100){
-            if (junct_prev == false && junct_cur == true){
+            if (!junct_prev && junct_cur){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
                 Mcon.ResetMovement();
                 Debug.SendMessage("Line has been found");
             }
-            if(!Mcon.MoveSetDistance(85)){
+            if(Mcon.MoveSetDistance(85)== COMPLETE){
                 LastState = LINE_NOT_FOUND;
                 Mcon.ResetMovement();
             }
         }
         if (closest_distance > 100){
-            if (junct_prev == false && junct_cur == true){
+            if (!junct_prev && junct_cur){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
                 Debug.SendMessage("Line has been found");
                 Mcon.ResetMovement();
             }
-            if (!Mcon.MoveSetDistance(closest_distance-25)){
+            if (Mcon.MoveSetDistance(closest_distance-25)== COMPLETE){
                 LastState = LINE_NOT_FOUND;
                 Mcon.ResetMovement();
             }
@@ -104,7 +104,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
     }
 
     if (LastState==LINE_NOT_FOUND){
-        if(!Mcon.TurnSetAngle(90, CLOCKWISE)){
+        if(Mcon.TurnSetAngle(90, CLOCKWISE)== COMPLETE){
             LastState = RECOVERY_SETUP;
             Mcon.ResetMovement();
         }
@@ -114,7 +114,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
 
     }
     if (LastState==DISTANCE_TOO_SMALL){
-        if (!Mcon.MoveSetDistance(-5)){
+        if (Mcon.MoveSetDistance(-5)== COMPLETE){
             LastState = RECOVERY_SETUP;
             Mcon.ResetMovement();
         }
