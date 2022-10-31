@@ -257,6 +257,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.junction_counter=0;                   
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.task=MOVE_FORWARD;
+                    Mcon.ResetMovement();
                     Mcon.SetMotors(255,255);
                     RobotState.task_stopwatch=0;
                 }
@@ -269,6 +270,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         RobotState.task_stopwatch=0;
                         RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                         RobotState.task=TURN_RIGHT; // 2) Start turning onto line
+                        Mcon.ResetMovement();
                     }
                 }
             }
@@ -280,6 +282,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==TURN_RIGHT){
                 if(Mcon.TurnSetAngle(90,true)==COMPLETE){ // 3) start following the line
                     RobotState.task=FOLLOW_LINE;
+                    Mcon.ResetMovement();
                     TiltSense.reset();
                     LineSense.ResetPID();
                     Mcon.LineFollowUpdate(1,false,Debug,true);
@@ -310,12 +313,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     if(RobotState.task_stopwatch>10000){
                         Debug.SendMessage("Stuck going up ramp");
                         //reverse back
+                        Mcon.ResetMovement();
                         RobotState.task=REVERSE;
                     }
                 }
                 if(TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
+                    Mcon.ResetMovement();
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=0;
                 }
@@ -332,6 +337,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             } else if(RobotState.task==REVERSE){
                 if(Mcon.MoveSetDistance(-30)==COMPLETE){
                     RobotState.task=FOLLOW_LINE;
+                    Mcon.ResetMovement();
                     Mcon.LineFollowUpdate(-0.0001,true,Debug,true);
                     RobotState.task_stopwatch=0;
                 }
@@ -340,8 +346,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==FOLLOW_LINE){
                 if(LineSense.juntionDetect() && RobotState.task_stopwatch>7000){
                     if (RobotState.wrongWay==true){
+                        Mcon.ResetMovement();
                         RobotState.task = MOVE_FORWARD;
-
                     }
                     else {
                         Debug.SendMessage("stopped at cross (todo)");
@@ -349,6 +355,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         RobotState.location=CROSS;
                         RobotState.task=STOPPED; //temporary
                         Mcon.SetMotors(0,0);
+                        Mcon.ResetMovement();
                         RobotState.task_stopwatch=0;
                         RobotState.task_timer=3000;// just stop for 3 seconds
                         //magnet sensing code
@@ -372,22 +379,26 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Debug.SendMessage("Unexpected tunnel entry");
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=REVERSE;
+                    Mcon.ResetMovement();
                     RobotState.wrongWay = true;
                     RobotState.task_stopwatch=0;
                 }
                 if(TiltSense.getTilt()==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
                     Debug.SendMessage("Unexpected Ramp hit");
                     RobotState.task = REVERSE;
+                    Mcon.ResetMovement();
                 }
             }
             if (RobotState.task == REVERSE){
                 if (Mcon.MoveSetDistance(-20) == COMPLETE){
                     RobotState.task = TURN_AROUND;
+                    Mcon.ResetMovement();
                 }
             }
             if (RobotState.task == TURN_AROUND){
                 if (Mcon.TurnSetAngle(180, CLOCKWISE) == COMPLETE){
                     RobotState.task = FOLLOW_LINE;
+                    Mcon.ResetMovement();
                     LineSense.ResetPID();
                     Mcon.LineFollowUpdate(0,false,Debug,true);
                 }
@@ -395,14 +406,16 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if (RobotState.task == MOVE_FORWARD){
                 if (Mcon.MoveSetDistance(20)==COMPLETE){
                     RobotState.task = TURN_AROUND;
+                    Mcon.ResetMovement();
                     RobotState.wrongWay = false;
                 }
             }
             if (RobotState.task == RECOVERY){
                 if(recovery.blockSite(Mcon, Debug, LineSense, distanceSense) == Recovery::LINE_FOUND){
                     LineSense.ResetPID();
-                    Mcon.LineFollowUpdate(0,false,Debug,true);
                     RobotState.task = FOLLOW_LINE;
+                    Mcon.ResetMovement();
+                    Mcon.LineFollowUpdate(0,false,Debug,true);
                 }
             }
         }
@@ -415,6 +428,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.purpose=TRAVEL_TO_START_SIDE;
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
+                    Mcon.ResetMovement();
                     LineSense.ResetPID();
                     RobotState.task_stopwatch=0;
                 }
@@ -428,6 +442,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Debug.SendMessage("Entered Tunnel");
                     RobotState.location=TUNNEL;
                     RobotState.task=MOVE_FORWARD;
+                    Mcon.ResetMovement();
                     Mcon.SetMotors(255,255);
                     RobotState.task_stopwatch=0;
                     LineSense.ResetPID();
@@ -440,11 +455,13 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Debug.SendMessage("Hit Left Wall");
                     RobotState.task=TURN_RIGHT;
                     RobotState.task_stopwatch=0;
+                    Mcon.ResetMovement();
                     Mcon.TurnSetAngle(25, CLOCKWISE);
                 } else if(TunnelSense.WallCollisionRight()){
                     Debug.SendMessage("Hit Right Wall");
                     RobotState.task=TURN_LEFT;
                     RobotState.task_stopwatch=0;
+                    Mcon.ResetMovement();
                     Mcon.TurnSetAngle(25, ANTI_CLOCKWISE);
                 }
             }
@@ -454,17 +471,20 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 RobotState.junction_counter=0;
                 RobotState.task_stopwatch=0;
                 RobotState.task=MOVE_FORWARD;
+                Mcon.ResetMovement();
                 Mcon.MoveSetDistance(10);
             }
             if (RobotState.task == TURN_RIGHT){
                 if (Mcon.TurnSetAngle(20, CLOCKWISE)==COMPLETE){
                     RobotState.task=MOVE_FORWARD;
+                    Mcon.ResetMovement();
                     Mcon.SetMotors(255,255);
                 }
             }
             if (RobotState.task == TURN_LEFT){
                 if (Mcon.TurnSetAngle(20, ANTI_CLOCKWISE)==COMPLETE){
                     RobotState.task=MOVE_FORWARD;
+                    Mcon.ResetMovement();
                     Mcon.SetMotors(255,255);
                 }
             }
@@ -472,6 +492,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(10)==COMPLETE){
                     Debug.SendMessage("Trying to find line after tunnel");
+                    Mcon.ResetMovement();
                     Mcon.LineFollowUpdate(-0.0001,true,Debug,true);
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
@@ -485,6 +506,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     if((RobotState.junction_counter==1 && !RobotState.is_magnetic) || (RobotState.junction_counter>=3 && RobotState.is_magnetic)){ // temporary loop back to start
                         RobotState.purpose=DROP_BLOCK;
                         RobotState.task=MOVE_FORWARD;
+                        Mcon.ResetMovement();
                         RobotState.task_stopwatch=0;
                         TiltSense.reset();
                     }
@@ -492,6 +514,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     if(RobotState.junction_counter==2){ // temporary loop back to start
                         RobotState.purpose=RETURN_HOME;
                         RobotState.task=MOVE_FORWARD;
+                        Mcon.ResetMovement();
                         RobotState.task_stopwatch=0;
                         TiltSense.reset();
                     }
@@ -503,18 +526,21 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
                     RobotState.task=TURN_RIGHT;
+                    Mcon.ResetMovement();
                 }
             } else if(RobotState.task==TURN_RIGHT){
                 if(RobotState.junction_counter==1){
                     if(Mcon.TurnSetAngle(60,true)==COMPLETE){
                         RobotState.task=MOVE_FORWARD;
                         RobotState.location=START_SQUARE;
+                        Mcon.ResetMovement();
                         RobotState.circuit_count+=1;
                     }
                 } else {
                     if(Mcon.TurnSetAngle(90,true)==COMPLETE){
                         RobotState.task=MOVE_FORWARD;
                         RobotState.location=START_SQUARE;
+                        Mcon.ResetMovement();
                         RobotState.circuit_count+=1;
                     }
                 }
@@ -524,12 +550,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(15)==COMPLETE){
                     RobotState.task=REVERSE;
+                    Mcon.ResetMovement();
                 }
             }else if(RobotState.task==REVERSE){
                 if(Mcon.MoveSetDistance(-20)==COMPLETE){
                     RobotState.is_holding_block=false;
                     RobotState.task=TURN_LEFT;
                     RobotState.task_stopwatch=0;
+                    Mcon.ResetMovement();
                 }
             }else if(RobotState.task==TURN_LEFT){
                 if(Mcon.TurnSetAngle(70,false)==COMPLETE){
@@ -537,6 +565,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                     RobotState.task_stopwatch=0;
+                    Mcon.ResetMovement();
                     Mcon.LineFollowUpdate(1,false,Debug,true);
                 }
                 
@@ -546,12 +575,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
+                    Mcon.ResetMovement();
                     RobotState.task=TURN_RIGHT;
                 }
             } else if(RobotState.task==TURN_RIGHT){
                 if(Mcon.TurnSetAngle(90,true)==COMPLETE){
                     RobotState.task=MOVE_FORWARD;
                     RobotState.location=START_SQUARE;
+                    Mcon.ResetMovement();
                     RobotState.circuit_count+=1;
                 } 
             }
@@ -559,15 +590,18 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(10)==COMPLETE){
                     RobotState.task=TURN_RIGHT;
+                    Mcon.ResetMovement();
                 }
             }else if(RobotState.task==TURN_RIGHT){
                 if(Mcon.TurnSetAngle(170,false)==COMPLETE){
                     RobotState.task=REVERSE;
+                    Mcon.ResetMovement();
                 } 
             } else if(RobotState.task==REVERSE){
                 if(Mcon.MoveSetDistance(-35)==COMPLETE){
                     RobotState.task=STOPPED;
                     RobotState.task_stopwatch=0;
+                    Mcon.ResetMovement();
                     Mcon.SetMotors(0,0);
                 }
             }

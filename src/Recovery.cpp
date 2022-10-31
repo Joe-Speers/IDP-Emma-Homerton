@@ -13,6 +13,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
     if (LastState==RECOVERY_SETUP){
         start_timer = milli;
         closest_distance = 1000;
+        Mcon.ResetMovement();
         Debug.SendMessage("Finding closest wall");
     }
     if (LastState==WALL_FIND){
@@ -20,11 +21,12 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
             if (distance < closest_distance){
                 wall_detect_time = milli;
                 closest_distance = distance;
-          }
+            }
         }
         else{
             wall_angle = Mcon.TimeToAngleCon(wall_detect_time);
             LastState=ROTATE_TO_WALL;
+            Mcon.ResetMovement();
             Debug.SendMessage("Rotating to face wall");
         }
     }
@@ -35,8 +37,10 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
             }
             else{
                 LastState = FIND_LINE_BACKWARDS;
+                
             }
-            LastState = FIND_LINE_BACKWARDS;
+            Mcon.ResetMovement();
+            //LastState = FIND_LINE_BACKWARDS; i presume this is not meant to be here
             Debug.SendMessage("Moving to find line");
         }
     }
@@ -45,10 +49,12 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
             if (junct_prev == false && junct_cur == true){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
+                Mcon.ResetMovement();
                 Debug.SendMessage("Line has been found");
             }
             else if(!Mcon.MoveSetDistance(closest_distance - 120)){
-                LastState == LINE_NOT_FOUND;
+                LastState = LINE_NOT_FOUND;
+                Mcon.ResetMovement();
                 Debug.SendMessage("Line not found rotating 90 degrees");
             }
         }
@@ -56,14 +62,17 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
             if (junct_prev == false && junct_cur == true){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
+                Mcon.ResetMovement();
                 Debug.SendMessage("Line has been found");
             }
             if(!Mcon.MoveSetDistance(closest_distance-110)){
                 LastState = FIND_LINE_FORWARDS;
+                Mcon.ResetMovement();
             }
         }
         if (closest_distance > 100){
             LastState = FIND_LINE_FORWARDS;
+            Mcon.ResetMovement();
         }
     }
 
@@ -72,10 +81,12 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
             if (junct_prev == false && junct_cur == true){
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
+                Mcon.ResetMovement();
                 Debug.SendMessage("Line has been found");
             }
             if(!Mcon.MoveSetDistance(85)){
                 LastState = LINE_NOT_FOUND;
+                Mcon.ResetMovement();
             }
         }
         if (closest_distance > 100){
@@ -83,9 +94,11 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
                 Debug.SendMessage("Line has been found");
+                Mcon.ResetMovement();
             }
             if (!Mcon.MoveSetDistance(closest_distance-25)){
                 LastState = LINE_NOT_FOUND;
+                Mcon.ResetMovement();
             }
         }
     }
@@ -93,6 +106,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
     if (LastState==LINE_NOT_FOUND){
         if(!Mcon.TurnSetAngle(90, CLOCKWISE)){
             LastState = RECOVERY_SETUP;
+            Mcon.ResetMovement();
         }
     }
 
@@ -102,6 +116,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
     if (LastState==DISTANCE_TOO_SMALL){
         if (!Mcon.MoveSetDistance(-5)){
             LastState = RECOVERY_SETUP;
+            Mcon.ResetMovement();
         }
     }
     return LastState;

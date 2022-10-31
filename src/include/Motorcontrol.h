@@ -22,6 +22,7 @@ class MotorControl{
         bool LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug,bool forceFind=false); // handles line following based on the PID correction input. Also handles if the robot looses the line. Returns false if the line is undetectable, true otherwise.
         bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
         bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
+        void ResetMovement(); //stops the current movement, used when interuptting a planned movement with a new one
         int DistanceCon(int distance);//converts distance to time at default speed
         int AngleCon(int angle);//converts angles to time at default speed
         int TimeToAngleCon(int millisec);//converts time to angle to turn

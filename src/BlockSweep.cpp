@@ -11,6 +11,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dse
     if (laststate == RORATE_TO_OFFSET){
         //Turns robot to be perpendicular to cross
         if (!Mcon.TurnSetAngle(90, CLOCKWISE)){
+            Mcon.ResetMovement();
             laststate == MOVE_OFFSET;
         }
     }
@@ -18,6 +19,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dse
         //Moves robot back an offset to eliminate the error caused by block being too close for the IR sensor
         if (!Mcon.MoveSetDistance(CROSS_OFFSET)){
             laststate == ROTATE_TO_SWEEP_START;
+            Mcon.ResetMovement();
         }
     }
 
@@ -25,6 +27,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dse
         //Rotates robot to face sweep start location
         if (!Mcon.TurnSetAngle(90, ANTI_CLOCKWISE)){
             laststate == START_SWEEP;
+            Mcon.ResetMovement();
             starttime = milli;
         }
     }
@@ -33,6 +36,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dse
         //Turns robot 180 degrees whilst recording if block is sensed
         if (!Mcon.TurnSetAngle(180, ANTI_CLOCKWISE)){
             angleofblock = 180 - Mcon.TimeToAngleCon(midp);
+            Mcon.ResetMovement();
             laststate == ROTATE_TO_BLOCK;
         }
         if (blockdetected == 0){
@@ -58,6 +62,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dse
             blockdistance = distance;
             blockdistance -= GAP_LEFT_TO_BLOCK;
             laststate = WAIT_FOR_IRSENSOR;
+            Mcon.ResetMovement();
             starttime = milli;
         }
     }
@@ -65,13 +70,15 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dse
     if (laststate == WAIT_FOR_IRSENSOR){
         if (milli + IR_WAIT_TIME > milli){
             laststate = MOVE_TO_BLOCK;
+            Mcon.ResetMovement();
         }
     }
 
     if (laststate == MOVE_TO_BLOCK){
         //Moves robot forwards to a set distance from the block
         if (Mcon.MoveSetDistance(blockdistance - GAP_LEFT_TO_BLOCK)){
-            laststate == GRAB_BLOCK;
+            laststate = GRAB_BLOCK;
+            Mcon.ResetMovement();
             crossangle = int((180 * CROSS_OFFSET * asin(sin(((90-angleofblock)*3.141592)/180)/blockdistance))/ 3.141592);
             crossdistance = int((sin(((90-angleofblock)*3.141592)/180)*CROSS_OFFSET)/sin(((crossangle)*3.141592)/180)); 
         }
@@ -86,17 +93,20 @@ BlockSweep::SweepState BlockSweep::ReturnToCross(MotorControl Mcon, DistanceSens
 
     if (laststate == GRAB_BLOCK){
         laststate = ROTATE_TO_CROSS;
+        Mcon.ResetMovement();
     }
     if (laststate == ROTATE_TO_CROSS){
         //Turns robot around
         if (angleofblock > 90){
             if (!Mcon.TurnSetAngle(180 - crossangle, ANTI_CLOCKWISE)){
                 laststate = MOVE_TO_CROSS;
+                Mcon.ResetMovement();
             }
         }
         else {
             if (!Mcon.TurnSetAngle(180 - crossangle, CLOCKWISE)){
                 laststate = MOVE_TO_CROSS;
+                Mcon.ResetMovement();
             }
         }
     }
@@ -104,6 +114,7 @@ BlockSweep::SweepState BlockSweep::ReturnToCross(MotorControl Mcon, DistanceSens
         //Moves robot back to cross
         if (!Mcon.MoveSetDistance(crossdistance)){
             laststate = ROTATE_FORWARD;
+            Mcon.ResetMovement();
         }
     }
     if (laststate == ROTATE_FORWARD){
@@ -111,11 +122,13 @@ BlockSweep::SweepState BlockSweep::ReturnToCross(MotorControl Mcon, DistanceSens
         if (angleofblock > 90){
             if (!Mcon.TurnSetAngle(180 - crossangle - angleofblock, ANTI_CLOCKWISE)){
                 laststate = SWEEP_COMPLETE;
+                Mcon.ResetMovement();
             }
         }
         else {
             if (!Mcon.TurnSetAngle(180 + crossangle - angleofblock, ANTI_CLOCKWISE)){
                 laststate = SWEEP_COMPLETE;
+                Mcon.ResetMovement();
             }
         }
     }

@@ -57,7 +57,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
   }
   if(forceFind||(LineState.lost_line_counter>150 && LineState.status == LINE_ALIGNED) || (LineDetected && LineState.status == LINE_UNDETECTABLE)){ // if just lost the line, start scanning in the most likely direction. Or if just rediscovered line, start aligning
     LineState.status=INITIAL_SCAN;
-    
+    ResetMovement();
     if(correction>=0){
       LineState.scan_direction=1;
       Debug.SendMessage("Lost line, scanning right");
@@ -74,14 +74,14 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     SetMotors(left_motor,right_motor);  
   } else if(LineState.status==INITIAL_SCAN){
     if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
-    Debug.SendMessage("Scanning reverse");
+      Debug.SendMessage("Scanning reverse");
       LineState.status=REVERSE_SCAN;
       LineState.scan_direction=!LineState.scan_direction;//reverse direction
     }
     if(LineDetected){
       Debug.SendMessage("Moving onto line");
       LineState.status=MOVING_ONTO_LINE;
-      ismoving=0;
+      ResetMovement();
     }
   } else if(LineState.status==REVERSE_SCAN){
     if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
@@ -91,7 +91,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     if(LineDetected){
       LineState.status=MOVING_ONTO_LINE;
       Debug.SendMessage("Moving onto line");
-      ismoving=0;
+      ResetMovement();
     }
   } else if(LineState.status==MOVING_ONTO_LINE){ //move onto the line, so the rotation point is where the line was detected
     if(MoveSetDistance(DISTANCE_TO_ROTATION_POINT+1)==COMPLETE){
@@ -110,7 +110,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
       LineState.status=LINE_ALIGNED; // robot is now fully aligned
       SetMotors(0,0);  
       LineState.lost_line_counter=0;
-      ismoving=0;
+      ResetMovement();
     }
     
   } else if(LineState.status==REVERSE_ALIGN_SCAN){
@@ -123,7 +123,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
       LineState.status=LINE_ALIGNED; //robot is now fully aligned
       SetMotors(0,0);  
       LineState.lost_line_counter=0;
-      ismoving=0;
+      ResetMovement();
     }
     
   }
@@ -183,6 +183,10 @@ bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
   }
   return ismoving;
   
+}
+
+void MotorControl::ResetMovement(){
+  ismoving=false;
 }
 
 int MotorControl::DistanceCon(int distance){
