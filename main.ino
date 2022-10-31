@@ -82,6 +82,7 @@ void setup(){
     pinMode(AMBER_LED_PIN, OUTPUT);
     pinMode(RED_LED, OUTPUT);
     pinMode(GREEN_LED, OUTPUT);
+    pinMode(RESET_BUTTON,INPUT);
 }
 //temp for distance calibration
 int move=0;
@@ -183,7 +184,10 @@ void loop(){
         digitalWrite(RED_LED, LOW);
         digitalWrite(GREEN_LED, HIGH);
     }
-
+    if(digitalRead(RESET_BUTTON)==HIGH){
+        ResetState();
+        digitalWrite(AMBER_LED_PIN, HIGH);
+    }
     //if(LineSense.isLineDetected()){
     //     digitalWrite(AMBER_LED_PIN, HIGH);
     //} else {
