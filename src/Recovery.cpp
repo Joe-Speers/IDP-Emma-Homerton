@@ -3,11 +3,13 @@
 #include "include/Recovery.h"
 #include "include/util.h"
 #include "include/LineSensor.h"
+#include "include/DistanceSense.h"
 
 
-Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance){
+Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, DistanceSense Dsense){
     milli = millis();
     junct_cur = Lsense.juntionDetect();
+    distance = Dsense.ReadIRDistance();
     if (LastState==RECOVERY_SETUP){
         start_timer = milli;
         closest_distance = 1000;

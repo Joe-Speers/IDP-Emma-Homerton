@@ -57,6 +57,7 @@ void ResetState(){
     RobotState.purpose=EXIT_START_BOX;
     RobotState.task=STOPPED;
     RobotState.isLost=false;
+    RobotState.wrongWay=false;
     RobotState.task_timer=0;
     RobotState.task_stopwatch=0;
     RobotState.junction_counter=0;
@@ -332,28 +333,70 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
                 if(LineSense.juntionDetect() && RobotState.task_stopwatch>7000){
-                    Debug.SendMessage("stopped at cross (todo)");
-                    RobotState.purpose=PICK_UP_BLOCK;
-                    RobotState.location=CROSS;
-                    RobotState.task=STOPPED; //temporary
-                    Mcon.SetMotors(0,0);
+                    if (RobotState.wrongWay==true){
+                        RobotState.task = MOVE_FORWARD;
+
+                    }
+                    else {
+                        Debug.SendMessage("stopped at cross (todo)");
+                        RobotState.purpose=PICK_UP_BLOCK;
+                        RobotState.location=CROSS;
+                        RobotState.task=STOPPED; //temporary
+                        Mcon.SetMotors(0,0);
+                        RobotState.task_stopwatch=0;
+                        RobotState.task_timer=3000;// just stop for 3 seconds
+                        //magnet sensing code
+                        if(magnetSense.MagnetDetected()){
+                            Debug.SendMessage("magnetic!");
+                            RobotState.is_magnetic=true;
+                            RobotState.is_holding_block=true;
+                        } else {
+                            Debug.SendMessage("Not magnetic");
+                            RobotState.is_magnetic=false;
+                            RobotState.is_holding_block=true;
+                        }
+                        if(RobotState.circuit_count>=1){
+                            RobotState.is_magnetic=false;
+                            RobotState.is_holding_block=false;
+                            Debug.SendMessage("Not picking up block");
+                        }
+                    }
+                }
+                if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){
+                    Debug.SendMessage("Unexpected tunnel entry");
+                    RobotState.location=COLLECTION_SIDE;
+                    RobotState.task=REVERSE;
+                    RobotState.wrongWay = true;
                     RobotState.task_stopwatch=0;
-                    RobotState.task_timer=3000;// just stop for 3 seconds
-                    //magnet sensing code
-                    if(magnetSense.MagnetDetected()){
-                        Debug.SendMessage("magnetic!");
-                        RobotState.is_magnetic=true;
-                        RobotState.is_holding_block=true;
-                    } else {
-                        Debug.SendMessage("Not magnetic");
-                        RobotState.is_magnetic=false;
-                        RobotState.is_holding_block=true;
-                    }
-                    if(RobotState.circuit_count>=1){
-                        RobotState.is_magnetic=false;
-                        RobotState.is_holding_block=false;
-                        Debug.SendMessage("Not picking up block");
-                    }
+                }
+                if(TiltSense.getTilt()==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
+                    Debug.SendMessage("Unexpected Ramp hit");
+                    RobotState.task = REVERSE;
+                }
+            }
+            if (RobotState.task == REVERSE){
+                if (Mcon.MoveSetDistance(-20) == COMPLETE){
+                    RobotState.task = TURN_AROUND;
+                }
+            }
+            if (RobotState.task == TURN_AROUND){
+                if (Mcon.TurnSetAngle(180, CLOCKWISE) == COMPLETE){
+                    RobotState.task = FOLLOW_LINE;
+                    LineSense.ResetPID();
+                    Mcon.LineFollowUpdate(0,false,Debug,true);
+                }
+            }
+            if (RobotState.task == MOVE_FORWARD){
+                if (Mcon.MoveSetDistance(20)==COMPLETE){
+                    RobotState.task = TURN_AROUND;
+                    RobotState.wrongWay = false;
+                }
+            }
+            if (RobotState.task == RECOVERY){
+                if(recovery.blockSite(Mcon, Debug, LineSense, distanceSense) == Recovery::LINE_FOUND){
+                    LineSense.ResetPID();
+                    Mcon.LineFollowUpdate(0,false,Debug,true);
+                    RobotState.task = FOLLOW_LINE;
                 }
             }
         }

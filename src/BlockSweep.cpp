@@ -1,8 +1,10 @@
 #include "include/BlockSweep.h"
 #include "include/Motorcontrol.h"
 #include"include\util.h"
+#include "include/DistanceSense.h"
 
-BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
+
+BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl Mcon, DistanceSense Dsense){
 
     milli = millis();
 
@@ -70,16 +72,20 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
         //Moves robot forwards to a set distance from the block
         if (Mcon.MoveSetDistance(blockdistance - GAP_LEFT_TO_BLOCK)){
             laststate == GRAB_BLOCK;
+            crossangle = int((180 * CROSS_OFFSET * asin(sin(((90-angleofblock)*3.141592)/180)/blockdistance))/ 3.141592);
+            crossdistance = int((sin(((90-angleofblock)*3.141592)/180)*CROSS_OFFSET)/sin(((crossangle)*3.141592)/180)); 
         }
     }
     if (laststate == GRAB_BLOCK){
-        Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
+    }
+}
 
-        //calculations to find where cross is
-        crossangle = int((180 * CROSS_OFFSET * asin(sin(((90-angleofblock)*3.141592)/180)/blockdistance))/ 3.141592);
-        crossdistance = int((sin(((90-angleofblock)*3.141592)/180)*CROSS_OFFSET)/sin(((crossangle)*3.141592)/180));
-        //may need to add delay time if 10us is not enough
-        laststate = ROTATE_TO_CROSS;
+BlockSweep::SweepState BlockSweep::ReturnToCross(MotorControl Mcon, DistanceSense Dsense){
+
+    milli = millis();
+
+    if (laststate == GRAB_BLOCK){
+        laststate = 
     }
     if (laststate == ROTATE_TO_CROSS){
         //Turns robot around

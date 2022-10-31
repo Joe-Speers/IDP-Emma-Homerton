@@ -1,5 +1,6 @@
 #include "util.h"
 #include "Motorcontrol.h"
+#include "DistanceSense.h"
 
 class BlockSweep
 {
@@ -24,7 +25,8 @@ class BlockSweep
         int distance = 0;
         
         //
-        SweepState BlockSwe(MotorControl Mcon, int distance);
+        SweepState BlockSwp(MotorControl Mcon, DistanceSense Dsense);
+        SweepState ReturnToCross(MotorControl Mcon, DistanceSense Dsense)
 
     private:
         int milli;
