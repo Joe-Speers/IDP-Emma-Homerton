@@ -113,7 +113,9 @@ enum Task{  //Describes the exact task the robot is peforming
     TURN_LEFT       = 3,
     TURN_RIGHT      = 4,
     FOLLOW_LINE     = 5,
-    SLOW_SWEEP      = 6, //add more as needed
+    SLOW_SWEEP      = 6,
+    TURN_AROUND     = 7,
+    RECOVERY        = 8,   //add more as needed
 
 };
 // struct to store the robot's state.
@@ -122,6 +124,7 @@ struct{
     Location location;
     Task task;
     bool isLost;
+    bool wrongWay;
     double task_timer; // acts as a countdown for the current action in miliseconds
     double task_stopwatch; // acts as a countup for the current action. useful to detect when an action is taking too long, so maybe the robot is lost
     int junction_counter; //counts the number of junctions passed

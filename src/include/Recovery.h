@@ -5,6 +5,7 @@ starting side recovery
 ramp recovery
 tunnel recovery
 */
+#include "DistanceSense.h"
 #include "MotorControl.h"
 #include "WifiDebug.h"
 #include "util.h"
@@ -24,12 +25,13 @@ class Recovery
             DISTANCE_TOO_SMALL = 7,
         };
         //location based recovery modules
-        RecoveryState blockSite(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
+        RecoveryState blockSite(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, DistanceSense Dsense);
         RecoveryState withblock(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
         RecoveryState ramp(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
         RecoveryState tunnel(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
 
     private:
+        int distance;
         int milli;
         bool junct_prev; //whether the junction was previously detected
         bool junct_cur; //whether the junction is currently detected

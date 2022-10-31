@@ -14,7 +14,7 @@ float DistanceSense::ReadUltrasoundDistance() {
   delayMicroseconds(2);
   // Sets the trigPin on HIGH state for 10 micro seconds
   digitalWrite(ULTRASOUND_TRIGGER_PIN, HIGH);
-  delayMicroseconds(10);
+  delayMicroseconds(50);
   digitalWrite(ULTRASOUND_TRIGGER_PIN, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
   long duration = pulseIn(ULTRASOUND_ECHO_PIN, HIGH,8000);
