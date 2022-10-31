@@ -26,7 +26,7 @@ class BlockSweep
         
         //
         SweepState BlockSwp(MotorControl Mcon, DistanceSense Dsense);
-        SweepState ReturnToCross(MotorControl Mcon, DistanceSense Dsense)
+        SweepState ReturnToCross(MotorControl Mcon, DistanceSense Dsense);
 
     private:
         int milli;

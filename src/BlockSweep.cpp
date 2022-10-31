@@ -85,7 +85,7 @@ BlockSweep::SweepState BlockSweep::ReturnToCross(MotorControl Mcon, DistanceSens
     milli = millis();
 
     if (laststate == GRAB_BLOCK){
-        laststate = 
+        laststate = ROTATE_TO_CROSS;
     }
     if (laststate == ROTATE_TO_CROSS){
         //Turns robot around
