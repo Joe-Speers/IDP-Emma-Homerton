@@ -46,7 +46,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
                 Debug.SendMessage("Line has been found");
             }
             else if(!Mcon.MoveSetDistance(closest_distance - 120)){
-                LastState == LINE_NOT_FOUND
+                LastState == LINE_NOT_FOUND;
                 Debug.SendMessage("Line not found rotating 90 degrees");
             }
         }

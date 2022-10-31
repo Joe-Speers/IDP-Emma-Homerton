@@ -38,6 +38,6 @@ class Recovery
         int wall_angle;
         int closest_distance;
         int start_distance;
-        RecoveryState LastState = LOCATION_FIND;
+        RecoveryState LastState = RECOVERY_SETUP;
 
 };
