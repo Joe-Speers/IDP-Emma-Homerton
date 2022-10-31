@@ -7,12 +7,21 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
     milli = millis();
 
     if (laststate == RORATE_TO_OFFSET){
+        //Turns robot to be perpendicular to cross
         if (!Mcon.TurnSetAngle(90, CLOCKWISE)){
             laststate == MOVE_OFFSET;
         }
     }
     if (laststate == MOVE_OFFSET){
+        //Moves robot back an offset to eliminate the error caused by block being too close for the IR sensor
         if (!Mcon.MoveSetDistance(CROSS_OFFSET)){
+            laststate == ROTATE_TO_SWEEP_START;
+        }
+    }
+
+    if (laststate == ROTATE_TO_SWEEP_START){
+        //Rotates robot to face sweep start location
+        if (!Mcon.TurnSetAngle(90, ANTI_CLOCKWISE)){
             laststate == START_SWEEP;
             starttime = milli;
         }
@@ -27,12 +36,14 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
         if (blockdetected == 0){
         //will work if block is placed closer than any part of the ramp/ tunnel, if not a linear distance equation is need
             if (distance < MIN_WALL_DISTANCE){
+                //records time at which block is first detected
                 blockdetected = 1;
                 firstdetect = milli;
             }
         }
         if (blockdetected == 1){
             if (distance > MIN_WALL_DISTANCE){
+                    //records time at which block is no longer detected
                     blockdetected = 0;
                     midpoint = int ((milli + starttime)/2);
 
@@ -43,6 +54,7 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
         //Turns robot to face midpoint of block and records distance to block
         if (!Mcon.TurnSetAngle(180 - angleofblock, ANTI_CLOCKWISE)){
             blockdistance = distance;
+            blockdistance -= GAP_LEFT_TO_BLOCK;
             laststate = MOVE_TO_BLOCK;
         }
     }
@@ -55,9 +67,9 @@ BlockSweep::SweepState BlockSweep::BlockSwe(MotorControl Mcon, int distance){
     if (laststate == GRAB_BLOCK){
         Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
 
-        //add cross calculations here
-        crossangle = 0;
-        crossdistance = 0;
+        //calculations to find where cross is
+        crossangle = int((180 * CROSS_OFFSET * asin(sin(((90-angleofblock)*3.141592)/180)/blockdistance))/ 3.141592);
+        crossdistance = int((sin(((90-angleofblock)*3.141592)/180)*CROSS_OFFSET)/sin(((crossangle)*3.141592)/180));
         //may need to add delay time if 10us is not enough
         laststate = ROTATE_TO_CROSS;
     }

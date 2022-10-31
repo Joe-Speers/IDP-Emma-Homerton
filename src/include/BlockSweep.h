@@ -7,15 +7,16 @@ class BlockSweep
         enum SweepState{
             RORATE_TO_OFFSET = 0,
             MOVE_OFFSET = 1,
-            START_SWEEP = 2,
-            ROTATE_TO_BLOCK = 3,
-            MOVE_TO_BLOCK = 4,
-            LINE_NOT_FOUND = 5,
-            GRAB_BLOCK = 6,
-            ROTATE_TO_CROSS = 7,
-            MOVE_TO_CROSS = 8,
-            ROTATE_FORWARD = 9,
-            SWEEP_COMPLETE = 10,
+            ROTATE_TO_SWEEP_START = 2,
+            START_SWEEP = 3,
+            ROTATE_TO_BLOCK = 4,
+            MOVE_TO_BLOCK = 5,
+            LINE_NOT_FOUND = 6,
+            GRAB_BLOCK = 7,
+            ROTATE_TO_CROSS = 8,
+            MOVE_TO_CROSS = 9,
+            ROTATE_FORWARD = 10,
+            SWEEP_COMPLETE = 11,
         };
 
         int angle = 0;
