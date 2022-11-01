@@ -83,11 +83,11 @@ bool LineSensor::isLineDetected(){
 }
 
 bool LineSensor::juntionDetect() {
-  if (digitalRead(JUNCTION_SENSOR_PIN) == HIGH)
+  if (digitalRead(JUNCTION_SENSOR_PIN) == LOW)
   {
     return true;
   }
-  if (digitalRead(JUNCTION_SENSOR_PIN) == LOW)
+  if (digitalRead(JUNCTION_SENSOR_PIN) == HIGH)
   {
     return false;
     

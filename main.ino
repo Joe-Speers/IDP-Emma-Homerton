@@ -231,7 +231,7 @@ void loop(){
         bool linesense = LineSense.isLineDetected();
         bool followingLine=false;
         if(!linesense && (RobotState.location!=RAMP || TiltSense.getTilt()==TiltSensor::HORIZONTAL)){
-            followingLine=Mcon.LineFollowUpdate(correction,false,Debug);
+            followingLine=Mcon.LineFollowUpdate(correction,true,Debug);
         } else {
             followingLine=Mcon.LineFollowUpdate(correction,true,Debug);
         }
@@ -327,12 +327,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 //ignore any tilt readings untill enough time has passed. Also reset if tilting down for some reason
                 if(distanceSense.ReadIRDistance()<35 && distanceSense.ReadIRDistance()!=INVALID_READING && m==0){
                     Debug.SendMessage("Near ramp");
-                    RobotState.task_timer=4500; //add this if useful.
+                    RobotState.task_timer=3000; //add this if useful.
                     //add anything here?
                 }
                 if(RobotState.task_stopwatch<4000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     TiltSense.reset();
-                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP || (RobotState.task_timer>0 && RobotState.task_timer<500 && false)){ // 4) check tilt sensor to see if has hit ramp
+                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP || (RobotState.task_timer>0 && RobotState.task_timer<500)){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=0;
@@ -348,7 +348,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     else if(!LineSense.isLineDetected()){
                         LineSense.integral-=0.00005*(elapsed_time_us/1000); //make robot tend to go right to avoid falling off the ramp
                     }
-                    if(RobotState.task_stopwatch>10000){
+                    if(RobotState.task_stopwatch>12000){
                         Debug.SendMessage("Stuck going up ramp");
                         //reverse back
                         Mcon.ResetMovement();
@@ -384,13 +384,13 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(distanceSense.ReadUltrasoundDistance()<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && RobotState.circuit_count==0){
+                if(distanceSense.ReadUltrasoundDistance()<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && RobotState.circuit_count==0 && RobotState.task_stopwatch>9000){
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
                     RobotState.task=MOVE_FORWARD;
                     Mcon.ResetMovement();
                 }
-                if(LineSense.juntionDetect() && RobotState.task_stopwatch>7000){
+                if(LineSense.juntionDetect() && RobotState.task_stopwatch>9000){
                     if (RobotState.wrongWay==true){
                         Mcon.ResetMovement();
                         RobotState.task = MOVE_FORWARD;
@@ -404,7 +404,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                             LineSense.ResetPID();
                             RobotState.task_stopwatch=0;
                         }
-                        Debug.SendMessage("stopped at cross");
+                        Debug.SendMessage("stopped at cross, time:" +String(RobotState.task_stopwatch));
                         if(RobotState.circuit_count==0){
                             RobotState.purpose=PICK_UP_BLOCK;
                             RobotState.location=CROSS;
@@ -436,12 +436,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
             if (RobotState.task == REVERSE){
                 if (Mcon.MoveSetDistance(-20) == COMPLETE){
+                    Debug.SendMessage("turn around");
                     RobotState.task = TURN_AROUND;
                     Mcon.ResetMovement();
                 }
             }
             if (RobotState.task == TURN_AROUND){
                 if (Mcon.TurnSetAngle(180, ANTI_CLOCKWISE) == COMPLETE){
+                    Debug.SendMessage("return to following line");
                     RobotState.task = FOLLOW_LINE;
                     Mcon.ResetMovement();
                     LineSense.ResetPID();

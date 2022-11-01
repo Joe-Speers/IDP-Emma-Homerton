@@ -15,6 +15,7 @@ void MotorControl::MotorSetup() {
   AFMS.begin();
   //set initial speed and direction
   SetMotors(0,0,FORWARD,FORWARD);
+  ServoSetup();
 }
 
 void MotorControl::ResetState(){
