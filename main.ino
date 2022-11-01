@@ -318,6 +318,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     LineSense.ResetPID();
                     Mcon.LineFollowUpdate(1,false,Debug,true);
                     RobotState.task_stopwatch=0;
+                    RobotState.task_timer=0;
                     RobotState.junction_counter=0;
                 }
             } else if(RobotState.task==FOLLOW_LINE){
@@ -325,12 +326,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 //ignore any tilt readings untill enough time has passed. Also reset if tilting down for some reason
                 if(distanceSense.ReadIRDistance()<35 && distanceSense.ReadIRDistance()!=INVALID_READING && m==0){
                     Debug.SendMessage("Near ramp");
-                    //RobotState.task_timer=4500; add this if useful.
+                    RobotState.task_timer=4500; //add this if useful.
                     //add anything here?
                 }
                 if(RobotState.task_stopwatch<4000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     TiltSense.reset();
-                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP || (RobotState.task_timer>0 && RobotState.task_timer<500)){ // 4) check tilt sensor to see if has hit ramp
+                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP || (RobotState.task_timer>0 && RobotState.task_timer<500 && false)){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=0;
@@ -728,6 +729,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
 void PC_Command(String command){
     if(command=="RESET"){
         ResetState();
+        s=0;
     }
     if(command=="STOP"){
         ResetState();
