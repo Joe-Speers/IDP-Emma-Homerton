@@ -280,7 +280,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==STOPPED){ // 0) This is the initial state after a reset
                 if(RobotState.task_timer==0 && s>=0){ // 1) Start moving after 1 second
                     Debug.SendMessage("Robot starting");
-                    Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
+                    Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
                 }
@@ -356,6 +356,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
                 if(TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     RobotState.location=COLLECTION_SIDE;
+                    Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.task=FOLLOW_LINE;
                     Mcon.ResetMovement();
                     RobotState.task_stopwatch=0;
@@ -363,6 +364,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
                 if((RobotState.task_timer==0 && TiltSense.getTilt()==TiltSensor::HORIZONTAL)&& RobotState.task_stopwatch>6500){
                     Debug.SendMessage("Must have completed ramp by now");
+                    Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
                     RobotState.task_stopwatch=0;
