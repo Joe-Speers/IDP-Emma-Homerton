@@ -67,7 +67,7 @@ void ResetState(){
     RobotState.is_magnetic=false;
     RobotState.is_holding_block=false;
     //temp
-    BSweep.laststate=BlockSweep::ROTATE_TO_SWEEP_START;
+    BSweep.laststate=BlockSweep::ROTATE_TO_OFFSET;
 }
 
 void setup(){
@@ -396,6 +396,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         } else {
                             RobotState.location==COLLECTION_SIDE;
                             RobotState.task=FINDING_BLOCK;
+                            BSweep.laststate=BlockSweep::ROTATE_TO_OFFSET;
                             Mcon.ResetMovement();
                             Mcon.SetMotors(0,0);
                         }

@@ -66,7 +66,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
                     return;
                 }
                 Debug.SendMessage("overshot: "+ String(overshoot) +" degrees");
-                angleofblock = 180 - Mcon.TimeToAngleCon(milli-starttime)+overshoot;
+                angleofblock = Mcon.TimeToAngleCon(milli-starttime)-overshoot;
                 laststate = ROTATE_TO_BLOCK;
                 Mcon.SetMotors(0,0);
                 Mcon.ResetMovement();
@@ -81,8 +81,10 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
     } else if (laststate == WAIT_FOR_IRSENSOR){
         Mcon.SetMotors(0,0);
-        if(distance==INVALID_READING){
-            //Debug.SendMessage("aaaaaahhhh");
+        if(distance==INVALID_READING){ //go back to sweeping
+            Mcon.ResetMovement();
+            laststate = ROTATE_TO_SWEEP_START;
+            Mcon.TurnSetAngle(10, CLOCKWISE);
         }
         if (milli > starttime + IR_WAIT_TIME && distance!=INVALID_READING){
             blockdistance = distance;
@@ -102,9 +104,10 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
             
         }
     } else if (laststate == MOVE_TO_ACCURATE_MEASURE_POINT){
-        if(distance > MIN_WALL_DISTANCE && false){ //if lost block
-            laststate=ROTATE_TO_SWEEP_START;
-            Mcon.TurnSetAngle(10, CLOCKWISE);//only rotate 10 degrees to search
+        if(distance > MIN_WALL_DISTANCE){ //if lost block
+            Mcon.ResetMovement();
+            laststate = ROTATE_TO_SWEEP_START;
+            Mcon.TurnSetAngle(5, CLOCKWISE);//only rotate 5 degrees
         }
         if (Mcon.MoveSetDistance(blockdistance - ACCURATE_MEASURING_DISTANCE)==COMPLETE){
             laststate = WAIT_FOR_IRSENSOR;
@@ -121,6 +124,9 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
         
     }else if (laststate == MOVE_TO_WITHIN_ULTRASOUND_RANGE){
+        if(distance>ACCURATE_MEASURING_DISTANCE){
+            //error lost block
+        }
         //Moves robot forwards to within ultrasound range
         if (Mcon.MoveSetDistance(blockdistance - ULTRASOUND_BLOCK_DETECTION_THRESHOLD+5)==COMPLETE){          
             laststate = PAUSE_BEFORE_FINAL_APPROACH;
