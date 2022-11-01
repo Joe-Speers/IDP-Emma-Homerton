@@ -22,8 +22,11 @@ Also contains enumerables for the state system.
 #define TILT_AVERAGE_READINGS 50
 
 //Block gathering constants
-#define GAP_LEFT_TO_BLOCK 5
-#define MIN_WALL_DISTANCE 100
+
+#define ACCURATE_MEASURING_DISTANCE 45
+#define DISTANCE_MEASURE_MAGNET 0
+#define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 10
+#define MIN_WALL_DISTANCE 80//100 changed while testing
 #define ARMS_CLOSED_ANGLE 90 //do not know these values currently, depends on setup and gearing
 #define ARMS_OPEN_ANGLE 0
 #define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
@@ -58,7 +61,8 @@ Also contains enumerables for the state system.
 
 //IR constant
 #define IR_AVERAGE_READINGS 5 //A=amount of readings averaged for the IR distance
-#define IR_WAIT_TIME 100 //amount of time to wait for IR readings to catch up
+#define INVALID_READING -1 //signifies an invalid IR Reading
+#define IR_WAIT_TIME 1000//100 //amount of time to wait for IR readings to catch up
 
 // ### Pin assignment ###
 
@@ -116,6 +120,7 @@ enum Task{  //Describes the exact task the robot is peforming
     SLOW_SWEEP      = 6,
     TURN_AROUND     = 7,
     RECOVERY        = 8,   //add more as needed
+    FINDING_BLOCK = 9
 
 };
 // struct to store the robot's state.

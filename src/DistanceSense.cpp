@@ -17,18 +17,21 @@ float DistanceSense::ReadUltrasoundDistance() {
   delayMicroseconds(50);
   digitalWrite(ULTRASOUND_TRIGGER_PIN, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  long duration = pulseIn(ULTRASOUND_ECHO_PIN, HIGH,8000);
+  long duration = pulseIn(ULTRASOUND_ECHO_PIN, HIGH,3000);
   // Calculating the distance
   float distance = duration * 0.034 / 2;
+  if(distance ==0){
+    return INVALID_READING;
+  }
   return distance;
 }
 
 float DistanceSense::ReadIRDistance() {
   //HERE
   val = analogRead(IR_SENSOR_PIN);
-  distanceVal = (11805/(val - 36.013));
+  distanceVal = (11805/(val - 38.013))-2;
   if (distanceVal >90 ){
-    distanceVal = (12334/(val - 23.763));
+    distanceVal = (12334/(val - 26.763))-2.5;
   }
 
  
@@ -41,7 +44,7 @@ float DistanceSense::ReadIRDistance() {
   average /= IR_AVERAGE_READINGS;
   IR_distance=average;
   if (IR_distance<=0 || IR_distance> 160) { //accounts for errors in non0linear region when outside of range to prevent spiking
-    return -1;
+    return INVALID_READING;
   }
   else {
     return IR_distance;

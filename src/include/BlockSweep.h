@@ -1,6 +1,7 @@
 #include "util.h"
 #include "Motorcontrol.h"
 #include "DistanceSense.h"
+#include "LineSensor.h"
 
 class BlockSweep
 {
@@ -12,31 +13,35 @@ class BlockSweep
             START_SWEEP = 3,
             ROTATE_TO_BLOCK = 4,
             WAIT_FOR_IRSENSOR = 5,
-            MOVE_TO_BLOCK = 6,
-            LINE_NOT_FOUND = 7,
-            GRAB_BLOCK = 8,
-            ROTATE_TO_CROSS = 9,
-            MOVE_TO_CROSS = 10,
-            ROTATE_FORWARD = 11,
-            SWEEP_COMPLETE = 12,
+            MOVE_TO_ACCURATE_MEASURE_POINT =6,
+            MOVE_TO_WITHIN_ULTRASOUND_RANGE = 7,
+            PAUSE_BEFORE_FINAL_APPROACH  =8,
+            MOVE_INTO_MAGNET = 9,
+            DETECT_MAGNET = 10,
+            LINE_NOT_FOUND = 11,
+            GRAB_BLOCK = 12,
+            ROTATE_TO_CROSS = 13,
+            MOVE_TO_CROSS = 14,
+            ROTATE_FORWARD = 15,
+            SWEEP_COMPLETE = 16,
         };
-
         int angle = 0;
         int distance = 0;
         
 
-        SweepState BlockSwp(MotorControl Mcon, DistanceSense Dsense);
-        SweepState ReturnToCross(MotorControl Mcon, DistanceSense Dsense);
-
+        SweepState BlockSwp(MotorControl &Mcon, DistanceSense &Dsense, WifiDebug &Debug);
+        SweepState ReturnToCross(MotorControl &Mcon, DistanceSense &Dsense, LineSensor &Lsense, WifiDebug &Debug);
+        //temp public
+        SweepState laststate = ROTATE_TO_OFFSET; 
+        unsigned long starttime = 0;
     private:
-        int milli;
-        int starttime = 0;
-        int firstdetect;
-        int midpoint = 0;
-        int midp = 0;
+        
+        
+        unsigned long firstdetect;
+        int overshoot = 0;
         int angleofblock = 700;
         int blockdistance = 0;
-        SweepState laststate = ROTATE_TO_OFFSET;
+        
         bool blockdetected = 0;
         int crossangle = 0;
         int crossdistance = 0;

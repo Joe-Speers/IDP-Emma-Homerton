@@ -139,8 +139,8 @@ bool MotorControl::MoveSetDistance(int distance){
   
   milli = millis();
 
-  if (ismoving == 0){
-    ismoving = 1;
+  if (!ismoving){
+    ismoving = true;
     starttime = milli;
     if(distance>0){
       SetMotors(Default_Speed, Default_Speed,FORWARD,FORWARD);
@@ -149,13 +149,10 @@ bool MotorControl::MoveSetDistance(int distance){
       SetMotors(Default_Speed, Default_Speed,BACKWARD,BACKWARD);
       stoptime = starttime + DistanceCon(-distance);
     }
-    
-    
-  }
-
+  } 
   if (milli >= stoptime){
     SetMotors(0,0);
-    ismoving = 0;
+    ismoving = false;
   }
   return ismoving;
 }
@@ -163,8 +160,8 @@ bool MotorControl::MoveSetDistance(int distance){
 bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
 
   milli = millis();
-  if (ismoving == 0){
-    ismoving = 1;
+  if (!ismoving){
+    ismoving = true;
     starttime = milli;
     
     if (isclockwise == 1) {
@@ -179,7 +176,7 @@ bool MotorControl::TurnSetAngle(int angle, bool isclockwise){
 
   if (milli >= stoptime){
     SetMotors(0,0);
-    ismoving = 0;
+    ismoving = false;
   }
   return ismoving;
   
@@ -202,7 +199,7 @@ int MotorControl::AngleCon(int angle){
 }
 
 int MotorControl::TimeToAngleCon(int time){
-  float ang = ang * Measured_Turn_Rate;//calculate angle it has moved through
+  float ang = time * Measured_Turn_Rate;//calculate angle it has moved through
   ang += Angle_Constant/2;//account for initial lag when starting to move
   return int(ang);
 

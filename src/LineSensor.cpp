@@ -4,7 +4,7 @@ See Linear Systems and Control handout 6, page 14 onwards for PID control info. 
 as well as proportional control (proportional_k) to set the correcting value.
 Ideally motor control should be removed from this file and implemented seperatly
 */
-
+#pragma once
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"

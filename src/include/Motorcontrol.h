@@ -37,7 +37,7 @@ class MotorControl{
         //time elapsed in milliseconds
         int milli;
         //set movement state
-        bool ismoving = 0;
+        bool ismoving = false;
         //setmovement's start time
         int starttime;
         //setmovement's stop time 
