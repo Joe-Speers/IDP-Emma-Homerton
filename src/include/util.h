@@ -137,6 +137,7 @@ struct{
     //int blocks_collected
     bool is_holding_block=false;
     bool is_magnetic=false;
+    bool return_home=false;
     int circuit_count=0;
     //remember to add any new options to ResetState() as well
 

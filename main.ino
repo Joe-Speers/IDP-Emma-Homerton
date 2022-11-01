@@ -55,6 +55,7 @@ void ResetState(){
     RobotState.junction_counter=0;
     m=0;
     //reset states to inital values
+    RobotState.return_home=false;
     RobotState.location=START_SQUARE;
     RobotState.purpose=EXIT_START_BOX;
     RobotState.task=STOPPED;
@@ -384,9 +385,17 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     if (RobotState.wrongWay==true){
                         Mcon.ResetMovement();
                         RobotState.task = MOVE_FORWARD;
-                        
                     }
                     else {
+                        if(RobotState.return_home){
+                            Debug.SendMessage("skipping block pickup");
+                            RobotState.purpose=TRAVEL_TO_START_SIDE;
+                            RobotState.location=COLLECTION_SIDE;
+                            RobotState.task=FOLLOW_LINE;
+                            Mcon.ResetMovement();
+                            LineSense.ResetPID();
+                            RobotState.task_stopwatch=0;
+                        }
                         Debug.SendMessage("stopped at cross");
                         if(RobotState.circuit_count==0){
                             RobotState.purpose=PICK_UP_BLOCK;
@@ -592,13 +601,22 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         TiltSense.reset();
                     }
                 } else {
-                    if(RobotState.junction_counter==2){ // temporary loop back to start
+                    if(RobotState.return_home){
+                        Debug.SendMessage("aiming home");
                         RobotState.purpose=RETURN_HOME;
+                        RobotState.location=DROPOFF_SIDE;
                         RobotState.task=MOVE_FORWARD;
                         Mcon.ResetMovement();
                         RobotState.task_stopwatch=0;
                         TiltSense.reset();
+                    } else {//contine back round to get another block
+                        Debug.SendMessage("no block to drop off");
+                        RobotState.task=FOLLOW_LINE;
+                        RobotState.location=DROPOFF_SIDE;
+                        RobotState.purpose=TRAVEL_TO_FAR_SIDE;
+                        RobotState.task_stopwatch=0;
                     }
+                    
                 }
             }
         }
@@ -642,12 +660,22 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }else if(RobotState.task==TURN_LEFT){
                 if(Mcon.TurnSetAngle(70,false)==COMPLETE){
-                    RobotState.task=FOLLOW_LINE;
-                    RobotState.location=DROPOFF_SIDE;
-                    RobotState.purpose=TRAVEL_TO_FAR_SIDE;
-                    RobotState.task_stopwatch=0;
-                    Mcon.ResetMovement();
-                    Mcon.LineFollowUpdate(1,false,Debug,true);
+                    if(RobotState.return_home && !RobotState.is_magnetic){//check it is in first box
+                        RobotState.junction_counter=1;
+                        RobotState.task=FOLLOW_LINE;
+                        RobotState.location=DROPOFF_SIDE;
+                        RobotState.purpose=TRAVEL_TO_START_SIDE;
+                        RobotState.task_stopwatch=0;
+                        LineSense.ResetPID();
+                    } else {
+                        RobotState.task=FOLLOW_LINE;
+                        RobotState.location=DROPOFF_SIDE;
+                        RobotState.purpose=TRAVEL_TO_FAR_SIDE;
+                        RobotState.task_stopwatch=0;
+                        Mcon.ResetMovement();
+                        Mcon.LineFollowUpdate(1,false,Debug,true);
+                    }
+                    
                 }
                 
             }
@@ -669,21 +697,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if (RobotState.location==START_SQUARE){
             if(RobotState.task==MOVE_FORWARD){
-                if(Mcon.MoveSetDistance(10)==COMPLETE){
-                    RobotState.task=TURN_RIGHT;
-                    Mcon.ResetMovement();
-                }
-            }else if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(170,false)==COMPLETE){
-                    RobotState.task=REVERSE;
-                    Mcon.ResetMovement();
-                } 
-            } else if(RobotState.task==REVERSE){
-                if(Mcon.MoveSetDistance(-35)==COMPLETE){
+                if(Mcon.MoveSetDistance(45)==COMPLETE){
                     RobotState.task=STOPPED;
                     RobotState.task_stopwatch=0;
                     Mcon.ResetMovement();
                     Mcon.SetMotors(0,0);
+                    Mcon.ResetMovement();
                 }
             }
         }
@@ -701,6 +720,10 @@ void PC_Command(String command){
         RobotState.location=START_SQUARE;
         RobotState.purpose=EXIT_START_BOX;
         s=-10000; //set timer to -10000 seconds to prevent state system from starting
+    }
+    if(command=="~H"){ //Raw sensor input
+        RobotState.return_home=true;
+        Debug.SendMessage("returning home");
     }
     if(command[0]=='M'){
         move=command.substring(1).toInt();

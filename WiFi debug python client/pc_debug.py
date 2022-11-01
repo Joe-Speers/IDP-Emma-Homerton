@@ -133,6 +133,10 @@ def ToggleGraph():
     if(plotting): plotting=False
     else: plotting=True
 
+def ReturnHome():
+    ConsoleWrite("sending return home message")
+    SendMessage("~H")
+
 def SendMessage(command=""): # send a message to the arduino from the text input box (command_entry)
     if(command==""):#if message blank, get message from input field
         command=command_entry.get()
@@ -273,6 +277,7 @@ main_font=("consolas", "14", "normal")
 ToggleBut = tkinter.Button(root, text ="Toggle graph", command = ToggleGraph,font=main_font)
 ResetBut=tkinter.Button(root, text='RESET robot', command=SendReset,font=main_font)
 StopBut=tkinter.Button(root, text='STOP robot', command=SendStop,font=main_font)
+ReturnHome=tkinter.Button(root, text='RETURN HOME', command=ReturnHome,font=main_font)
 command_entry = tkinter.Entry(root,font=main_font)
 SubmitBut=tkinter.Button(root, text='Send Command', command=SendMessage,font=main_font)
 FPS_text = tkinter.StringVar()
@@ -301,6 +306,7 @@ FPS_label.pack()
 ToggleBut.pack()
 ResetBut.pack()
 StopBut.pack()
+ReturnHome.pack()
 command_entry.pack()
 SubmitBut.pack()
 location_status.pack()
