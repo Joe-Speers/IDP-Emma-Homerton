@@ -35,6 +35,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
             laststate = START_SWEEP;
             starttime = milli;
             firstdetect=0;
+            angleofblock=0;
             blockdetected=false;
             Debug.SendMessage("swp");
             Mcon.ResetMovement();
@@ -66,7 +67,9 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
                     return;
                 }
                 Debug.SendMessage("overshot: "+ String(overshoot) +" degrees");
-                angleofblock = Mcon.TimeToAngleCon(milli-starttime)-overshoot;
+                if(angleofblock==0){
+                    angleofblock = Mcon.TimeToAngleCon(milli-starttime)-overshoot;
+                }
                 laststate = ROTATE_TO_BLOCK;
                 Mcon.SetMotors(0,0);
                 Mcon.ResetMovement();
