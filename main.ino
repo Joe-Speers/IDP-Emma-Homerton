@@ -280,6 +280,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==STOPPED){ // 0) This is the initial state after a reset
                 if(RobotState.task_timer==0 && s>=0){ // 1) Start moving after 1 second
                     Debug.SendMessage("Robot starting");
+                    Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
                 }
@@ -503,6 +504,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     }
                     RobotState.task=STOPPED;
                     RobotState.task_stopwatch=0;
+                    Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                     RobotState.task_timer=2000;// just stop for 2 seconds while capturing block
                     Debug.SendMessage("picking up block");
                     //initiate pickup block
