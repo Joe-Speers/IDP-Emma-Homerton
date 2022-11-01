@@ -323,9 +323,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             } else if(RobotState.task==FOLLOW_LINE){
                 //if(RobotState.task_stopwatch>10000) RobotState.isLost=true; //if ramp has not been hit after 10 seconds then the robot is lost
                 //ignore any tilt readings untill enough time has passed. Also reset if tilting down for some reason
+                if(distanceSense.ReadIRDistance()<35 && distanceSense.ReadIRDistance()!=INVALID_READING && m==0){
+                    Debug.SendMessage("Near ramp");
+                    //RobotState.task_timer=4500; add this if useful.
+                    //add anything here?
+                }
                 if(RobotState.task_stopwatch<4000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     TiltSense.reset();
-                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP){ // 4) check tilt sensor to see if has hit ramp
+                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP || (RobotState.task_timer>0 && RobotState.task_timer<500)){ // 4) check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=0;
@@ -385,8 +390,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     if (RobotState.wrongWay==true){
                         Mcon.ResetMovement();
                         RobotState.task = MOVE_FORWARD;
-                    }
-                    else {
+                    }else {
                         if(RobotState.return_home){
                             Debug.SendMessage("skipping block pickup");
                             RobotState.purpose=TRAVEL_TO_START_SIDE;
@@ -433,7 +437,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
             if (RobotState.task == TURN_AROUND){
-                if (Mcon.TurnSetAngle(180, CLOCKWISE) == COMPLETE){
+                if (Mcon.TurnSetAngle(180, ANTI_CLOCKWISE) == COMPLETE){
                     RobotState.task = FOLLOW_LINE;
                     Mcon.ResetMovement();
                     LineSense.ResetPID();
@@ -441,7 +445,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
             if (RobotState.task == MOVE_FORWARD){
-                if (Mcon.MoveSetDistance(20)==COMPLETE){
+                if (Mcon.MoveSetDistance(30)==COMPLETE){
                     RobotState.task = TURN_AROUND;
                     Mcon.ResetMovement();
                     RobotState.wrongWay = false;
@@ -471,10 +475,11 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 if(sweepState==BlockSweep::GRAB_BLOCK){
                     //grab block
                     Debug.SendMessage("picking up block");
-                    
+                    Mcon.ResetMovement();
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=STOPPED;
+                    Mcon.SetMotors(0,0);
                     RobotState.task_timer=2000;
                 }
             }
