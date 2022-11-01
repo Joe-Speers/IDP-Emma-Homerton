@@ -20,10 +20,10 @@ class BlockSweep
             DETECT_MAGNET = 10,
             LINE_NOT_FOUND = 11,
             GRAB_BLOCK = 12,
-            ROTATE_TO_CROSS = 13,
-            MOVE_TO_CROSS = 14,
-            ROTATE_FORWARD = 15,
-            SWEEP_COMPLETE = 16,
+            REVERSE_TO_LINE = 13,
+            ROTATE_FORWARD = 14,
+            SWEEP_COMPLETE = 15,
+            
         };
         int angle = 0;
         int distance = 0;
