@@ -68,7 +68,7 @@ Also contains enumerables for the state system.
 
 #define LINE_SENSOR_PIN         A0 //connection to subtraction circuit
 #define IR_SENSOR_PIN           A1 
-#define SERVO_PIN A5
+
 //digital
 #define RESET_BUTTON 2
 #define JUNCTION_SENSOR_PIN 3
@@ -77,10 +77,11 @@ Also contains enumerables for the state system.
 #define RIGHT_BUMPER_PIN 6
 #define LIGHT_SENSOR 7
 #define AMBER_LED_PIN 8
-#define ULTRASOUND_TRIGGER_PIN 9
-#define ULTRASOUND_ECHO_PIN 10
-#define RED_LED 11
-#define GREEN_LED 12
+#define SERVO_PIN 9
+#define ULTRASOUND_TRIGGER_PIN 10
+#define ULTRASOUND_ECHO_PIN 11
+#define RED_LED 12
+#define GREEN_LED 13
 // Motor shield motor numbers (1-4)
 #define LEFT_MOTOR_NUM          1
 #define RIGHT_MOTOR_NUM         2
