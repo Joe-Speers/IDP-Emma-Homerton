@@ -31,7 +31,7 @@ void MotorControl::ServoSetup(){
 void MotorControl::SetServoAngle(int angle){
   //restrict input to valid range
   if (angle < 0 ){angle = 0;}
-  if (angle > 180){angle = 180;}
+  if (angle > 270){angle = 270;}
   //set servo angle
   myservo.write(angle);
 }

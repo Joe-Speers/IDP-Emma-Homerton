@@ -6,8 +6,8 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-#define DERIVITIVE_LINE_SENSE_THRESHOLD 3//3
-#define PROPORTIONAL_LINE_SENSE_REGION 0.35//0.35
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 2.5//3
+#define PROPORTIONAL_LINE_SENSE_REGION 0.30//0.35
 #define INTEGRAL_LINE_SENSE_REGION 0.01 //bound is currently 0.12
 //Motor speeds
 #define Default_Speed 255
@@ -25,10 +25,10 @@ Also contains enumerables for the state system.
 
 #define ACCURATE_MEASURING_DISTANCE 45
 #define DISTANCE_MEASURE_MAGNET 0
-#define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 10
+#define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 16
 #define MIN_WALL_DISTANCE 80//100 changed while testing
-#define ARMS_CLOSED_ANGLE 120 //do not know these values currently, depends on setup and gearing
-#define ARMS_OPEN_ANGLE 220
+#define ARMS_CLOSED_ANGLE 70 //do not know these values currently, depends on setup and gearing
+#define ARMS_OPEN_ANGLE 155
 #define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
 
 //Turning direction 
@@ -60,9 +60,9 @@ Also contains enumerables for the state system.
 #define ERROR_DEAD_SPOT             0.02 //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
 
 //IR constant
-#define IR_AVERAGE_READINGS 5 //A=amount of readings averaged for the IR distance
+#define IR_AVERAGE_READINGS 3 //A=amount of readings averaged for the IR distance
 #define INVALID_READING -1 //signifies an invalid IR Reading
-#define IR_WAIT_TIME 1000//100 //amount of time to wait for IR readings to catch up
+#define IR_WAIT_TIME 500//100 //amount of time to wait for IR readings to catch up
 
 // ### Pin assignment ###
 
