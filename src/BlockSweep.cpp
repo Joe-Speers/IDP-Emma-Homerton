@@ -170,52 +170,33 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
 
 BlockSweep::SweepState BlockSweep::ReturnToCross(MotorControl &Mcon, DistanceSense &Dsense, LineSensor &Lsense, WifiDebug &Debug){
 
-    unsigned long milli = millis();
-
     if (laststate == GRAB_BLOCK){
-        laststate = ROTATE_TO_CROSS;
+        laststate = REVERSE_TO_LINE;
         Mcon.ResetMovement();
     }
-    if (laststate == ROTATE_TO_CROSS){
+    if (laststate == REVERSE_TO_LINE){
         //Turns robot around
-        if (angleofblock > 90){
-            if (Mcon.TurnSetAngle(180 - crossangle, ANTI_CLOCKWISE)== COMPLETE){
-                Debug.SendMessage("returning to cross");
-                laststate = MOVE_TO_CROSS;
-            }
+        if(!Mcon.MoveSetDistance(-200)){
+            laststate = LINE_NOT_FOUND;
+            Mcon.ResetMovement();
         }
-        else {
-            if (Mcon.TurnSetAngle(180 - crossangle, CLOCKWISE)== COMPLETE){
-                laststate = MOVE_TO_CROSS;
-                Debug.SendMessage("returning to cross");
-            }
-        }
-    }
-    if (laststate == MOVE_TO_CROSS){
-        //Moves robot back to cross
-        Mcon.SetMotors(255,255);
-        if (Lsense.juntionDetect()){
+        if(Lsense.juntionDetect()){
+            Mcon.SetMotors(0,0);
             laststate = ROTATE_FORWARD;
-            Debug.SendMessage("rotating forward");
             Mcon.ResetMovement();
         }
     }
+    
     if (laststate == ROTATE_FORWARD){
         //Rotates robot to face allong the line
-        if (angleofblock > 90){
-            if (Mcon.TurnSetAngle(180 - crossangle - angleofblock, ANTI_CLOCKWISE)== COMPLETE ||  Lsense.isLineDetected()){
-                laststate = SWEEP_COMPLETE;
-                Debug.SendMessage("complete");
-                Mcon.ResetMovement();
-            }
+        if(!Mcon.TurnSetAngle(90, CLOCKWISE)){
+            laststate = SWEEP_COMPLETE;
+            Mcon.ResetMovement();
         }
-        else {
-            if (Mcon.TurnSetAngle(180 + crossangle - angleofblock, ANTI_CLOCKWISE)== COMPLETE||  Lsense.isLineDetected()){
-                laststate = SWEEP_COMPLETE;
-                Debug.SendMessage("complete");
-                Mcon.ResetMovement();
-            }
-        }
+    }
+
+    if (laststate == LINE_NOT_FOUND){
+        
     }
     return laststate;
 }

@@ -470,6 +470,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
                 if(sweepState==BlockSweep::GRAB_BLOCK){
                     //grab block
+                    Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                     Debug.SendMessage("picking up block");
                     
                     RobotState.purpose=PICK_UP_BLOCK;
@@ -648,8 +649,17 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         } else if (RobotState.location==START_SQUARE){
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(15)==COMPLETE){
-                    RobotState.task=REVERSE;
+                    RobotState.task=STOPPED;
+                    RobotState.task_timer=2000;
+                    RobotState.task=REVERSE;   
                     Mcon.ResetMovement();
+                }
+            }else if(RobotState.task==STOPPED){
+                Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
+                if (RobotState.task_timer == 0){
+                RobotState.is_holding_block=false;
+                RobotState.task=REVERSE;
+                RobotState.task_stopwatch=0;
                 }
             }else if(RobotState.task==REVERSE){
                 if(Mcon.MoveSetDistance(-20)==COMPLETE){
