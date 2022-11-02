@@ -74,7 +74,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     int right_motor =(-correction*LINE_FOLLOW_MOTOR_SWING)+LINE_FOLLOW_MOTOR_SPEED;
     SetMotors(left_motor,right_motor);  
   } else if(LineState.status==INITIAL_SCAN){
-    if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
+    if(TurnSetAngle(30,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
       Debug.SendMessage("Scanning reverse");
       LineState.status=REVERSE_SCAN;
       LineState.scan_direction=!LineState.scan_direction;//reverse direction
@@ -85,8 +85,8 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
       ResetMovement();
     }
   } else if(LineState.status==REVERSE_SCAN){
-    if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
-      LineState.status=LINE_UNDETECTABLE;
+    if(TurnSetAngle(60,LineState.scan_direction)==COMPLETE){
+      LineState.status=SECOND_INITIAL_SCAN;
       SetMotors(0,0);//stop robot if line cannot be found.
     }
     if(LineDetected){
@@ -101,7 +101,7 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
       LineState.scan_direction=!LineState.scan_direction;
     }
   } else if(LineState.status==ALIGN_SCAN){
-    if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){
+    if(TurnSetAngle(30,LineState.scan_direction)==COMPLETE){
       Debug.SendMessage("reverse aligning");
       LineState.status=REVERSE_ALIGN_SCAN;
       LineState.scan_direction=!LineState.scan_direction; //sweep in other direction
@@ -115,6 +115,60 @@ bool MotorControl::LineFollowUpdate(double correction, bool LineDetected,WifiDeb
     }
     
   } else if(LineState.status==REVERSE_ALIGN_SCAN){
+    if(TurnSetAngle(60,LineState.scan_direction)==COMPLETE){
+      LineState.status=SECOND_ALIGN_SCAN;
+      SetMotors(0,0);//stop robot if line cannot be found
+    }
+    if(LineDetected){
+      Debug.SendMessage("aligned!");
+      LineState.status=LINE_ALIGNED; //robot is now fully aligned
+      SetMotors(0,0);  
+      LineState.lost_line_counter=0;
+      ResetMovement();
+    }
+    
+  }else if(LineState.status==SECOND_INITIAL_SCAN){
+    if(TurnSetAngle(120,LineState.scan_direction)==COMPLETE){//if turn complete, scan in other direction
+      Debug.SendMessage("Scanning reverse");
+      LineState.status=SECOND_REVERSE_SCAN;
+      LineState.scan_direction=!LineState.scan_direction;//reverse direction
+    }
+    if(LineDetected){
+      Debug.SendMessage("Moving onto line");
+      LineState.status=SECOND_MOVING_ONTO_LINE;
+      ResetMovement();
+    }
+  } else if(LineState.status==SECOND_REVERSE_SCAN){
+    if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
+      LineState.status=LINE_UNDETECTABLE;
+      SetMotors(0,0);//stop robot if line cannot be found.
+    }
+    if(LineDetected){
+      LineState.status=SECOND_MOVING_ONTO_LINE;
+      Debug.SendMessage("Moving onto line");
+      ResetMovement();
+    }
+  } else if(LineState.status==SECOND_MOVING_ONTO_LINE){ //move onto the line, so the rotation point is where the line was detected
+    if(MoveSetDistance(DISTANCE_TO_ROTATION_POINT+1)==COMPLETE){
+      Debug.SendMessage("aligning");
+      LineState.status=SECOND_ALIGN_SCAN;//scan backwards for the line to align the robot along it
+      LineState.scan_direction=!LineState.scan_direction;
+    }
+  } else if(LineState.status==SECOND_ALIGN_SCAN){
+    if(TurnSetAngle(90,LineState.scan_direction)==COMPLETE){
+      Debug.SendMessage("reverse aligning");
+      LineState.status=SECOND_REVERSE_ALIGN_SCAN;
+      LineState.scan_direction=!LineState.scan_direction; //sweep in other direction
+    }
+    if(LineDetected){
+      Debug.SendMessage("aligned!");
+      LineState.status=LINE_ALIGNED; // robot is now fully aligned
+      SetMotors(0,0);  
+      LineState.lost_line_counter=0;
+      ResetMovement();
+    }
+    
+  } else if(LineState.status==SECOND_REVERSE_ALIGN_SCAN){
     if(TurnSetAngle(180,LineState.scan_direction)==COMPLETE){
       LineState.status=LINE_UNDETECTABLE;
       SetMotors(0,0);//stop robot if line cannot be found
