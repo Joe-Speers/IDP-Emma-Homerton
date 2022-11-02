@@ -27,8 +27,8 @@ Also contains enumerables for the state system.
 #define DISTANCE_MEASURE_MAGNET 0
 #define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 16
 #define MIN_WALL_DISTANCE 80//100 changed while testing
-#define ARMS_CLOSED_ANGLE 70 //do not know these values currently, depends on setup and gearing
-#define ARMS_OPEN_ANGLE 155
+#define ARMS_CLOSED_ANGLE 82 //do not know these values currently, depends on setup and gearing
+#define ARMS_OPEN_ANGLE 150
 #define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
 
 //Turning direction 

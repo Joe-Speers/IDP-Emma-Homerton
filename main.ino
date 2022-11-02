@@ -185,8 +185,8 @@ void loop(){
     TiltSensor::TiltState tilt = TiltSense.getTilt(dt/1000); // update tilt sensor
     if(m%20==0){
         //Serial.println(String(TiltSense.y_average));
-        //Serial.println(String(distanceSense.ReadIRDistance()));
-        //Serial.println(","+String(distanceSense.ReadUltrasoundDistance()));
+        Serial.println(String(distanceSense.ReadIRDistance()));
+        Serial.println(","+String(distanceSense.ReadUltrasoundDistance()));
         //Serial.print(String(LineSense.derivative));
         //Serial.println(","+String(LineSense.error));
     }
@@ -400,6 +400,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     }else {
                         if(RobotState.return_home){
                             Debug.SendMessage("skipping block pickup");
+                            Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                             RobotState.purpose=TRAVEL_TO_START_SIDE;
                             RobotState.location=COLLECTION_SIDE;
                             RobotState.task=FOLLOW_LINE;
