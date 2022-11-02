@@ -25,10 +25,7 @@ class Recovery
             DISTANCE_TOO_SMALL = 7,
         };
         //location based recovery modules
-        RecoveryState blockSite(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, DistanceSense Dsense);
-        RecoveryState withblock(MotorControl Mcon, WifiDebug Debug, LineSensor Lsense, Location location, Purpose purpose, int distance);
-        RecoveryState ramp(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
-        RecoveryState tunnel(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int distance);
+        RecoveryState blockSite(MotorControl &Mcon, WifiDebug &Debug, LineSensor &Lsense, DistanceSense &Dsense);
 
     private:
         int distance;

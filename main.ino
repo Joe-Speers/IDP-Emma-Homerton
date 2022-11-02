@@ -264,9 +264,17 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     if(RobotState.isLost){
         //recovery mode here
         //Mcon.SetMotors(0,0);//stop robot at the moment
-        Mcon.ResetState();
-        Mcon.ResetMovement();
-        RobotState.isLost=false;
+        if (RobotState.location == COLLECTION_SIDE || RobotState.location == CROSS || RobotState.location == BLOCK_COLLECTION_AREA){
+            if (recovery.blockSite(Mcon, Debug, LineSense, distanceSense) == Recovery::LINE_FOUND){
+                RobotState.isLost = false;
+                Mcon.ResetMovement();
+            }
+            
+        }else{
+            Mcon.ResetState();
+            Mcon.ResetMovement();
+            RobotState.isLost=false;
+        }
         return;// do not proceed to descision tree
     }
 

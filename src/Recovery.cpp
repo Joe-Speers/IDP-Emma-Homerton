@@ -6,7 +6,7 @@
 #include "include/DistanceSense.h"
 
 
-Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, DistanceSense Dsense){
+Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug,LineSensor &Lsense, DistanceSense &Dsense){
     milli = millis();
     junct_cur = Lsense.juntionDetect();
     distance = Dsense.ReadIRDistance();
@@ -122,23 +122,5 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl Mcon, WifiDebug Debug,L
     return LastState;
     
     junct_prev = Lsense.juntionDetect();
-
-}
-
-Recovery::RecoveryState Recovery::withblock(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance){
-
-    return LastState;
-
-}
-
-Recovery::RecoveryState Recovery::ramp(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance){
-
-    return LastState;
-
-}
-
-Recovery::RecoveryState Recovery::tunnel(MotorControl Mcon, WifiDebug Debug,LineSensor Lsense, Location location, Purpose purpose, int usdistance){
-
-    return LastState;
 
 }
