@@ -47,9 +47,10 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug
     if (LastState==FIND_LINE_BACKWARDS){
         if (distance < 29){
             if (junct_prev == false && junct_cur == true){
+                Mcon.ResetMovement();
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
-                Mcon.ResetMovement();
+                
                 Debug.SendMessage("Line has been found");
             }
             else if(Mcon.MoveSetDistance(closest_distance - 120)== COMPLETE){
@@ -60,9 +61,10 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug
         }
         if (closest_distance >= 29 && closest_distance <= 100){
             if (junct_prev == false && junct_cur == true){
+                Mcon.ResetMovement();
                 Mcon.SetMotors(0,0);
                 LastState = LINE_FOUND;
-                Mcon.ResetMovement();
+                
                 Debug.SendMessage("Line has been found");
             }
             if(Mcon.MoveSetDistance(closest_distance-110)== COMPLETE){
@@ -79,9 +81,10 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug
     if (LastState==FIND_LINE_FORWARDS){
         if (closest_distance >= 29 && closest_distance <= 100){
             if (!junct_prev && junct_cur){
-                Mcon.SetMotors(0,0);
+                
                 LastState = LINE_FOUND;
                 Mcon.ResetMovement();
+                Mcon.SetMotors(0,0);
                 Debug.SendMessage("Line has been found");
             }
             if(Mcon.MoveSetDistance(85)== COMPLETE){
@@ -91,10 +94,11 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug
         }
         if (closest_distance > 100){
             if (!junct_prev && junct_cur){
-                Mcon.SetMotors(0,0);
+                
                 LastState = LINE_FOUND;
                 Debug.SendMessage("Line has been found");
                 Mcon.ResetMovement();
+                Mcon.SetMotors(0,0);
             }
             if (Mcon.MoveSetDistance(closest_distance-25)== COMPLETE){
                 LastState = LINE_NOT_FOUND;

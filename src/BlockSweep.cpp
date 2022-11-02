@@ -26,7 +26,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
     } else if (laststate == MOVE_OFFSET){
         //Moves robot back an offset to eliminate the error caused by block being too close for the IR sensor
-        if (Mcon.MoveSetDistance(10)== COMPLETE){
+        if (Mcon.MoveSetDistance(-5)== COMPLETE){
             laststate = ROTATE_TO_SWEEP_START;
         }
     } else if (laststate == ROTATE_TO_SWEEP_START){
@@ -47,6 +47,14 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
             //did not find block, return to beginning
             laststate = ROTATE_TO_SWEEP_START;
             Mcon.TurnSetAngle(180, CLOCKWISE);
+        }
+        int ultrasoundDist=Dsense.ReadUltrasoundDistance();
+        if(ultrasoundDist<DISTANCE_MEASURE_MAGNET+4 && ultrasoundDist!=INVALID_READING){
+            Debug.SendMessage("ultrasound takeover: "+String(ultrasoundDist));
+            laststate = MOVE_INTO_MAGNET;
+            starttime=milli;
+            Mcon.ResetMovement();
+            Mcon.MoveSetDistance(3);
         }
         if (!blockdetected){
         //will work if block is placed closer than any part of the ramp/ tunnel, if not a linear distance equation is need
@@ -72,8 +80,9 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
                     angleofblock = Mcon.TimeToAngleCon(milli-starttime)-overshoot;
                 }
                 laststate = ROTATE_TO_BLOCK;
-                Mcon.SetMotors(0,0);
                 Mcon.ResetMovement();
+                Mcon.SetMotors(0,0);
+                
             } 
         }
     } else if (laststate == ROTATE_TO_BLOCK){
@@ -82,6 +91,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
             Debug.SendMessage("locked on");
             laststate = WAIT_FOR_IRSENSOR;
             Mcon.ResetMovement();
+            Mcon.SetMotors(0,0);
             starttime = milli;
         }
     } else if (laststate == WAIT_FOR_IRSENSOR){
@@ -93,19 +103,22 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
                 }
             }else{
                 if(distance==INVALID_READING){
-                    distance=uDistance;
+                    blockdistance=uDistance;
+                } else {
+                    blockdistance = distance;
                 }
-                blockdistance = distance;
                 if(blockdistance<=ACCURATE_MEASURING_DISTANCE+5){
                     Debug.SendMessage("Accurate: "+String(blockdistance));
-                    Mcon.MoveSetDistance(blockdistance - ULTRASOUND_BLOCK_DETECTION_THRESHOLD+5);
-                    laststate = MOVE_TO_WITHIN_ULTRASOUND_RANGE;
                     Mcon.ResetMovement();
+                    Mcon.MoveSetDistance(blockdistance - DISTANCE_MEASURE_MAGNET);
+                    laststate = MOVE_TOWARDS_MAGNET;
+                    
                 } else{
                     laststate = MOVE_TO_ACCURATE_MEASURE_POINT;
+                    Mcon.ResetMovement();
                     Mcon.MoveSetDistance(blockdistance - ACCURATE_MEASURING_DISTANCE);
                     Debug.SendMessage("Move closer: "+String(blockdistance));
-                    Mcon.ResetMovement();
+                    
                 }
             }
             
@@ -113,11 +126,11 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
             Mcon.SetMotors(0,0);
         }
     } else if (laststate == MOVE_TO_ACCURATE_MEASURE_POINT){
-        if(distance > MIN_WALL_DISTANCE && false){ //if lost block
-            Mcon.ResetMovement();
-            laststate = ROTATE_TO_SWEEP_START;
-            Mcon.TurnSetAngle(5, CLOCKWISE);//only rotate 5 degrees
-        }
+        //if(distance > MIN_WALL_DISTANCE && false){ //if lost block
+        //    Mcon.ResetMovement();
+        //   laststate = ROTATE_TO_SWEEP_START;
+        //    Mcon.TurnSetAngle(5, CLOCKWISE);//only rotate 5 degrees
+        //}
         if (Mcon.MoveSetDistance(blockdistance - ACCURATE_MEASURING_DISTANCE)==COMPLETE){
             laststate = WAIT_FOR_IRSENSOR;
             starttime = milli;
@@ -126,41 +139,39 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
         //just in case it reaches the block early, keep an eye on the ultrasound distance
         int ultrasoundDist=Dsense.ReadUltrasoundDistance();
-        if(ultrasoundDist<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && ultrasoundDist!=INVALID_READING){
+        if(ultrasoundDist<DISTANCE_MEASURE_MAGNET+4 && ultrasoundDist!=INVALID_READING){
             Debug.SendMessage("ultrasound takeover: "+String(ultrasoundDist));
-            laststate = PAUSE_BEFORE_FINAL_APPROACH;
+            laststate = MOVE_INTO_MAGNET;
             starttime=milli;
             Mcon.ResetMovement();
+            Mcon.MoveSetDistance(3);
         }
         
-    }else if (laststate == MOVE_TO_WITHIN_ULTRASOUND_RANGE){
-        if(distance>ACCURATE_MEASURING_DISTANCE){
-            //error lost block
+    } else if(laststate == MOVE_TOWARDS_MAGNET){
+        //if(distance > MIN_WALL_DISTANCE && false){ //if lost block
+        //    Mcon.ResetMovement();
+        //    laststate = ROTATE_TO_SWEEP_START;
+        //    Mcon.TurnSetAngle(5, CLOCKWISE);//only rotate 5 degrees
+        //}
+        if (Mcon.MoveSetDistance(blockdistance - DISTANCE_MEASURE_MAGNET)==COMPLETE){
+            laststate = DETECT_MAGNET;
+            starttime = milli;
+            Mcon.ResetMovement();
+            Mcon.SetMotors(0,0);
         }
-        //Moves robot forwards to within ultrasound range
-        if (Mcon.MoveSetDistance(blockdistance - ULTRASOUND_BLOCK_DETECTION_THRESHOLD+5)==COMPLETE){          
-            laststate = PAUSE_BEFORE_FINAL_APPROACH;
-            starttime=milli;
-        }
+        //just in case it reaches the block early, keep an eye on the ultrasound distance
         int ultrasoundDist=Dsense.ReadUltrasoundDistance();
-        if(ultrasoundDist<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && ultrasoundDist!=INVALID_READING){
+        if(ultrasoundDist<DISTANCE_MEASURE_MAGNET+4 && ultrasoundDist!=INVALID_READING){
             Debug.SendMessage("ultrasound takeover: "+String(ultrasoundDist));
-            laststate = PAUSE_BEFORE_FINAL_APPROACH;
+            laststate = MOVE_INTO_MAGNET;
             starttime=milli;
             Mcon.ResetMovement();
+            Mcon.MoveSetDistance(3);
         }
-    } else if (laststate == PAUSE_BEFORE_FINAL_APPROACH){
-        Mcon.SetMotors(0,0);
-        if(milli-starttime>500){
-            laststate=MOVE_INTO_MAGNET;
-            int ultrasoundDist=Dsense.ReadUltrasoundDistance();
-            Debug.SendMessage("Stable reading: "+String(ultrasoundDist));
-            Mcon.ResetMovement();
-            return;
-        }
-    } else if(laststate == MOVE_INTO_MAGNET){
-        if(Mcon.MoveSetDistance(Dsense.ReadUltrasoundDistance()-DISTANCE_MEASURE_MAGNET)==COMPLETE){//wait for previous task to complete
+    }else if(laststate == MOVE_INTO_MAGNET){
+        if(Mcon.MoveSetDistance(3)==COMPLETE){//wait for previous task to complete
             Debug.SendMessage("Final range: "+String(Dsense.ReadUltrasoundDistance(),2));
+            Mcon.ResetMovement();
             Mcon.SetMotors(0,0);
             starttime=milli;
             laststate=DETECT_MAGNET;
@@ -168,6 +179,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
     }else if (laststate == DETECT_MAGNET){
         if(milli-starttime>5000){
+            Mcon.ResetMovement();
             Mcon.SetMotors(0,0);
             laststate =GRAB_BLOCK; //done!
             //find out angle to turn back
