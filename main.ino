@@ -394,14 +394,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
                 float ultrasoundDist = distanceSense.ReadUltrasoundDistance(); 
-                if(ultrasoundDist<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && ultrasoundDist!=INVALID_READING &&RobotState.circuit_count==0 && RobotState.task_stopwatch>11000){
+                if(ultrasoundDist<DISTANCE_MEASURE_MAGNET+4 && ultrasoundDist!=INVALID_READING &&RobotState.circuit_count==0 && RobotState.task_stopwatch>11000){
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
                     RobotState.task=MOVE_FORWARD;
                     Mcon.ResetMovement();
-                    Mcon.MoveSetDistance(ultrasoundDist-DISTANCE_MEASURE_MAGNET-2);
+                    Mcon.MoveSetDistance(3);
                 }
-                if(LineSense.juntionDetect() && RobotState.task_stopwatch>9000){
+                if(LineSense.juntionDetect() && RobotState.task_stopwatch>11000){
                     if (RobotState.wrongWay==true){
                         Mcon.ResetMovement();
                         RobotState.task = MOVE_FORWARD;
@@ -479,6 +479,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
             if(RobotState.task==FINDING_BLOCK){
                 BlockSweep::SweepState sweepState = BSweep.BlockSwp(Mcon,distanceSense,Debug);
+                
                 if(sweepState==BlockSweep::DETECT_MAGNET && !RobotState.is_holding_block){
                     if(magnetSense.MagnetDetected()){
                         Debug.SendMessage("magnetic!");
@@ -500,6 +501,16 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task=STOPPED;
                     Mcon.SetMotors(0,0);
                     RobotState.task_timer=2000;
+                }
+                if(RobotState.return_home){
+                    Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
+                    Debug.SendMessage("aborting to return home");
+                    Mcon.ResetMovement();
+                    RobotState.purpose=PICK_UP_BLOCK;
+                    RobotState.location=COLLECTION_SIDE;
+                    RobotState.task=STOPPED;
+                    Mcon.SetMotors(0,0);
+                    RobotState.task_timer=100;
                 }
             }
         }
@@ -659,6 +670,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     if(Mcon.TurnSetAngle(90,true)==COMPLETE){
                         RobotState.task=MOVE_FORWARD;
                         RobotState.location=START_SQUARE;
+                        Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                         Mcon.ResetMovement();
                         RobotState.circuit_count+=1;
                     }
@@ -677,12 +689,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(15)==COMPLETE){
                     RobotState.task=STOPPED;
-                    RobotState.task_timer=2000;
+                    Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
+                    RobotState.task_timer=1000;
                     RobotState.task=REVERSE;   
                     Mcon.ResetMovement();
                 }
             }else if(RobotState.task==STOPPED){
                 if (RobotState.task_timer == 0){
+                    Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.is_holding_block=false;
                     RobotState.task=REVERSE;
                     Mcon.ResetMovement();
@@ -696,7 +710,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.ResetMovement();
                 }
             }else if(RobotState.task==TURN_LEFT){
-                if(Mcon.TurnSetAngle(70,false)==COMPLETE){
+                if(Mcon.TurnSetAngle(90,false)==COMPLETE){
                     if(RobotState.return_home && !RobotState.is_magnetic){//check it is in first box
                         RobotState.junction_counter=1;
                         RobotState.task=FOLLOW_LINE;
@@ -741,7 +755,6 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     Mcon.ResetMovement();
                     Mcon.SetMotors(0,0);
-                    Mcon.ResetMovement();
                 }
             }
         }
