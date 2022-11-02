@@ -50,7 +50,12 @@ class MotorControl{
             REVERSE_SCAN = 3, // if sweeping back 180 degrees
             MOVING_ONTO_LINE = 4, // if line has been detected (and so moving towards it)
             ALIGN_SCAN = 5, //if aligning with the line (by moving 90 degrees)
-            REVERSE_ALIGN_SCAN = 6 //sweeping back to align (by moving 180 degrees)
+            REVERSE_ALIGN_SCAN = 6, //sweeping back to align (by moving 180 degrees)
+            SECOND_INITIAL_SCAN = 7, // if sweeping 90 degrees to find the line
+            SECOND_REVERSE_SCAN = 8, // if sweeping back 180 degrees
+            SECOND_MOVING_ONTO_LINE = 9, // if line has been detected (and so moving towards it)
+            SECOND_ALIGN_SCAN = 10, //if aligning with the line (by moving 90 degrees)
+            SECOND_REVERSE_ALIGN_SCAN = 11 //sweeping back to align (by moving 180 degrees)
         };
         // line following state
         struct{
