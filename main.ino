@@ -547,7 +547,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                 }
             }
-        } else if(RobotState.location=COLLECTION_SIDE){
+        } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task_timer==0){//finished picking up block
                 BlockSweep::SweepState sweepState = BSweep.ReturnToCross(Mcon,distanceSense,LineSense,Debug);
                 if(sweepState==BlockSweep::SWEEP_COMPLETE){

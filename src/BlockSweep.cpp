@@ -26,7 +26,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
     } else if (laststate == MOVE_OFFSET){
         //Moves robot back an offset to eliminate the error caused by block being too close for the IR sensor
-        if (Mcon.MoveSetDistance(-5)== COMPLETE){
+        if (Mcon.MoveSetDistance(4)== COMPLETE){
             laststate = ROTATE_TO_SWEEP_START;
         }
     } else if (laststate == ROTATE_TO_SWEEP_START){

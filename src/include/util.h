@@ -6,9 +6,9 @@ Also contains enumerables for the state system.
 #pragma once
 
 // ### constants ###
-#define DERIVITIVE_LINE_SENSE_THRESHOLD 2.5//3
-#define PROPORTIONAL_LINE_SENSE_REGION 0.30//0.35
-#define INTEGRAL_LINE_SENSE_REGION 0.01 //bound is currently 0.12
+#define DERIVITIVE_LINE_SENSE_THRESHOLD 2//3
+#define PROPORTIONAL_LINE_SENSE_REGION 0.2//0.35
+#define INTEGRAL_LINE_SENSE_REGION 0.03 //bound is currently 0.12
 //Motor speeds
 #define Default_Speed 255
 #define Sweep_Speed 255
@@ -26,7 +26,7 @@ Also contains enumerables for the state system.
 #define ACCURATE_MEASURING_DISTANCE 45
 #define DISTANCE_MEASURE_MAGNET 2
 #define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 16
-#define MIN_WALL_DISTANCE 80//100 changed while testing
+#define MIN_WALL_DISTANCE 70//100 changed while testing
 #define ARMS_CLOSED_ANGLE 82 //do not know these values currently, depends on setup and gearing
 #define ARMS_OPEN_ANGLE 150
 #define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
