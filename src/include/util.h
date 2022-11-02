@@ -24,7 +24,7 @@ Also contains enumerables for the state system.
 //Block gathering constants
 
 #define ACCURATE_MEASURING_DISTANCE 45
-#define DISTANCE_MEASURE_MAGNET 2
+#define DISTANCE_MEASURE_MAGNET 1
 #define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 16
 #define MIN_WALL_DISTANCE 70//100 changed while testing
 #define ARMS_CLOSED_ANGLE 82 //do not know these values currently, depends on setup and gearing
@@ -60,7 +60,7 @@ Also contains enumerables for the state system.
 #define ERROR_DEAD_SPOT             0.02 //fraction of reading (between 0 and 1) to discard. e.g. 0.01 means if reading within 1% of 0 then treat as 0.
 
 //IR constant
-#define IR_AVERAGE_READINGS 3 //A=amount of readings averaged for the IR distance
+#define IR_AVERAGE_READINGS 4 //A=amount of readings averaged for the IR distance
 #define INVALID_READING -1 //signifies an invalid IR Reading
 #define IR_WAIT_TIME 500//100 //amount of time to wait for IR readings to catch up
 

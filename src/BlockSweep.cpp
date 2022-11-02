@@ -26,7 +26,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
     } else if (laststate == MOVE_OFFSET){
         //Moves robot back an offset to eliminate the error caused by block being too close for the IR sensor
-        if (Mcon.MoveSetDistance(4)== COMPLETE){
+        if (Mcon.MoveSetDistance(-1)== COMPLETE){
             laststate = ROTATE_TO_SWEEP_START;
         }
     } else if (laststate == ROTATE_TO_SWEEP_START){
@@ -54,7 +54,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
             laststate = MOVE_INTO_MAGNET;
             starttime=milli;
             Mcon.ResetMovement();
-            Mcon.MoveSetDistance(3);
+            Mcon.MoveSetDistance(-1);
         }
         if (!blockdetected){
         //will work if block is placed closer than any part of the ramp/ tunnel, if not a linear distance equation is need
