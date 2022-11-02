@@ -717,7 +717,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         RobotState.location=DROPOFF_SIDE;
                         RobotState.purpose=TRAVEL_TO_START_SIDE;
                         Mcon.ResetMovement();
-                        Mcon.LineFollowUpdate(1,true,Debug,true);
+                        Mcon.LineFollowUpdate(-1,true,Debug,true);
                         RobotState.task_stopwatch=0;
                         LineSense.ResetPID();
                     } else {
@@ -726,7 +726,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         RobotState.purpose=TRAVEL_TO_FAR_SIDE;
                         RobotState.task_stopwatch=0;
                         Mcon.ResetMovement();
-                        Mcon.LineFollowUpdate(1,true,Debug,true);
+                        Mcon.LineFollowUpdate(-1,true,Debug,true);
                     }
                     
                 }

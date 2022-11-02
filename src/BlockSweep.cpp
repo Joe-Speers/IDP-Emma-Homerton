@@ -110,7 +110,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
                 if(blockdistance<=ACCURATE_MEASURING_DISTANCE+5){
                     Debug.SendMessage("Accurate: "+String(blockdistance));
                     Mcon.ResetMovement();
-                    Mcon.MoveSetDistance(blockdistance - DISTANCE_MEASURE_MAGNET);
+                    Mcon.MoveSetDistance(blockdistance - DISTANCE_MEASURE_MAGNET +3);
                     laststate = MOVE_TOWARDS_MAGNET;
                     
                 } else{
@@ -153,7 +153,8 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         //    laststate = ROTATE_TO_SWEEP_START;
         //    Mcon.TurnSetAngle(5, CLOCKWISE);//only rotate 5 degrees
         //}
-        if (Mcon.MoveSetDistance(blockdistance - DISTANCE_MEASURE_MAGNET)==COMPLETE){
+        if (Mcon.MoveSetDistance(blockdistance - DISTANCE_MEASURE_MAGNET +3)==COMPLETE){
+            Debug.SendMessage("used IR");
             laststate = DETECT_MAGNET;
             starttime = milli;
             Mcon.ResetMovement();
