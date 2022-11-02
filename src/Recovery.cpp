@@ -14,7 +14,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug
         start_timer = milli;
         closest_distance = 1000;
         Mcon.ResetMovement();
-        Debug.SendMessage("Finding closest wall");
+        //Debug.SendMessage("Finding closest wall");
     }
     if (LastState==WALL_FIND){
         if (Mcon.TurnSetAngle(360, CLOCKWISE)){
@@ -41,7 +41,7 @@ Recovery::RecoveryState Recovery::blockSite(MotorControl &Mcon, WifiDebug &Debug
             }
             Mcon.ResetMovement();
             //LastState = FIND_LINE_BACKWARDS; i presume this is not meant to be here
-            Debug.SendMessage("Moving to find line");
+            //Debug.SendMessage("Moving to find line");
         }
     }
     if (LastState==FIND_LINE_BACKWARDS){
