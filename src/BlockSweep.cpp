@@ -6,20 +6,17 @@
 
 
 
-// free RAM check for debugging. SRAM for ATmega328p = 2048Kb.
-int availableMemory() {
-    // Use 1024 with ATmega168
-    int size = 6144;
-    byte *buf;
-    while ((buf = (byte *) malloc(--size)) == NULL);
-        free(buf);
-    return size;
-}
+int timeout=0;
 BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &Dsense, WifiDebug &Debug){
+    timeout+=10;
+    if(timeout>30000){//time out if there is a problem
+        laststate=GRAB_BLOCK;
+    }
     //Serial.println(availableMemory());
     unsigned long milli = millis();
     distance=Dsense.ReadIRDistance();
     if (laststate == ROTATE_TO_OFFSET){
+        timeout = 0;
         //Turns robot to be perpendicular to cross
         if (Mcon.TurnSetAngle(90, ANTI_CLOCKWISE) == COMPLETE){
             laststate = MOVE_OFFSET;
@@ -87,7 +84,7 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
         }
     } else if (laststate == ROTATE_TO_BLOCK){
         //Turns robot to face midpoint of block and records distance to block
-        if (Mcon.TurnSetAngle(overshoot, CLOCKWISE)== COMPLETE){
+        if (Mcon.TurnSetAngle(overshoot-Angle_Constant, CLOCKWISE)== COMPLETE){
             Debug.SendMessage("locked on");
             laststate = WAIT_FOR_IRSENSOR;
             Mcon.ResetMovement();
@@ -114,10 +111,17 @@ BlockSweep::SweepState BlockSweep::BlockSwp(MotorControl &Mcon, DistanceSense &D
                     laststate = MOVE_TOWARDS_MAGNET;
                     
                 } else{
-                    laststate = MOVE_TO_ACCURATE_MEASURE_POINT;
-                    Mcon.ResetMovement();
-                    Mcon.MoveSetDistance(blockdistance - ACCURATE_MEASURING_DISTANCE);
-                    Debug.SendMessage("Move closer: "+String(blockdistance));
+                    if(distance > MIN_WALL_DISTANCE){
+                        laststate = ROTATE_TO_SWEEP_START;
+                        Debug.SendMessage("error, not valid");
+                        Mcon.ResetMovement();
+                        Mcon.TurnSetAngle(angleofblock,true);
+                    } else {
+                        laststate = MOVE_TO_ACCURATE_MEASURE_POINT;
+                        Mcon.ResetMovement();
+                        Mcon.MoveSetDistance(blockdistance - ACCURATE_MEASURING_DISTANCE);
+                        Debug.SendMessage("Move closer: "+String(blockdistance));
+                    }
                     
                 }
             }

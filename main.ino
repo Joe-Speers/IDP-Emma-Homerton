@@ -710,7 +710,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.ResetMovement();
                 }
             }else if(RobotState.task==TURN_LEFT){
-                if(Mcon.TurnSetAngle(80,false)==COMPLETE){
+                if(Mcon.TurnSetAngle(100,false)==COMPLETE){
                     if(RobotState.return_home && !RobotState.is_magnetic){//check it is in first box
                         RobotState.junction_counter=0;
                         RobotState.task=FOLLOW_LINE;
@@ -719,7 +719,6 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         Mcon.ResetMovement();
                         Mcon.LineFollowUpdate(-1,true,Debug,true);
                         RobotState.task_stopwatch=0;
-                        LineSense.ResetPID();
                     } else {
                         RobotState.task=FOLLOW_LINE;
                         RobotState.location=DROPOFF_SIDE;
@@ -751,7 +750,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if (RobotState.location==START_SQUARE){
             if(RobotState.task==MOVE_FORWARD){
-                if(Mcon.MoveSetDistance(45)==COMPLETE){
+                if(Mcon.MoveSetDistance(32)==COMPLETE){
                     RobotState.task=STOPPED;
                     RobotState.task_stopwatch=0;
                     Mcon.ResetMovement();
