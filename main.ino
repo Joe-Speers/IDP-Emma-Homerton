@@ -80,7 +80,7 @@ void ResetState(){
     Mcon.ResetState();
     Mcon.ResetMovement();
     TiltSense.reset();
-    BSweep.laststate=BlockSweep::ROTATE_TO_OFFSET;
+    BSweep.sweep_state=BlockSweep::ROTATE_TO_OFFSET;
     //reset milisecond counter
     m=0;
     //reset state system to inital values
@@ -361,7 +361,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         } else if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
                 float ultrasoundDist = distanceSense.ReadUltrasoundDistance(); 
-                if(ultrasoundDist<DISTANCE_MEASURE_MAGNET+4 && ultrasoundDist!=INVALID_READING &&RobotState.circuit_count==0 && RobotState.task_stopwatch>11000){
+                if(ultrasoundDist<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && ultrasoundDist!=INVALID_READING &&RobotState.circuit_count==0 && RobotState.task_stopwatch>11000){
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
                     RobotState.task=MOVE_FORWARD;
@@ -392,7 +392,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         } else {
                             RobotState.location==COLLECTION_SIDE;
                             RobotState.task=FINDING_BLOCK;
-                            BSweep.laststate=BlockSweep::ROTATE_TO_OFFSET;
+                            BSweep.sweep_state=BlockSweep::ROTATE_TO_OFFSET;
                             Mcon.ResetMovement();
                             Mcon.SetMotors(0,0);
                         }    

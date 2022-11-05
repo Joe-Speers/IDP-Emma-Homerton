@@ -5,6 +5,8 @@ Also contains enumerables for the state system.
 */
 #pragma once
 
+#define ULTRASOUND_TIMEOUT 3000 //max time to wait for ultrasound to return
+
 // ### constants ###
 #define DERIVITIVE_LINE_SENSE_THRESHOLD 2//3
 #define PROPORTIONAL_LINE_SENSE_REGION 0.2//0.35
@@ -25,11 +27,12 @@ Also contains enumerables for the state system.
 
 #define ACCURATE_MEASURING_DISTANCE 45
 #define DISTANCE_MEASURE_MAGNET 2
-#define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 16
+#define ULTRASOUND_BLOCK_DETECTION_THRESHOLD 6
 #define MIN_WALL_DISTANCE 60//100 changed while testing
 #define ARMS_CLOSED_ANGLE 82 //do not know these values currently, depends on setup and gearing
 #define ARMS_OPEN_ANGLE 150
 #define CROSS_OFFSET 15 //distance robot will move from the cross so block is in IR range
+#define PI 3.141592
 
 //Turning direction 
 #define CLOCKWISE 1
