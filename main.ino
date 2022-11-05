@@ -6,7 +6,7 @@ The main file:
     - sets the initial state
     - contains an update loop and timing system to trigger time based events
     - handles commands recieved from a PC
-    - contains a state system to handle changes in state and peform new actions. (todo)
+    - contains a state system to handle changes in state and peform new actions.
 Target interval for loop() is set by 'TICK_TIME' in miliseconds.
 */
 
@@ -43,8 +43,6 @@ int max_tick_time_exceeded=0;//biggest time by which the TICK_TIME has been exce
 int m=0;//miliseconds counter (between 0 and 999), in increments of 'TICK_TIME'
 int s=-10000;//seconds counter
 
-int error=0;
-
 //called to reset the time and state to an inital value
 void ResetState(){
     Debug.SendMessage("Resetting State");
@@ -67,7 +65,6 @@ void ResetState(){
     RobotState.circuit_count=0;
     RobotState.is_magnetic=false;
     RobotState.is_holding_block=false;
-    //temp
     BSweep.laststate=BlockSweep::ROTATE_TO_OFFSET;
 }
 
@@ -91,17 +88,8 @@ void setup(){
     pinMode(RESET_BUTTON,INPUT);
     
 }
-//temp for distance calibration
-int move=0;
-int turn=0;
+
 void loop(){ 
-    error+=1;
-    if(error>1){
-        Serial.println("MAIN LOOP CRITICAL ERROR: "+String(error));
-        if(error==2){
-            Debug.SendMessage("CRITICAL ERROR");
-        }
-    }
     // ### TIMER CODE ### 
 
     //Aims to delay for 'TICK_TIME' and records if it takes any longer.
@@ -145,55 +133,27 @@ void loop(){
     }
     if(m%500==0){ // twice a second
         //print out the clock
-        //Debug.SendMessage("Distance: "+String(distanceSense.ReadUltrasoundDistance(),1)); has a long delay!
-        //Debug.SendMessage("t: "+String(s)+":"+String(m));
-        int temp=0;
+        Debug.SendMessage("t: "+String(s)+":"+String(m));
     }
     if(!LineSense.LastJunctionDetectionState && LineSense.juntionDetect() && !RobotState.isLost){
         RobotState.junction_counter+=1;
     }
     LineSense.LastJunctionDetectionState=LineSense.juntionDetect();
     // ### UPDATE SUBSYSTEMS ###
-    //temp calibration script
-    if(false){
-        BlockSweep::SweepState sweepState = BSweep.BlockSwp(Mcon,distanceSense,Debug);
-        if(sweepState==BlockSweep::DETECT_MAGNET && !RobotState.is_holding_block){
-            if(magnetSense.MagnetDetected()){
-                Debug.SendMessage("magnetic!");
-                RobotState.is_magnetic=true;
-                RobotState.is_holding_block=true;
-            } else {
-                Debug.SendMessage("Not magnetic");
-                RobotState.is_magnetic=false;
-                RobotState.is_holding_block=true;
-            }
-        }
-    } else if(false){//true if calibrating motors
-        if(move>0){
-            if(Mcon.MoveSetDistance(move)== COMPLETE){
-                move=0;
-            }
-        }
-        if(turn>0){
-            if(Mcon.TurnSetAngle(turn,true)== COMPLETE){
-                turn=0;
-            }
-        }
-    } else {
-        StateSystemUpdate(dt); // update state system
-    }
+    StateSystemUpdate(dt); // update state system
     TiltSensor::TiltState tilt = TiltSense.getTilt(dt/1000); // update tilt sensor
     if(m%20==0){
+        //send useful information for debugging
         //Serial.println(String(TiltSense.y_average));
-        Serial.println(String(distanceSense.ReadIRDistance()));
-        Serial.println(","+String(distanceSense.ReadUltrasoundDistance()));
+        //Serial.println(String(distanceSense.ReadIRDistance()));
+        //Serial.println(","+String(distanceSense.ReadUltrasoundDistance()));
         //Serial.print(String(LineSense.derivative));
         //Serial.println(","+String(LineSense.error));
     }
     // peform PID calculation  
     double correction = LineSense.PIDLineFollowCorrection(dt);
+
     //amber LED code
-    
     if(RobotState.task==STOPPED){
         digitalWrite(AMBER_LED_PIN, LOW);
     }
@@ -220,12 +180,7 @@ void loop(){
         digitalWrite(AMBER_LED_PIN, HIGH);
         
     }
-    //if(LineSense.isLineDetected()){
-    //     digitalWrite(AMBER_LED_PIN, HIGH);
-    //} else {
-    //   
-    //    digitalWrite(AMBER_LED_PIN, LOW);
-    //}
+
     //if following line, apply PID calculation
     if(RobotState.task==FOLLOW_LINE && !RobotState.isLost){
         bool linesense = LineSense.isLineDetected();
@@ -247,7 +202,6 @@ void loop(){
     if(PC_reply!=""){
         PC_Command(PC_reply);
     }
-    error=0;
 }
 
 void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microseconds as an input
@@ -336,16 +290,10 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 if(distanceSense.ReadIRDistance()<35 && distanceSense.ReadIRDistance()!=INVALID_READING && m==0){
                     Debug.SendMessage("Near ramp");
                     Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
-                    //RobotState.task_timer=3000; //add this if useful.
-                    //add anything here?
                 }
                 if(RobotState.task_stopwatch<4000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     TiltSense.reset();
-                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP || (RobotState.task_timer>0 && RobotState.task_timer<500 && false)){ // 4) check tilt sensor to see if has hit ramp
-                    RobotState.location=RAMP;
-                    RobotState.task_stopwatch=0;
-                    RobotState.task_timer=0;
-                }
+                } 
             }
         } else if(RobotState.location==RAMP){      
             if(RobotState.task==FOLLOW_LINE){
@@ -440,11 +388,6 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.wrongWay = true;
                     RobotState.task_stopwatch=0;
                 }
-                if(TiltSense.getTilt()==TiltSensor::TILT_UP && false){ // 4) disabled for now
-                    Debug.SendMessage("Unexpected Ramp hit");
-                    RobotState.task = REVERSE;
-                    Mcon.ResetMovement();
-                }
             }
             if (RobotState.task == REVERSE){
                 if (Mcon.MoveSetDistance(-20) == COMPLETE){
@@ -467,14 +410,6 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task = TURN_AROUND;
                     Mcon.ResetMovement();
                     RobotState.wrongWay = false;
-                }
-            }
-            if (RobotState.task == RECOVERY && false){ //disabled for now
-                if(recovery.blockSite(Mcon, Debug, LineSense, distanceSense) == Recovery::LINE_FOUND){
-                    LineSense.ResetPID();
-                    RobotState.task = FOLLOW_LINE;
-                    Mcon.ResetMovement();
-                    Mcon.LineFollowUpdate(0,false,Debug,true);
                 }
             }
             if(RobotState.task==FINDING_BLOCK){
@@ -630,7 +565,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     
                 }
                 if(RobotState.is_holding_block){
-                    if((RobotState.junction_counter==1 && !RobotState.is_magnetic) || (RobotState.junction_counter>=3 && RobotState.is_magnetic)){ // temporary loop back to start
+                    if((RobotState.junction_counter==1 && !RobotState.is_magnetic) || (RobotState.junction_counter>=3 && RobotState.is_magnetic)){
                         RobotState.purpose=DROP_BLOCK;
                         RobotState.task=MOVE_FORWARD;
                         
@@ -781,12 +716,6 @@ void PC_Command(String command){
     if(command=="~H"){ //Raw sensor input
         RobotState.return_home=true;
         Debug.SendMessage("returning home");
-    }
-    if(command[0]=='M'){
-        move=command.substring(1).toInt();
-    }
-    if(command[0]=='T'){
-        turn=command.substring(1).toInt();
     }
     if(command[0]=='A'){
         if(command[1]=='P'){
