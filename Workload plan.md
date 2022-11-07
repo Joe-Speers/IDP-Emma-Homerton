@@ -1,35 +1,33 @@
 # Modules and Descision system
+Workload plan
 ## Modules
-- Main
+- Main (joe)
     - Creates objects
     - Setup script
     - Descision system (joe to set up, then everyone)
-- Wifi Debug
-- MotorControl (jerry + joe)
+- Wifi Debug (joe)
+- MotorControl (joe)
   - Servos
   - Motors
-- LineSense (joe + jerry+ kyle)
+  - Distance calibration (kyle)
+- LineSense (joe)
     - Junction detection (kyle)
     - line following
-- BlockCapture (orla + jerry + kyle)
+- BlockSweep (orla, joe, kyle)
     - Sensing block
     - senses block for magnet
-    - displays LED
     - picking up block
+- MagnetSense (kyle)
 - DistanceSense (orla)
     - Ultrasound
     - Infrared
-    -distance calculation
+    - distance calculation
 - Recovery (kyle)
-- AdditonalSensors (kyle)
-  - Tunnel sensor
-  - Ramp sensor
-- BlockSweep
--TunnelSensor
-TiltSensor
+- TunnelSensor
+- TiltSensor (joe)
 
 # Descision System
-The descision system executes every loop, with an interval of `tick_time`
+The descision system executes every loop, with an interval of `TICK_TIME`
 
 State enumerables:
  - Location
@@ -41,7 +39,7 @@ State enumerables:
  - m (int): millisecond counter from 0-999 then loops every second back to zero. In increments of `tick_time` currently set to 10ms.
 
 
-# Recovery Module
+# Recovery Module Plan
   ## Inputs
   - location
   - purpose
@@ -103,7 +101,7 @@ State enumerables:
   - falling off ramp
   - a loop of forwards and backwards movement
 
-# block sweep module
+# block sweep plan
  - Starts with robot on cross
  - Rotates 180 degrees anticlockwise
  - while rotating logs angle block is detected and angle block is no longer detected

@@ -102,7 +102,7 @@ enum Purpose{ //Describes the current goal
 };
 
 enum Location{
-    SQUARE            = 0,
+    SQUARE                  = 0,
     DROPOFF_SIDE            = 1,
     RAMP                    = 2,
     COLLECTION_SIDE         = 3,

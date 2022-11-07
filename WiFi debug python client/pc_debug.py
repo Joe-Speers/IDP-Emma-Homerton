@@ -2,11 +2,14 @@
 # It has a console to display messages from the Arduino and a input field to send commands
 # There is also a graph to display sensor readings. This has a number of modes that can be selected with keyboard keys
 
-#update enums here!
 # ANY CHANGES TO THESE, please replicate in util.h
 PURPOSE={
     0:"EXIT_START_BOX",
-    1:"TRAVEL_TO_FAR_SIDE"
+    1:"TRAVEL_TO_FAR_SIDE",
+    2:"PICK_UP_BLOCK",
+    3:"TRAVEL_TO_START_SIDE",
+    4:"DROP_BLOCK",
+    5:"RETURN_HOME"
 }
 
 LOCATION={
@@ -28,7 +31,10 @@ TASK={
     3:"TURN_LEFT",
     4:"TURN_RIGHT",
     5:"FOLLOW_LINE",
-    6:"SLOW_SWEEP"
+    6:"SLOW_SWEEP",
+    7:"TURN_AROUND",
+    8:"RECOVERY",
+    9:"FINDING_BLOCK"
 }
 
 # use pip to install these modules first:

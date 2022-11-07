@@ -1,18 +1,15 @@
 # Emma - Homerton IDP
-Group M108
+Group M108 (Steve the porridge bot)
 ## Structure
  ### Main Program
-
- - `src` contains the modules for each subsystem
- - `src\include` contains the header files
  - `main.ino` is the main program that calls the other modules
+ - `src` contains the modules for each subsystem
+    - `src\include` contains the header files
+        - `src\include\util.h` contains the key constants, pin assignments and enums
  - `Wifi debug Python client` contains the PC code that connects to the arduino for debugging
 
 ### Other Programs
- - `magnetsensing` Contains the code for the hall effect sensor
  - `LineSensitivityPlot` contains the code for calibrating the line sensor positions
- - `servo` contains test code for the servo module
- - `ultra_sound` contains test code for the ultrasound sensor
 
 ## Setup Instructions
 
