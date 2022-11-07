@@ -11,6 +11,8 @@ Group M108 (Steve the porridge bot)
 ### Other Programs
  - `LineSensitivityPlot` contains the code for calibrating the line sensor positions
 
+## System Diagram
+![System Diagram](images/system_diagram.png)
 ## Setup Instructions
 
 First install:
