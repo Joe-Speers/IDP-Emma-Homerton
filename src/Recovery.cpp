@@ -1,3 +1,5 @@
+//TODO: commenting
+//This code is incomplete, we were not able to implent this for the competition
 #include "include/MotorControl.h"
 #include "include/WifiDebug.h"
 #include "include/Recovery.h"

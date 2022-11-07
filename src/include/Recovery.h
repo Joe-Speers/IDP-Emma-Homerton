@@ -8,6 +8,8 @@ tunnel recovery
 #include "DistanceSense.h"
 #include "MotorControl.h"
 #include "WifiDebug.h"
+//TODO: commenting
+//This code is incomplete, we were not able to implent this for the competition
 #include "util.h"
 #include "LineSensor.h"
 

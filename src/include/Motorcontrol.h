@@ -1,4 +1,5 @@
 /*
+MotorControl.h
 MotorControl interfaces with the 2 DC motors and servo motor. Any actions peformed on the motors will persist untill changed again.
 MotorControlUpdate() contains an algorithm to steer the robot based on a 'correction' value between -1 an 1, used for line follwing.
 DistanceCon takes distance input in cm and returns millisecond value to move that distance.
@@ -6,12 +7,14 @@ AngleCon takes angle input and returns millisecond value to turn that amount.
 TimeToAngleCon takes millisecond input and returns turned in that time, assumes angle turned in acceleration = angle turned in deceleration.
 MoveSetDistance takes a distance value and runs motor for required time to move distance input, constantly returns a bool which will return 0 for movement complete.
 TurnSetAngle takes a Angle value and runs motor for required time to turn angle input, constantly returns a bool which will return 0 for movement complete.
-TODO: servo motor control and exact distance traveling.
 */
+
 #pragma once
+
 #include <Servo.h>
 #include <Adafruit_MotorShield.h>
 #include "WifiDebug.h"
+
 
 class MotorControl{
     public:
@@ -20,13 +23,13 @@ class MotorControl{
         void SetServoAngle(int angle); //Set servo angle
         void SetMotors(int lmotor, int rmotor, int ldirection=FORWARD,int rdirection=FORWARD); //Set motor speed and direction (optional)
         bool LineFollowUpdate(double correction, bool LineDetected,WifiDebug Debug,bool forceFind=false); // handles line following based on the PID correction input. Also handles if the robot looses the line. Returns false if the line is undetectable, true otherwise.
-        bool MoveSetDistance(int distance);//moves set distance, returns bool of 0 when movement is complete
-        bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns bool of 0 when movement is complete
+        bool MoveSetDistance(int distance);//moves set distance in cm, returns COMPLETE when movement is complete
+        bool TurnSetAngle(int angle, bool isclockwise);//turns set angle clockwise, returns COMPLETE when movement is complete
         void ResetMovement(); //stops the current movement, used when interuptting a planned movement with a new one
         int DistanceCon(int distance);//converts distance to time at default speed
         int AngleCon(int angle);//converts angles to time at default speed
         int TimeToAngleCon(int millisec);//converts time to angle to turn
-        void ResetState();
+        void ResetState();  //resets state to be on the line
     private:
         //motor objects
         Adafruit_MotorShield AFMS;
@@ -51,11 +54,6 @@ class MotorControl{
             MOVING_ONTO_LINE = 4, // if line has been detected (and so moving towards it)
             ALIGN_SCAN = 5, //if aligning with the line (by moving 90 degrees)
             REVERSE_ALIGN_SCAN = 6, //sweeping back to align (by moving 180 degrees)
-            SECOND_INITIAL_SCAN = 7, // if sweeping 90 degrees to find the line
-            SECOND_REVERSE_SCAN = 8, // if sweeping back 180 degrees
-            SECOND_MOVING_ONTO_LINE = 9, // if line has been detected (and so moving towards it)
-            SECOND_ALIGN_SCAN = 10, //if aligning with the line (by moving 90 degrees)
-            SECOND_REVERSE_ALIGN_SCAN = 11 //sweeping back to align (by moving 180 degrees)
         };
         // line following state
         struct{

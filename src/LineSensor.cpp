@@ -1,28 +1,32 @@
 /*
-This program uses PID control to follow a line.
-See Linear Systems and Control handout 6, page 14 onwards for PID control info. Effectivly uses the derivative and integral of the error (in proportions derivative_k and integral_k)
-as well as proportional control (proportional_k) to set the correcting value.
-Ideally motor control should be removed from this file and implemented seperatly
+LineSensor.cpp
+See header file for description
 */
+
 #pragma once
+
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
+#include "include/util.h"
+#include "include/LineSensor.h"
 
-#include "include/util.h" //contains some key constants used by this file
-#include "include/LineSensor.h" // see this file for publicly accessable variables
 
-
+//Setup input pins for line sensors
 void LineSensor::LineSensorSetup() {
-  pinMode(LINE_SENSOR_PIN,INPUT);
-  pinMode(JUNCTION_SENSOR_PIN, INPUT);
+  pinMode(LINE_SENSOR_PIN,INPUT); //connectes to subtraction circuit, used for PID control (analog)
+  pinMode(JUNCTION_SENSOR_PIN, INPUT); //digital input connecting through a schmitt trigger to the junction sensor
 }
 
+//Resets PID Integral and derivitive to zero, used when re-discovering line
 void LineSensor::ResetPID(){
   integral=0;
-  //also reset error values (todo)
+  for(int i=0;i<DERIVITIVE_PREVIOUS_READINGS_TO_AVERAGE;i++){
+    error_array[i]=0;
+  }
 }
 
+//Peforms PID calculation based upon readings from line sensors. Returns a correction value between -1 and 1
 double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   double dt=(double)dt_micros/1000000;//calculate dt in seconds, this is the time elapsed since the last call
 
@@ -66,15 +70,18 @@ double LineSensor::PIDLineFollowCorrection(int dt_micros) {
   return correction;
 }
 
-int LostLineCounter=0;
-
+//Returns if a line is detected based upon the noise present in the reading
 bool LineSensor::isLineDetected(){
+  //if the derivitive component is high then it is likely the robot is on the line
+  //if the integral is close to zero then the robot is likely on the line
+  //if the proporional value is above a baseline then the robot is on the line
   if(derivative>DERIVITIVE_LINE_SENSE_THRESHOLD || derivative< -DERIVITIVE_LINE_SENSE_THRESHOLD ||(integral<=INTEGRAL_LINE_SENSE_REGION && integral>=-INTEGRAL_LINE_SENSE_REGION && false) || (error>PROPORTIONAL_LINE_SENSE_REGION || error< -PROPORTIONAL_LINE_SENSE_REGION)){
     LostLineCounter=0;
     return true;
   } else{
+    //use a counter system to remove noise.
     LostLineCounter+=1;
-    if(LostLineCounter>10){
+    if(LostLineCounter>LINE_LOST_COUNT){
       return false;
     } else{
       return true;
@@ -82,6 +89,7 @@ bool LineSensor::isLineDetected(){
   }
 }
 
+//Returns true if a junction is detected
 bool LineSensor::juntionDetect() {
   if (digitalRead(JUNCTION_SENSOR_PIN) == LOW)
   {

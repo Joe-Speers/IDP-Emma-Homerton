@@ -86,7 +86,7 @@ void ResetState(){
     //reset state system to inital values
     RobotState.junction_counter=0;
     RobotState.return_home=false;
-    RobotState.location=START_SQUARE;
+    RobotState.location=SQUARE;
     RobotState.purpose=EXIT_START_BOX;
     RobotState.task=STOPPED;
     RobotState.isLost=false;
@@ -253,20 +253,20 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
 
     // ### STATE SYSTEM DESCISION TREE
     // This handles all descisions and keeps track of the robots state. RobotState variables are visible over wifi Debug.
-    // State system plan here: https://docs.google.com/spreadsheets/d/1c6zy2WIi2YzP9drrig8WuBd60yu9RLzDmgVKKxzxKIg/edit?usp=sharing
+    // Old State system plan here: https://docs.google.com/spreadsheets/d/1c6zy2WIi2YzP9drrig8WuBd60yu9RLzDmgVKKxzxKIg/edit?usp=sharing
     // This is in approximate chronological order.
     // Each nested 'if' statement is: Purpose, then Location, then Task, then any condition required to proceed to the next state
     if(RobotState.purpose==EXIT_START_BOX){
-        if(RobotState.location==START_SQUARE){
-            if(RobotState.task==STOPPED){ // 0) This is the initial state after a reset
-                if(RobotState.task_timer==0 && s>=0){ // 1) Start moving after 1 second
+        if(RobotState.location==SQUARE){
+            if(RobotState.task==STOPPED){ //This is the initial state after a reset
+                if(RobotState.task_timer==0 && s>=0){ // Start moving after 1 second
                     Debug.SendMessage("Robot starting");
                     Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.task=MOVE_FORWARD;
                     RobotState.task_stopwatch=0;
                 }
-            } else if(RobotState.task==MOVE_FORWARD){
-                if(Mcon.MoveSetDistance(20)==COMPLETE){
+            } else if(RobotState.task==MOVE_FORWARD){ 
+                if(Mcon.MoveSetDistance(20)==COMPLETE){//Move forward 20cm out of start box
                     RobotState.junction_counter=0;                   
                     RobotState.location=DROPOFF_SIDE;
                     RobotState.task=MOVE_FORWARD;
@@ -277,7 +277,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
             }
         } else if(RobotState.location==DROPOFF_SIDE){
             if(RobotState.task==MOVE_FORWARD){
-                if(RobotState.junction_counter>0 ||RobotState.task_stopwatch>1200){
+                if(RobotState.junction_counter>0 ||RobotState.task_stopwatch>1200){ //continue moving forward until main line detected or timer elapses
                     if(Mcon.MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
                         RobotState.junction_counter=0;                   
                         RobotState.task_stopwatch=0;
@@ -290,8 +290,8 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         }
     } else if (RobotState.purpose==TRAVEL_TO_FAR_SIDE){
         if(RobotState.location==DROPOFF_SIDE){
-            if(RobotState.task==TURN_RIGHT){
-                if(Mcon.TurnSetAngle(90,true)==COMPLETE){ // 3) start following the line
+            if(RobotState.task==TURN_RIGHT){ 
+                if(Mcon.TurnSetAngle(90,true)==COMPLETE){ //turn right onto main line
                     RobotState.task=FOLLOW_LINE;
                     Mcon.ResetMovement();
                     TiltSense.reset();
@@ -301,37 +301,37 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_timer=0;
                     RobotState.junction_counter=0;
                 }
-            } else if(RobotState.task==FOLLOW_LINE){
-                if(distanceSense.ReadIRDistance()<35 && distanceSense.ReadIRDistance()!=INVALID_READING && m==0){
+            } else if(RobotState.task==FOLLOW_LINE){ //follow line until ramp is met
+                if(distanceSense.ReadIRDistance()<35 && distanceSense.ReadIRDistance()!=INVALID_READING && m==0){ //close arms when near ramp
                     Debug.SendMessage("Near ramp");
                     Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                 }
                 //ignore any tilt readings untill enough time has passed. Also reset if tilting down for some reason
                 if(RobotState.task_stopwatch<4000 && TiltSense.getTilt()==TiltSensor::TILT_DOWN){
                     TiltSense.reset();
-                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP ){ // 4) check tilt sensor to see if has hit ramp
+                } else if(TiltSense.getTilt()==TiltSensor::TILT_UP ){ // check tilt sensor to see if has hit ramp
                     RobotState.location=RAMP;
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=0;
                 }
             }
         } else if(RobotState.location==RAMP){      
-            if(RobotState.task==FOLLOW_LINE){
+            if(RobotState.task==FOLLOW_LINE){//follow line up ramp
                 if(TiltSense.getTilt()==TiltSensor::TILT_UP){
-                    if(TunnelSense.WallCollisionRight()){
+                    if(TunnelSense.WallCollisionRight()){ //set integral if it hits side such that the robot will begin to move in the other direction
                         LineSense.integral=LineSense.integral_limit*2;
                     }
-                    else if(!LineSense.isLineDetected()){
-                        LineSense.integral-=0.00005*(elapsed_time_us/1000); //make robot tend to go right to avoid falling off the ramp
+                    else if(!LineSense.isLineDetected()){//if line is lost, tend to move to the right to avoid falling off the ramp
+                        LineSense.integral-=0.00005*(elapsed_time_us/1000); 
                     }
-                    if(RobotState.task_stopwatch>12000){
+                    if(RobotState.task_stopwatch>12000){//reverse if stuck on ramp and retry
                         Debug.SendMessage("Stuck going up ramp");
                         //reverse back
                         Mcon.ResetMovement();
                         RobotState.task=REVERSE;
                     }
                 }
-                if(TiltSense.getTilt()==TiltSensor::TILT_DOWN){
+                if(TiltSense.getTilt()==TiltSensor::TILT_DOWN){//robot has passed over ramp
                     RobotState.location=COLLECTION_SIDE;
                     Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.task=FOLLOW_LINE;
@@ -339,7 +339,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     RobotState.task_timer=0;
                 }
-                if((RobotState.task_timer==0 && TiltSense.getTilt()==TiltSensor::HORIZONTAL)&& RobotState.task_stopwatch>6500){
+                if((RobotState.task_timer==0 && TiltSense.getTilt()==TiltSensor::HORIZONTAL)&& RobotState.task_stopwatch>6500){ //this executes if TILT_DOWN event is misssed
                     Debug.SendMessage("Must have completed ramp by now");
                     Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.location=COLLECTION_SIDE;
@@ -350,7 +350,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_timer=7000;
                     RobotState.task_stopwatch=0;
                 }
-            } else if(RobotState.task==REVERSE){
+            } else if(RobotState.task==REVERSE){//reverse and retry going up ramp if stuck
                 if(Mcon.MoveSetDistance(-30)==COMPLETE){
                     RobotState.task=FOLLOW_LINE;
                     Mcon.ResetMovement();
@@ -359,8 +359,9 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         } else if(RobotState.location==COLLECTION_SIDE){
-            if(RobotState.task==FOLLOW_LINE){
+            if(RobotState.task==FOLLOW_LINE){//follow line untill block is detected or is at cross
                 float ultrasoundDist = distanceSense.ReadUltrasoundDistance(); 
+                //only executes on first round
                 if(ultrasoundDist<ULTRASOUND_BLOCK_DETECTION_THRESHOLD && ultrasoundDist!=INVALID_READING &&RobotState.circuit_count==0 && RobotState.task_stopwatch>11000){
                     RobotState.purpose=PICK_UP_BLOCK;
                     RobotState.location=CROSS;
@@ -368,12 +369,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.ResetMovement();
                     Mcon.MoveSetDistance(3);
                 }
-                if(LineSense.juntionDetect() && RobotState.task_stopwatch>11000){
-                    if (RobotState.wrongWay==true){
+                if(LineSense.juntionDetect() && RobotState.task_stopwatch>11000){//if robot has reached cross
+                    if (RobotState.wrongWay==true){//if going wrong way then start seaquence to turn around
                         Mcon.ResetMovement();
                         RobotState.task = MOVE_FORWARD;
                     }else {
-                        if(RobotState.return_home){
+                        if(RobotState.return_home){//if returning home, skip block pickup
                             Debug.SendMessage("skipping block pickup");
                             Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                             RobotState.purpose=TRAVEL_TO_START_SIDE;
@@ -384,12 +385,12 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                             RobotState.task_stopwatch=0;
                         }
                         Debug.SendMessage("stopped at cross, time:" +String(RobotState.task_stopwatch));
-                        if(RobotState.circuit_count==0){
+                        if(RobotState.circuit_count==0){ //block should be on cross on round one. (ultrasound should pickup block prior to this)
                             RobotState.purpose=PICK_UP_BLOCK;
                             RobotState.location=CROSS;
                             RobotState.task=MOVE_FORWARD;
                             Mcon.ResetMovement();
-                        } else {
+                        } else { //on further rounds, begin sweep seaquence
                             RobotState.location==COLLECTION_SIDE;
                             RobotState.task=FINDING_BLOCK;
                             BSweep.sweep_state=BlockSweep::ROTATE_TO_OFFSET;
@@ -398,7 +399,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         }    
                     }
                 }
-                if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){
+                if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){//if entered tunnel, then cross has been missed, turn around and head back
                     Debug.SendMessage("Unexpected tunnel entry");
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=REVERSE;
@@ -407,14 +408,14 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                 }
             }
-            if (RobotState.task == REVERSE){
+            if (RobotState.task == REVERSE){//reverse before turning around due to unexpected tunnel entry
                 if (Mcon.MoveSetDistance(-20) == COMPLETE){
                     Debug.SendMessage("turn around");
                     RobotState.task = TURN_AROUND;
                     Mcon.ResetMovement();
                 }
             }
-            if (RobotState.task == TURN_AROUND){
+            if (RobotState.task == TURN_AROUND){ //turn around to refind line
                 if (Mcon.TurnSetAngle(180, ANTI_CLOCKWISE) == COMPLETE){
                     Debug.SendMessage("return to following line");
                     RobotState.task = FOLLOW_LINE;
@@ -423,16 +424,16 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.LineFollowUpdate(0,false,Debug,true);
                 }
             }
-            if (RobotState.task == MOVE_FORWARD){
+            if (RobotState.task == MOVE_FORWARD){ //this executes at the cross when the robot is the wrong way round. This now means the robot is in the right place
                 if (Mcon.MoveSetDistance(30)==COMPLETE){
                     RobotState.task = TURN_AROUND;
                     Mcon.ResetMovement();
                     RobotState.wrongWay = false;
                 }
             }
-            if(RobotState.task==FINDING_BLOCK){
+            if(RobotState.task==FINDING_BLOCK){ //Begin sweep seaquence for block. This is handled within block sweep
                 BlockSweep::SweepState sweepState = BSweep.BlockSwp(Mcon,distanceSense,Debug);
-                if(sweepState==BlockSweep::DETECT_MAGNET && !RobotState.is_holding_block){
+                if(sweepState==BlockSweep::DETECT_MAGNET && !RobotState.is_holding_block){//if in position to detect magnet, set the right state
                     if(magnetSense.MagnetDetected()){
                         Debug.SendMessage("magnetic!");
                         RobotState.is_magnetic=true;
@@ -443,7 +444,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         RobotState.is_holding_block=true;
                     }
                 }
-                if(sweepState==BlockSweep::GRAB_BLOCK){
+                if(sweepState==BlockSweep::GRAB_BLOCK){ //pick up block
                     //grab block
                     Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                     Debug.SendMessage("picking up block");
@@ -454,7 +455,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.SetMotors(0,0);
                     RobotState.task_timer=2000;
                 }
-                if(RobotState.return_home){
+                if(RobotState.return_home){ //if return home message is sent, give up and return to line
                     Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                     Debug.SendMessage("aborting to return home");
                     RobotState.purpose=TRAVEL_TO_START_SIDE;
@@ -468,7 +469,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
         }
     } else if(RobotState.purpose==PICK_UP_BLOCK){
         if(RobotState.location==CROSS){ //only called on round 1
-            if(RobotState.task==MOVE_FORWARD){
+            if(RobotState.task==MOVE_FORWARD){//move final distance to magnet and pick up
                 if(Mcon.MoveSetDistance(10)==COMPLETE){
                     Mcon.SetMotors(0,0);
                     //magnet sensing code
@@ -489,7 +490,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     //initiate pickup block
                 }
             } else if(RobotState.task==STOPPED){
-                if(RobotState.task_timer==0){//finished picking up block
+                if(RobotState.task_timer==0){ // finished picking up block, now keep following line
                     RobotState.purpose=TRAVEL_TO_START_SIDE;
                     RobotState.location=COLLECTION_SIDE;
                     RobotState.task=FOLLOW_LINE;
@@ -499,7 +500,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         } else if(RobotState.location==COLLECTION_SIDE){
-            if(RobotState.task_timer==0){//finished picking up block
+            if(RobotState.task_timer==0){//finished picking up block from off the line, now return to line
                 BlockSweep::SweepState sweepState = BSweep.ReturnToCross(Mcon,distanceSense,LineSense,Debug);
                 if(sweepState==BlockSweep::SWEEP_COMPLETE){
                     RobotState.purpose=TRAVEL_TO_START_SIDE;
@@ -514,7 +515,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
     } else if(RobotState.purpose==TRAVEL_TO_START_SIDE){
         if(RobotState.location==COLLECTION_SIDE){
             if(RobotState.task==FOLLOW_LINE){
-                if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){
+                if(TunnelSense.TunnelDetected() && RobotState.task_stopwatch>5000){ //tunnel entry. Now just go straight and rely on bumper switches
                     Debug.SendMessage("Entered Tunnel");
                     RobotState.location=TUNNEL;
                     RobotState.task=MOVE_FORWARD;
@@ -525,7 +526,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         } else if(RobotState.location==TUNNEL){
-            if(RobotState.task==MOVE_FORWARD){
+            if(RobotState.task==MOVE_FORWARD){ //rotate robot back onto line if it hits the wall
                 if(TunnelSense.WallCollisionLeft()){
                     Debug.SendMessage("Hit Left Wall");
                     RobotState.task=TURN_RIGHT;
@@ -540,7 +541,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.TurnSetAngle(25, ANTI_CLOCKWISE);
                 }
             }
-            if(!TunnelSense.TunnelDetected() && RobotState.task_stopwatch>600){ // checks 600ms has elapsed from last turning event
+            if(!TunnelSense.TunnelDetected() && RobotState.task_stopwatch>600){ // checks 600ms has elapsed from last turning event before registering that robot has left tunnel
                 Debug.SendMessage("Leaving tunnel");
                 RobotState.location=DROPOFF_SIDE;
                 RobotState.junction_counter=0;
@@ -549,23 +550,23 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 Mcon.ResetMovement();
                 Mcon.MoveSetDistance(10);
             }
-            if (RobotState.task == TURN_RIGHT){
+            if (RobotState.task == TURN_RIGHT){ //executes when hitting left wall
                 if (Mcon.TurnSetAngle(20, CLOCKWISE)==COMPLETE){
                     RobotState.task=MOVE_FORWARD;
                     Mcon.ResetMovement();
                     Mcon.SetMotors(255,255);
                 }
             }
-            if (RobotState.task == TURN_LEFT){
+            if (RobotState.task == TURN_LEFT){//executes when hitting right wall
                 if (Mcon.TurnSetAngle(20, ANTI_CLOCKWISE)==COMPLETE){
                     RobotState.task=MOVE_FORWARD;
                     Mcon.ResetMovement();
                     Mcon.SetMotors(255,255);
                 }
             }
-        } else if(RobotState.location==DROPOFF_SIDE){
+        } else if(RobotState.location==DROPOFF_SIDE){ //move forward a bit after leaving the tunnel
             if(RobotState.task==MOVE_FORWARD){
-                if(Mcon.MoveSetDistance(10)==COMPLETE){
+                if(Mcon.MoveSetDistance(10)==COMPLETE){//refind line after tunnel
                     Debug.SendMessage("Trying to find line after tunnel");
                     Mcon.ResetMovement();
                     Mcon.LineFollowUpdate(-0.0001,true,Debug,true);
@@ -573,11 +574,11 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     RobotState.task_stopwatch=0;
                     LineSense.ResetPID();
                 }
-            } else if(RobotState.task==FOLLOW_LINE){
+            } else if(RobotState.task==FOLLOW_LINE){//once line has been found, continue
                 if(RobotState.task_stopwatch<2000){ //reset junction counter
                     RobotState.junction_counter=0;
                 }
-                if(RobotState.is_holding_block){
+                if(RobotState.is_holding_block){//wait for robot to reach the correct box based on the junction counter
                     if((RobotState.junction_counter==1 && !RobotState.is_magnetic) || (RobotState.junction_counter>=3 && RobotState.is_magnetic)){
                         RobotState.purpose=DROP_BLOCK;
                         RobotState.task=MOVE_FORWARD;
@@ -586,7 +587,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                         TiltSense.reset();
                     }
                 } else {
-                    if(RobotState.return_home){
+                    if(RobotState.return_home){//if robot is returning home, aim for bo2
                         if(RobotState.junction_counter==2){
                             Debug.SendMessage("aiming home");
                             RobotState.purpose=RETURN_HOME;
@@ -595,7 +596,7 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                             Mcon.ResetMovement();
                             RobotState.task_stopwatch=0;
                         }
-                    } else {//contine back round to get another block
+                    } else {//contine back round to get another block if not holding a block
                         Debug.SendMessage("no block to drop off");
                         RobotState.task=FOLLOW_LINE;
                         Mcon.ResetMovement();
@@ -606,43 +607,34 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         }
-    } else if(RobotState.purpose==DROP_BLOCK){
+    } else if(RobotState.purpose==DROP_BLOCK){//executes when depositing a block
         if(RobotState.location==DROPOFF_SIDE){
-            if(RobotState.task==MOVE_FORWARD){
+            if(RobotState.task==MOVE_FORWARD){//move to rotation point
                 if(Mcon.MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
                     RobotState.task=TURN_RIGHT;
                     Mcon.ResetMovement();
                 }
-            } else if(RobotState.task==TURN_RIGHT){
+            } else if(RobotState.task==TURN_RIGHT){//turn towards box
                 if(RobotState.junction_counter==1){
                     if(Mcon.TurnSetAngle(90,true)==COMPLETE){
                         RobotState.task=MOVE_FORWARD;
-                        RobotState.location=START_SQUARE;
+                        RobotState.location=SQUARE;
                         Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                         Mcon.ResetMovement();
                         RobotState.circuit_count+=1;
                     }
-                } else {
-                    if(Mcon.TurnSetAngle(90,true)==COMPLETE){
-                        RobotState.task=MOVE_FORWARD;
-                        RobotState.location=START_SQUARE;
-                        Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
-                        Mcon.ResetMovement();
-                        RobotState.circuit_count+=1;
-                        RobotState.is_holding_block=false;
-                    }
-                }
+                } 
             }
-        } else if (RobotState.location==START_SQUARE){
-            if(RobotState.task==MOVE_FORWARD){
+        } else if (RobotState.location==SQUARE){
+            if(RobotState.task==MOVE_FORWARD){//move forward into box and open arms to deposit block
                 if(Mcon.MoveSetDistance(15)==COMPLETE){
                     RobotState.task=STOPPED;
                     Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.task_timer=1000;
-                    RobotState.task=REVERSE;   
+                    RobotState.task=STOPPED;   
                     Mcon.ResetMovement();
                 }
-            }else if(RobotState.task==STOPPED){
+            }else if(RobotState.task==STOPPED){ //stop to deposit block
                 if (RobotState.task_timer == 0){
                     Mcon.SetServoAngle(ARMS_OPEN_ANGLE);
                     RobotState.is_holding_block=false;
@@ -650,16 +642,16 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                     Mcon.ResetMovement();
                     RobotState.task_stopwatch=0;
                 }
-            }else if(RobotState.task==REVERSE){
+            }else if(RobotState.task==REVERSE){ //reverse out of box
                 if(Mcon.MoveSetDistance(-20)==COMPLETE){
                     RobotState.is_holding_block=false;
                     RobotState.task=TURN_LEFT;
                     RobotState.task_stopwatch=0;
                     Mcon.ResetMovement();
                 }
-            }else if(RobotState.task==TURN_LEFT){
+            }else if(RobotState.task==TURN_LEFT){ //turn back towards line
                 if(Mcon.TurnSetAngle(110,false)==COMPLETE){
-                    if(RobotState.return_home && !RobotState.is_magnetic){//check it is in first box
+                    if(RobotState.return_home && !RobotState.is_magnetic){//if in first box and returning home, can go straight to next box
                         RobotState.junction_counter=1;
                         RobotState.is_holding_block=false;
                         RobotState.task=FOLLOW_LINE;
@@ -679,23 +671,23 @@ void StateSystemUpdate(int elapsed_time_us){ //takes the elapsed time in microse
                 }
             }
         }
-    } else if(RobotState.purpose==RETURN_HOME){
+    } else if(RobotState.purpose==RETURN_HOME){//if aiming for start / stop square
         if(RobotState.location==DROPOFF_SIDE){
-            if(RobotState.task==MOVE_FORWARD){
+            if(RobotState.task==MOVE_FORWARD){//move to rotation point
                 if(Mcon.MoveSetDistance(DISTANCE_TO_ROTATION_POINT)==COMPLETE){
                     Mcon.ResetMovement();
                     RobotState.task=TURN_RIGHT;
                 }
-            } else if(RobotState.task==TURN_RIGHT){
+            } else if(RobotState.task==TURN_RIGHT){ //turn right towards box
                 if(Mcon.TurnSetAngle(100,true)==COMPLETE){
                     Mcon.SetServoAngle(ARMS_CLOSED_ANGLE);
                     RobotState.task=MOVE_FORWARD;
-                    RobotState.location=START_SQUARE;
+                    RobotState.location=SQUARE;
                     Mcon.ResetMovement();
                     RobotState.circuit_count+=1;
                 } 
             }
-        } else if (RobotState.location==START_SQUARE){
+        } else if (RobotState.location==SQUARE){ //move into box and stop
             if(RobotState.task==MOVE_FORWARD){
                 if(Mcon.MoveSetDistance(31)==COMPLETE){
                     RobotState.task=STOPPED;

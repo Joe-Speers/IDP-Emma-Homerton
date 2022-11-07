@@ -1,11 +1,9 @@
 /*
-Wifi Debug code. Sets up a wifi hotspot (details in WifiDebug.h). Connects to the python program 'pc_debug.py'
-Useful for sending text and data values back and forth from a pc.
-Note: WiFi is slow! I have only been able to send data up to 20 times per second reliably.
+WifiDebug.cpp
+See header for details
 */
 #include <WiFiNINA.h>
 #include <String.h>
-
 #include "include/WifiDebug.h"
 #include "include/util.h"
 
@@ -13,9 +11,9 @@ Note: WiFi is slow! I have only been able to send data up to 20 times per second
 WiFiServer server(PORT);
 WiFiClient client;
 
-
+//Sets up the Wifi hotspot
 void WifiDebug::SetupHotspot() {
-  // serup wifi hotspot
+  // setup wifi hotspot
   Serial.print("Creating access point named: ");
   Serial.println(SSID);
   WiFi.beginAP(SSID, PASSWORD);
@@ -24,6 +22,7 @@ void WifiDebug::SetupHotspot() {
   Serial.println("created wifi hotspot");
 }
 
+//sends a message to the PC
 void WifiDebug::SendMessage(String msg){
   //sends a message to the PC
   if (client && client.connected()){ // checks if client is connected
@@ -31,6 +30,7 @@ void WifiDebug::SendMessage(String msg){
   }
 }
 
+//checks for messages from the pc and returns one if avaliable. returns "" if none availiable
 String WifiDebug::ReadCommand() { //checks for messages from the pc and returns one if avaliable.
   if(newLine){//resets currentLine if true, to start reading a new message
     currentLine="";

@@ -10,7 +10,7 @@ PURPOSE={
 }
 
 LOCATION={
-    0:"START_SQUARE",
+    0:"SQUARE",
     1:"DROPOFF_SIDE",
     2:"RAMP",
     3:"COLLECTION_SIDE",

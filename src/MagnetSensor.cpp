@@ -1,16 +1,23 @@
+/*
+MagnetSensor.cpp
+See header file for description
+*/
+
 #include <Wire.h>
 #include "include/MagnetSensor.h"
 #include "include/util.h"
 
+
+//Sets up magnet sensor input pin
 void MagnetSensor::sensorSetup(){
     pinMode(MAGNET_SENSOR_PIN,INPUT);
 }
 
-bool MagnetSensor::MagnetDetected(){//must be called constatly
+//Called continuously, returns true if a magnet has been detected in the last 5 seconds
+bool MagnetSensor::MagnetDetected(){
     if (digitalRead(MAGNET_SENSOR_PIN) == LOW)
     {
         detected_magnet_countdown-=1;
-        
     }
     if (digitalRead(MAGNET_SENSOR_PIN) == HIGH)
     {
